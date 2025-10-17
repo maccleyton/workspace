@@ -1001,3 +1001,130 @@ Eixo E — Construção e Gerenciamento da Carreira
 	E4. Plano de Carreira e Negociação: Como planejar sua progressão (Júnior, Pleno, Sênior, Especialista, Gestão), definir metas e negociar salários e promoções de forma eficaz.
 
 ---
+
+
+### **Novo Plano de Estudos Mestre por Linguagem**
+
+***
+### **1. Linguagem Mestre: HTML - A Estrutura da Web**
+Este plano de estudos é projetado para levar um iniciante do zero ao domínio completo do HTML, não apenas como uma linguagem de marcação, mas como a espinha dorsal de documentos acessíveis, otimizados para SEO e prontos para aplicações web complexas.
+
+*   **Eixo A: Sintaxe e Estrutura Fundamental**
+    *   **Nível 1 (Fundamentos)**: Estrutura básica de um documento (`<!DOCTYPE>`, `<html>`, `<head>`, `<body>`), tags de texto essenciais (`<h1>`-`<h6>`, `<p>`), links (`<a>`) e imagens (`<img>`).[2][9]
+    *   **Nível 2 (Intermediário)**: Listas (`<ul>`, `<ol>`, `<dl>`), tabelas (`<table>`, `<tr>`, `<td>`, `<th>`), e atributos globais (`id`, `class`, `style`, `data-*`).[9]
+    *   **Nível 3 (Avançado)**: Organização de conteúdo com `<div>` e `<span>`, e o conceito de tags de bloco vs. em linha.
+    *   **Nível 4 (Expert)**: Entendimento profundo do DOM (Document Object Model) como uma árvore de nós e a diferença entre o HTML fonte e o DOM renderizado.
+
+*   **Eixo B: Semântica e Acessibilidade (A11y)**
+    *   **Nível 1 (Fundamentos)**: Introdução à semântica e por que usar tags significativas. Uso do atributo `alt` para imagens.[2][9]
+    *   **Nível 2 (Intermediário)**: Estruturação de layouts com tags semânticas do HTML5 (`<header>`, `<footer>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<aside>`).[2]
+    *   **Nível 3 (Avançado)**: Acessibilidade avançada com atributos ARIA (`role`, `aria-label`, `aria-hidden`) para criar componentes dinâmicos e acessíveis.[4]
+    *   **Nível 4 (Expert)**: Implementação de microdados com Schema.org (`itemscope`, `itemtype`) para criar Rich Snippets e otimizar a interpretação do conteúdo por motores de busca.[4]
+
+*   **Eixo C: Formulários e Conteúdo Interativo**
+    *   **Nível 1 (Fundamentos)**: Criação de formulários simples com `<form>`, `<input>` (tipos `text`, `password`), `<label>` e `<button>`.[9]
+    *   **Nível 2 (Intermediário)**: Uso de elementos de formulário complexos (`<textarea>`, `<select>`, `checkbox`, `radio`), e validação de formulário nativa do HTML5 (`required`, `pattern`).[1]
+    *   **Nível 3 (Avançado)**: Incorporação de multimídia com `<audio>` e `<video>` e seus atributos. Uso da tag `<picture>` para direção de arte em imagens.[9]
+    *   **Nível 4 (Expert)**: APIs de HTML5 para interatividade, como Canvas para desenho 2D, e Drag and Drop API.
+
+*   **Eixo D: Integração e Performance**
+    *   **Nível 1 (Fundamentos)**: Integração de folhas de estilo CSS (`<link>`) e scripts JavaScript (`<script>`).
+    *   **Nível 2 (Intermediário)**: Otimização de metadados no `<head>` para SEO e redes sociais (Open Graph).
+    *   **Nível 3 (Avançado)**: Otimização de carregamento de scripts com os atributos `async` e `defer`.
+    *   **Nível 4 (Expert)**: Técnicas avançadas de performance como `preload` e `prefetch`, e o conceito de Web Components (Shadow DOM, Custom Elements) para criar componentes encapsulados e reutilizáveis.
+
+***
+### **2. Linguagem Mestre: CSS - A Arte da Estilização Web**
+Este plano de estudos abrange o CSS desde as regras básicas de cores e fontes até a criação de layouts complexos, animações fluidas e arquiteturas de estilo para projetos de grande escala.
+
+*   **Eixo A: Fundamentos, Seletores e a Cascata**
+    *   **Nível 1 (Fundamentos)**: Sintaxe básica do CSS, formas de aplicação (inline, interno, externo), e seletores fundamentais (tipo, classe, id).[5]
+    *   **Nível 2 (Intermediário)**: O Box Model (`margin`, `border`, `padding`, `content`), unidades de medida (`px`, `em`, `rem`, `%`) e o conceito de especificidade.[5]
+    *   **Nível 3 (Avançado)**: Seletores avançados (pseudo-classes e pseudo-elementos), combinadores (`>`, `+`, `~`) e o uso de `box-sizing: border-box`.
+    *   **Nível 4 (Expert)**: Domínio completo da cascata, herança, e o uso de `!important` (e por que evitá-lo). Entendimento do colapso de margens (`margin collapsing`).
+
+*   **Eixo B: Layout e Design Responsivo**
+    *   **Nível 1 (Fundamentos)**: Controle de layout com `display` (`block`, `inline`, `inline-block`) e `position` (`static`, `relative`, `absolute`).
+    *   **Nível 2 (Intermediário)**: Criação de layouts unidimensionais com **Flexbox**, dominando suas propriedades de contêiner e de item.
+    *   **Nível 3 (Avançado)**: Criação de layouts bidimensionais complexos com **CSS Grid**.
+    *   **Nível 4 (Expert)**: Implementação de Design Responsivo com **Media Queries** e a abordagem "Mobile First". Técnicas de layout intrinsecamente responsivas.
+
+*   **Eixo C: Efeitos Visuais e Animações**
+    *   **Nível 1 (Fundamentos)**: Estilização de texto (tipografia), cores (HEX, RGB, HSL) e backgrounds (imagens, gradientes).
+    *   **Nível 2 (Intermediário)**: Efeitos visuais com `transform` (`translate`, `rotate`, `scale`), `box-shadow` e `filter`.
+    *   **Nível 3 (Avançado)**: Criação de animações fluidas com `transition` para mudanças de estado e `@keyframes` para animações complexas.
+    *   **Nível 4 (Expert)**: Otimização de performance de animações (usando `transform` e `opacity`), e o uso da propriedade `will-change`.
+
+*   **Eixo D: Arquitetura e Ferramentas Modernas**
+    *   **Nível 1 (Fundamentos)**: Organização básica do CSS em múltiplos arquivos.
+    *   **Nível 2 (Intermediário)**: Uso de Variáveis CSS (Custom Properties) para criar temas e manter a consistência do design.
+    *   **Nível 3 (Avançado)**: Introdução a metodologias de arquitetura CSS como **BEM** (Block, Element, Modifier) para organizar classes em projetos grandes.
+    *   **Nível 4 (Expert)**: Uso de pré-processadores como **Sass/SCSS** para adicionar lógica (loops, condicionais, mixins) ao CSS. Comparativo com a abordagem moderna de frameworks "Utility-First" como **Tailwind CSS**.
+
+***
+### **3. Linguagem Mestre: JavaScript - O Canivete Suíço da Programação**
+O JavaScript deixou de ser apenas a linguagem do frontend. Este plano mostrará como dominar o JavaScript para construir praticamente qualquer tipo de aplicação.
+
+*   **Eixo A: Fundamentos da Linguagem e Lógica**
+    *   Foco no JavaScript "puro" (Vanilla JS), entendendo o motor da linguagem, tipos de dados, escopo, `this`, programação assíncrona (callbacks, Promises, async/await) e manipulação básica do DOM.
+
+*   **Eixo B: Desenvolvimento Web Frontend**
+    *   Aplicação do JavaScript para criar interfaces web ricas e interativas. Abordará o ecossistema moderno, incluindo um framework popular como o **React**, gerenciamento de estado e otimização de performance no navegador.
+
+*   **Eixo C: Desenvolvimento Web Backend**
+    *   Uso do **Node.js** para levar o JavaScript para o lado do servidor. Construção de APIs RESTful com **Express**, comunicação com bancos de dados e autenticação.
+
+*   **Eixo D: Além da Web - Desktop e Mobile**
+    *   Explorando a versatilidade máxima do JavaScript para criar aplicações para outras plataformas, como aplicativos desktop com **Electron** e aplicativos mobile com **React Native**.
+
+***
+### **4. Linguagem Mestre: Python - A Linguagem da Produtividade e dos Dados**
+Este plano mostrará por que o Python é a linguagem preferida para startups, análise de dados e automação, cobrindo desde scripts simples até inteligência artificial.
+
+*   **Eixo A: Fundamentos da Linguagem e Scripting**
+    *   Domínio da sintaxe elegante do Python, suas estruturas de dados (listas, dicionários), programação orientada a objetos e a criação de scripts para automação de tarefas do dia a dia.
+
+*   **Eixo B: Desenvolvimento Web Backend**
+    *   Construção de aplicações web e APIs robustas utilizando um framework de alta produtividade como o **Django**, abordando ORMs, painel de administração e segurança.
+
+*   **Eixo C: Ciência de Dados e Machine Learning**
+    *   Análise do ecossistema que faz do Python o líder em dados. Uso de bibliotecas como **Pandas** para manipulação, **Matplotlib/Seaborn** para visualização e **Scikit-learn** para criar modelos de machine learning.
+
+*   **Eixo D: Automação e Aplicações Diversas**
+    *   Exploração de nichos onde o Python brilha, como web scraping (com BeautifulSoup/Scrapy), automação de sistemas e criação de aplicações desktop simples (com Tkinter/PyQt).
+
+***
+### **5. Linguagem Mestre: C++ - A Linguagem da Performance e do Controle**
+Focado em alta performance, este plano de estudos mergulhará no controle de baixo nível que o C++ oferece, essencial para jogos, sistemas embarcados e software que exige velocidade máxima.
+
+*   **Eixo A: Fundamentos da Linguagem e Gerenciamento de Memória**
+    *   Domínio da sintaxe, ponteiros, e o mais importante, o gerenciamento de memória moderno com RAII e Smart Pointers (`unique_ptr`, `shared_ptr`), além de uma introdução à Standard Template Library (STL).
+
+*   **Eixo B: Desenvolvimento de Software de Alta Performance**
+    *   Foco em otimização, programação concorrente (multithreading), e design de sistemas eficientes. Uso de ferramentas de profiling para identificar e eliminar gargalos.
+
+*   **Eixo C: Desenvolvimento de Jogos e Gráficos**
+    *   Introdução ao desenvolvimento de jogos, seja através da integração com uma engine como a **Unreal Engine** (que usa C++ como sua linguagem de scripting principal) ou do uso de bibliotecas gráficas como **OpenGL/Vulkan** para criar renderizadores do zero.
+
+*   **Eixo D: Sistemas Embarcados e de Tempo Real**
+    *   Aplicação do C++ em ambientes com recursos limitados, como microcontroladores (IoT), robótica e sistemas onde a previsibilidade e a latência são críticas.
+
+***
+### **6. Linguagem Mestre: Dart com Flutter - A Solução Moderna para UI Multiplataforma**
+Este plano se concentrará no ecossistema do Google para criar, a partir de uma única base de código, aplicativos bonitos e compilados nativamente para mobile, web e desktop.
+
+*   **Eixo A: Fundamentos da Linguagem Dart e do Flutter**
+    *   Domínio completo da linguagem Dart e da filosofia de UI declarativa do Flutter. Foco em widgets, layouts, gerenciamento de estado local e a arquitetura fundamental.
+
+*   **Eixo B: Desenvolvimento de Aplicações Mobile (iOS e Android)**
+    *   O principal caso de uso do Flutter. Construção de um aplicativo mobile completo, cobrindo gerenciamento de estado avançado (BLoC/Riverpod), consumo de APIs, persistência de dados e acesso a recursos nativos.
+
+*   **Eixo C: Expansão para Web e Desktop**
+    *   Exploração de como adaptar e compilar a mesma base de código Flutter para rodar como um Progressive Web App (PWA) em navegadores e como uma aplicação nativa em Windows, macOS e Linux.
+
+*   **Eixo D: Ecossistema Avançado e Backend as a Service (BaaS)**
+    *   Aprofundamento em tópicos como animações complexas, testes e integração com serviços de Backend as a Service (BaaS) como **Firebase** ou **Supabase**, que complementam perfeitamente o desenvolvimento com Flutter.
+
+***
+
+
