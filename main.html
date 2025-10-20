@@ -25,8 +25,26 @@
 
   <!-- header -->
   <div class="header">
-    <div class="logo">Cosmos</div>
-    <div class="title">Editor de Textos Científicos</div>
+    <div class="logo">
+		<!--<img src="./assets/logo/cosmos.png" width="50" height="50" alt="Logo Cosmos" />-->
+		Cosmos</div>
+    <div class="title"></div>
+
+    <div class="actions">
+      <button class="top-btn" id="saveBtn"><img src="./assets/icons/save_as.svg" alt="Salvar" />&nbsp;Salvar</button>
+      <button class="top-btn" id="exportBtn"><span class="material-icon">file_download</span>&nbsp;Exportar</button>
+      <button class="top-btn" id="publishBtn"><span class="material-icon">cloud_upload</span>&nbsp;Publicar</button>	  
+    </div>
+	
+    <div class="sep"></div>
+	
+	<div class="group">
+      <div class="icon-btn" id="formatLatexBtn" title="Formatar LaTeX"><span class="material-icon">functions</span></div>
+      <div class="icon-btn" id="formatCodeBtn" title="Formatar Código"><span class="material-icon">code</span></div>
+      <div class="icon-btn" id="saveBtn" title="Salvar"><span class="material-icon">save_as</span></div>
+      <div class="icon-btn" id="publishBtn" title="Publicar"><span class="material-icon">cloud_upload</span></div>
+      <div class="icon-btn" id="configBtn" title="Configurações"><span class="material-icon">settings</span></div>
+	</div>
   </div>
 
   <!-- toolbar -->
@@ -82,15 +100,6 @@
       <div class="icon-btn" id="exportBtn" title="Exportar como PDF"><span class="material-icon">picture_as_pdf</span></div>
 	</div>
   
-    <div class="sep"></div>
-	
-	<div class="group">
-      <div class="icon-btn" id="formatLatexBtn" title="Formatar LaTeX"><span class="material-icon">functions</span></div>
-      <div class="icon-btn" id="formatCodeBtn" title="Formatar Código"><span class="material-icon">code</span></div>
-      <div class="icon-btn" id="saveBtn" title="Salvar"><span class="material-icon">save_as</span></div>
-      <div class="icon-btn" id="publishBtn" title="Publicar"><span class="material-icon">cloud_upload</span></div>
-      <div class="icon-btn" id="configBtn" title="Configurações"><span class="material-icon">settings</span></div>
-	</div>
   </div>
 
   <!-- main area -->

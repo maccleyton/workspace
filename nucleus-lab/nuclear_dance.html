@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nuclear Dance — Crie Elementos</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #0b0c1a;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e6e6ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    h1 {
+      color: #4fc3f7;
+      font-size: 2.2em;
+      margin-bottom: 8px;
+    }
+
+    .info {
+      color: #bbdefb;
+      text-align: center;
+      max-width: 600px;
+      margin: 10px auto;
+      font-size: 0.95em;
+      line-height: 1.6;
+    }
+
+    .controls {
+      margin: 15px 0;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      background: #4fc3f7;
+      color: #0b0c1a;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-family: 'Segoe UI', sans-serif;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background: #29b6f6;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .status {
+      color: #81d4fa;
+      font-weight: bold;
+      margin: 12px 0;
+      min-height: 24px;
+      text-align: center;
+      background: #1e1f35;
+      padding: 8px 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      white-space: pre-line;
+    }
+
+    canvas {
+      background: #0d0e20;
+      border: 1px solid #2a2d45;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      margin: 10px auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nuclear Dance</h1>
+  <p class="info">Arraste prótons (+1) e nêutrons (0) para formar um núcleo.<br>
+  Equilibre-os. O universo decidirá se ele pode existir.</p>
+
+  <div class="controls">
+    <button id="add-proton">+ Próton (+1)</button>
+    <button id="add-neutron">+ Nêutron (0)</button>
+    <button id="reset">Limpar</button>
+  </div>
+
+  <div class="status" id="status">Esperando o primeiro átomo...</div>
+  <canvas id="canvas" width="600" height="400"></canvas>
+
+  <script>
+    // --- O SEU CÓDIGO JAVASCRIPT PERMANECE EXATAMENTE IGUAL ---
+    // (mantive tudo intacto — só o visual foi atualizado)
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+
+    let particles = [];
+    let selected = null;
+    let lastTime = 0;
+
+    // Configurações
+    const PROTON_COLOR = '#FFD700';
+    const NEUTRON_COLOR = '#AAAAAA';
+    const STABLE_COLOR = '#4caf50'; // Agora verde suave (como no NUCLEUS LAB)
+    const UNSTABLE_COLOR = '#f44336'; // Vermelho mais elegante
+    const RADIUS_PROTON = 12;
+    const RADIUS_NEUTRON = 10;
+    const STRONG_FORCE_RANGE = 50;
+    const REPULSION_STRENGTH = 0.05;
+    const BINDING_STRENGTH = 0.01;
+
+    // Elementos estáveis (Z, N, nome)
+    const STABLE_NUCLEI = [
+      { Z: 1, N: 0, name: "Hidrogênio-1", stable: true },
+      { Z: 2, N: 2, name: "Hélio-4", stable: true },
+      { Z: 6, N: 6, name: "Carbono-12", stable: true },
+      { Z: 8, N: 8, name: "Oxigênio-16", stable: true },
+      { Z: 26, N: 30, name: "Ferro-56", stable: true },
+      { Z: 92, N: 146, name: "Urânio-238", stable: true },
+      { Z: 118, N: 176, name: "Oganessôn-294", stable: false }
+    ];
+
+    function addParticle(type, x, y) {
+      particles.push({
+        type,
+        x,
+        y,
+        vx: 0,
+        vy: 0,
+        radius: type === 'proton' ? RADIUS_PROTON : RADIUS_NEUTRON,
+        color: type === 'proton' ? PROTON_COLOR : NEUTRON_COLOR
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let p of particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+
+        ctx.strokeStyle = p.type === 'proton' ? '#FFF' : '#DDD';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '10px "Segoe UI"';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.type === 'proton' ? '+1' : '0', p.x, p.y);
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+
+          if (dist < STRONG_FORCE_RANGE) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = 'rgba(100, 200, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      checkStability();
+    }
+
+    function checkStability() {
+      const protons = particles.filter(p => p.type === 'proton').length;
+      const neutrons = particles.filter(p => p.type === 'neutron').length;
+      const total = protons + neutrons;
+
+      if (total === 0) {
+        statusEl.textContent = "Esperando o primeiro átomo...";
+        return;
+      }
+
+      const idealNeutrons = protons * 1.2;
+      const minN = idealNeutrons - 2;
+      const maxN = idealNeutrons + 2;
+
+      if (neutrons >= minN && neutrons <= maxN) {
+        statusEl.textContent = `✅ ESTÁVEL: ${protons} prótons + ${neutrons} nêutrons`;
+        for (let p of particles) p.color = STABLE_COLOR;
+
+        const known = STABLE_NUCLEI.find(n => n.Z === protons && n.N === neutrons);
+        if (known) {
+          statusEl.textContent = `🌟 ${known.name}!`;
+          if (known.name === "Oganessôn-294") {
+            statusEl.innerHTML = `🌠 OGANESSÔN-294<br>O universo ainda não sabe se pode sustentá-lo...`;
+            for (let p of particles) p.color = '#FFF';
+          }
+        }
+      } else {
+        statusEl.textContent = `❌ INSTÁVEL: precisa de ~${idealNeutrons.toFixed(1)} nêutrons`;
+        for (let p of particles) p.color = UNSTABLE_COLOR;
+      }
+    }
+
+    function update(time) {
+      const deltaTime = time - lastTime;
+      lastTime = time;
+
+      for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+
+          if (dist < 1) continue;
+
+          if (p1.type === 'proton' && p2.type === 'proton') {
+            const force = REPULSION_STRENGTH / (dist * dist);
+            const fx = (dx / dist) * force;
+            const fy = (dy / dist) * force;
+            p1.vx -= fx;
+            p1.vy -= fy;
+            p2.vx += fx;
+            p2.vy += fy;
+          }
+
+          if (dist < STRONG_FORCE_RANGE) {
+            const force = BINDING_STRENGTH;
+            const fx = (dx / dist) * force;
+            const fy = (dy / dist) * force;
+            p1.vx += fx;
+            p1.vy += fy;
+            p2.vx -= fx;
+            p2.vy -= fy;
+          }
+        }
+
+        p1.x += p1.vx;
+        p1.y += p1.vy;
+        p1.vx *= 0.98;
+        p1.vy *= 0.98;
+
+        if (p1.x < p1.radius) p1.x = p1.radius;
+        if (p1.x > canvas.width - p1.radius) p1.x = canvas.width - p1.radius;
+        if (p1.y < p1.radius) p1.y = p1.radius;
+        if (p1.y > canvas.height - p1.radius) p1.y = canvas.height - p1.radius;
+      }
+
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        const dx = x - p.x;
+        const dy = y - p.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < p.radius) {
+          selected = p;
+          break;
+        }
+      }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!selected) return;
+      const rect = canvas.getBoundingClientRect();
+      selected.x = e.clientX - rect.left;
+      selected.y = e.clientY - rect.top;
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      selected = null;
+    });
+
+    document.getElementById('add-proton').addEventListener('click', () => {
+      addParticle('proton', canvas.width/2, canvas.height/2);
+    });
+
+    document.getElementById('add-neutron').addEventListener('click', () => {
+      addParticle('neutron', canvas.width/2, canvas.height/2);
+    });
+
+    document.getElementById('reset').addEventListener('click', () => {
+      particles = [];
+      statusEl.textContent = "Esperando o primeiro átomo...";
+    });
+
+    requestAnimationFrame(update);
+  </script>
+</body>
+</html>

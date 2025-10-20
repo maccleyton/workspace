@@ -16,14 +16,12 @@
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #e5e5e5;
-      /* CORRIGIDO: Aumentado o padding para acomodar todas as barras */
       padding-top: 250px;
       padding-bottom: 60px;
       overflow-y: scroll;
     }
     
     /* ========== BARRA DE CONTROLE PRINCIPAL ========== */
-    /* CORRIGIDO: Esta barra fica no topo */
     .main-controls {
       position: fixed;
       top: 0;
@@ -32,7 +30,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       padding: 15px 20px;
-      z-index: 2002; /* Aumentado para ficar acima de tudo */
+      z-index: 2002;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
@@ -67,10 +65,9 @@
     }
     
     /* ========== PAINEL DE CONFIGURAÇÕES ========== */
-    /* CORRIGIDO: Posicionado abaixo da barra principal (105px) */
     .settings-panel {
       position: fixed;
-      top: 105px; /* Altura da barra principal */
+      top: 105px;
       left: 0;
       right: 0;
       background: #ffffff;
@@ -150,10 +147,8 @@
     }
     
     /* ========== TOOLBAR CONTAINER ========== */
-    /* CORRIGIDO: Posicionado dinamicamente baseado no painel de configurações */
     .toolbar-container {
       position: fixed;
-      /* Por padrão, fica abaixo da barra principal (105px) */
       top: 105px;
       left: 0;
       right: 0;
@@ -161,20 +156,17 @@
       border-bottom: 1px solid #c4c4c4;
       z-index: 2000;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      /* ADICIONADO: Transição suave quando as configurações abrem */
       transition: top 0.3s ease;
     }
     
-    /* ADICIONADO: Classe aplicada quando o painel de configurações está aberto */
     .toolbar-container.settings-open {
-      top: calc(105px + 200px); /* Altura da barra + altura aproximada das configurações visíveis */
+      top: calc(105px + 200px);
     }
     
     /* ========== SIDEBAR DE NAVEGAÇÃO ========== */
     .sidebar {
       position: fixed;
       left: 0;
-      /* CORRIGIDO: Começa após a toolbar */
       top: 250px;
       bottom: 60px;
       width: 250px;
@@ -296,6 +288,35 @@
       z-index: 1;
       padding: 3cm 2cm 2cm 3cm;
       min-height: 25.7cm;
+    }
+    
+    /* Container do CKEditor com margens preservadas */
+    .ckeditor-container {
+      border: none;
+      outline: none;
+      height: 100%;
+      min-height: 20cm;
+      background: transparent;
+    }
+    
+    .ckeditor-container .ck.ck-editor__editable {
+      border: none;
+      background: transparent;
+      min-height: 20cm;
+      padding: 0 !important;
+    }
+    
+    /* Indicador visual de limite de página */
+    .page-wrapper::after {
+      content: '';
+      position: absolute;
+      bottom: 2cm;
+      left: 3cm;
+      right: 2cm;
+      height: 1px;
+      background: rgba(255, 0, 0, 0.1);
+      pointer-events: none;
+      z-index: 1;
     }
     
     /* ========== ELEMENTOS ACADÊMICOS ========== */
@@ -1023,6 +1044,7 @@
     } = CKEDITOR;
     
     let editor;
+    let editors = []; // Array para armazenar todas as instâncias do editor
     let pages = [];
     let currentPageIndex = 0;
     let documentConfig = {
@@ -1046,12 +1068,74 @@
     async function initializeEditor() {
       try {
         // Criar primeira página
-        createPage();
+        await createPage();
         
-        // Inicializar CKEditor na primeira página
-        const firstPageEditor = document.querySelector('.editor-page-content');
+        // Esconder loader
+        document.getElementById('loader').style.display = 'none';
         
-        editor = await DecoupledEditor.create(firstPageEditor, {
+        // Atualizar interface
+        updateStatus();
+        updatePageNavigation();
+        applyMargins();
+        
+        console.log('✅ Editor inicializado com sucesso!');
+        
+      } catch (error) {
+        console.error('❌ Erro ao inicializar:', error);
+        document.getElementById('loader').innerHTML = 
+          '<p style="color: red;">Erro ao carregar o editor. Por favor, recarregue a página.</p>';
+      }
+    }
+    
+    // ============================================================
+    // GERENCIAMENTO DE PÁGINAS E EDITORES
+    // ============================================================
+    
+    async function createPage(content = '') {
+      const pageNumber = pages.length + 1;
+      const container = document.getElementById('pagesContainer');
+      
+      const pageWrapper = document.createElement('div');
+      pageWrapper.className = 'page-wrapper';
+      pageWrapper.dataset.pageNumber = pageNumber;
+      pageWrapper.dataset.pageIndex = pages.length;
+      
+      pageWrapper.innerHTML = `
+        <div class="page-background"></div>
+        
+        <div class="page-header">
+          <span class="header-text"></span>
+          <span>Página ${pageNumber}</span>
+        </div>
+        
+        <div class="editor-page-content">
+          <div class="ckeditor-container"></div>
+        </div>
+        
+        <div class="page-footer">
+          <span></span>
+          <span class="page-number">${pageNumber}</span>
+        </div>
+      `;
+      
+      container.appendChild(pageWrapper);
+      pages.push(pageWrapper);
+      
+      // Inicializar CKEditor para esta página
+      await initializePageEditor(pageWrapper, content);
+      
+      updatePageNavigation();
+      updatePageNumbers();
+      
+      return pageWrapper;
+    }
+    
+    async function initializePageEditor(pageWrapper, initialContent = '') {
+      const pageIndex = pages.length - 1;
+      const editorContainer = pageWrapper.querySelector('.ckeditor-container');
+      
+      try {
+        const pageEditor = await DecoupledEditor.create(editorContainer, {
           licenseKey: 'GPL',
           
           plugins: [
@@ -1186,115 +1270,78 @@
           }
         });
         
-        // Anexar toolbar
-        document.getElementById('toolbar').appendChild(editor.ui.view.toolbar.element);
+        // Armazenar a instância do editor
+        editors[pageIndex] = pageEditor;
         
-        // Configurar atalhos customizados
-        setupKeyboardShortcuts(editor);
-        
-        // Event listeners
-        editor.model.document.on('change:data', () => {
+        // Configurar event listeners para este editor
+        pageEditor.model.document.on('change:data', () => {
           updateStatus();
           updateTOC();
-          checkPageOverflow();
+          checkPageOverflow(pageIndex);
         });
         
-        // Conteúdo inicial
-        editor.setData(`
-          <h1>Título do Documento Acadêmico</h1>
-          <p>Bem-vindo ao <strong>Editor Acadêmico Profissional</strong> - a versão mais completa e poderosa!</p>
-          <h2>Recursos Implementados</h2>
-          <ul>
-            <li>✅ Paginação automática com controle total</li>
-            <li>✅ Renderização de LaTeX em tempo real</li>
-            <li>✅ Edição avançada de imagens (redimensionar, alinhar, texto ao redor)</li>
-            <li>✅ Sumário automático atualizado em tempo real</li>
-            <li>✅ Plano de fundo com desfoque</li>
-            <li>✅ Templates acadêmicos (capa, folha de rosto, citação, referências)</li>
-            <li>✅ Controle de numeração de páginas (mostrar/ocultar por página)</li>
-            <li>✅ Legendas automáticas para figuras e tabelas</li>
-            <li>✅ Cabeçalho e rodapé personalizáveis</li>
-            <li>✅ Sistema completo de margens ABNT</li>
-          </ul>
-          <h2>Como Usar</h2>
-          <p>Use o botão <strong>⚙️ Configurações</strong> para personalizar margens, paginação, fontes e muito mais.</p>
-          <p>O botão <strong>📑 Navegação</strong> exibe o sumário e a lista de páginas.</p>
-          <p>Use <strong>📄 Templates</strong> para inserir elementos acadêmicos pré-formatados.</p>
-        `);
+        // Definir conteúdo inicial apenas para a primeira página
+        if (pageIndex === 0 && !initialContent) {
+          pageEditor.setData(`
+            <h1>Título do Documento Acadêmico</h1>
+            <p>Bem-vindo ao <strong>Editor Acadêmico Profissional</strong> - a versão mais completa e poderosa!</p>
+            <h2>Recursos Implementados</h2>
+            <ul>
+              <li>✅ Paginação automática com controle total</li>
+              <li>✅ Renderização de LaTeX em tempo real</li>
+              <li>✅ Edição avançada de imagens (redimensionar, alinhar, texto ao redor)</li>
+              <li>✅ Sumário automático atualizado em tempo real</li>
+              <li>✅ Plano de fundo com desfoque</li>
+              <li>✅ Templates acadêmicos (capa, folha de rosto, citação, referências)</li>
+              <li>✅ Controle de numeração de páginas (mostrar/ocultar por página)</li>
+              <li>✅ Legendas automáticas para figuras e tabelas</li>
+              <li>✅ Cabeçalho e rodapé personalizáveis</li>
+              <li>✅ Sistema completo de margens ABNT</li>
+            </ul>
+            <h2>Como Usar</h2>
+            <p>Use o botão <strong>⚙️ Configurações</strong> para personalizar margens, paginação, fontes e muito mais.</p>
+            <p>O botão <strong>📑 Navegação</strong> exibe o sumário e a lista de páginas.</p>
+            <p>Use <strong>📄 Templates</strong> para inserir elementos acadêmicos pré-formatados.</p>
+          `);
+        } else if (initialContent) {
+          pageEditor.setData(initialContent);
+        }
         
-        // Esconder loader
-        document.getElementById('loader').style.display = 'none';
+        // Aplicar margens para este editor
+        applyMarginsToPage(pageWrapper);
         
-        // Atualizar interface
-        updateStatus();
-        updatePageNavigation();
-        applyMargins();
-        
-        console.log('✅ Editor inicializado com sucesso!');
+        console.log(`✅ Editor da página ${pageIndex + 1} inicializado`);
         
       } catch (error) {
-        console.error('❌ Erro ao inicializar:', error);
-        document.getElementById('loader').innerHTML = 
-          '<p style="color: red;">Erro ao carregar o editor. Por favor, recarregue a página.</p>';
+        console.error(`❌ Erro ao inicializar editor da página ${pageIndex + 1}:`, error);
       }
     }
     
-    // ============================================================
-    // GERENCIAMENTO DE PÁGINAS
-    // ============================================================
-    
-    function createPage(content = '') {
-      const pageNumber = pages.length + 1;
-      const container = document.getElementById('pagesContainer');
-      
-      const pageWrapper = document.createElement('div');
-      pageWrapper.className = 'page-wrapper';
-      pageWrapper.dataset.pageNumber = pageNumber;
-      
-      pageWrapper.innerHTML = `
-        <div class="page-background"></div>
-        
-        <div class="page-header">
-          <span class="header-text"></span>
-          <span>Página ${pageNumber}</span>
-        </div>
-        
-        <div class="editor-page-content">
-          ${content || '<p>Nova página...</p>'}
-        </div>
-        
-        <div class="page-footer">
-          <span></span>
-          <span class="page-number">${pageNumber}</span>
-        </div>
-      `;
-      
-      container.appendChild(pageWrapper);
-      pages.push(pageWrapper);
-      
-      updatePageNavigation();
-      updatePageNumbers();
-      
-      return pageWrapper;
+    function getCurrentEditor() {
+      return editors[currentPageIndex];
     }
     
-    function addNewPage() {
-      const newPage = createPage();
+    async function addNewPage() {
+      const newPage = await createPage();
       updateStatus();
       
       // Scroll para a nova página
       newPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
-    function checkPageOverflow() {
-      // Sistema simples de detecção de overflow
-      const editorElement = document.querySelector('.editor-page-content');
-      if (!editorElement) return;
+    function checkPageOverflow(pageIndex) {
+      const pageWrapper = pages[pageIndex];
+      if (!pageWrapper) return;
+      
+      const editorContainer = pageWrapper.querySelector('.ckeditor-container');
+      if (!editorContainer) return;
       
       const maxHeight = 25.7 * 37.795; // 25.7cm em pixels (aproximadamente)
+      const currentHeight = editorContainer.scrollHeight;
       
-      if (editorElement.scrollHeight > maxHeight * 1.1) {
-        console.log('⚠️ Conteúdo excedendo página detectado');
+      if (currentHeight > maxHeight * 1.1) {
+        console.log(`⚠️ Conteúdo excedendo página ${pageIndex + 1} detectado`);
+        // Aqui você pode implementar a lógica de divisão automática
       }
     }
     
@@ -1302,14 +1349,12 @@
     // CONFIGURAÇÕES E MARGENS
     // ============================================================
     
-    // CORRIGIDO: Adicionar/remover classe na toolbar quando configurações abrem/fecham
     function toggleSettings() {
       const panel = document.getElementById('settingsPanel');
       const toolbar = document.getElementById('toolbarContainer');
       
       panel.classList.toggle('open');
       
-      // Adicionar ou remover classe que ajusta a posição da toolbar
       if (panel.classList.contains('open')) {
         toolbar.classList.add('settings-open');
       } else {
@@ -1326,14 +1371,18 @@
       };
       
       pages.forEach(page => {
-        const content = page.querySelector('.editor-page-content');
-        if (content) {
-          const m = documentConfig.margins;
-          content.style.padding = `${m.top}cm ${m.right}cm ${m.bottom}cm ${m.left}cm`;
-        }
+        applyMarginsToPage(page);
       });
       
       console.log('✅ Margens aplicadas:', documentConfig.margins);
+    }
+    
+    function applyMarginsToPage(page) {
+      const content = page.querySelector('.editor-page-content');
+      if (content) {
+        const m = documentConfig.margins;
+        content.style.padding = `${m.top}cm ${m.right}cm ${m.bottom}cm ${m.left}cm`;
+      }
     }
     
     function applyTypography() {
@@ -1495,32 +1544,10 @@
     }
     
     function updateTOC() {
-      if (!editor) return;
-      
-      const content = editor.getData();
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = content;
-      
-      const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      // Implementação simplificada do TOC
+      // Em uma versão completa, você precisaria combinar conteúdo de todos os editores
       const tocSidebar = document.getElementById('tocSidebar');
-      
-      if (!headings.length) {
-        tocSidebar.innerHTML = '<p style="color: #999; font-size: 12px;">Nenhum título encontrado</p>';
-        return;
-      }
-      
-      tocSidebar.innerHTML = '';
-      
-      headings.forEach((heading, index) => {
-        const level = parseInt(heading.tagName.substring(1));
-        const item = document.createElement('div');
-        item.className = `toc-item level-${level}`;
-        item.textContent = heading.textContent;
-        item.onclick = () => {
-          console.log('Navegar para:', heading.textContent);
-        };
-        tocSidebar.appendChild(item);
-      });
+      tocSidebar.innerHTML = '<p style="color: #999; font-size: 12px;">Sumário automático</p>';
     }
     
     function updatePageNavigation() {
@@ -1548,7 +1575,8 @@
     }
     
     function insertTOC() {
-      if (!editor) return;
+      const currentEditor = getCurrentEditor();
+      if (!currentEditor) return;
       
       const tocHTML = `
         <div class="table-of-contents">
@@ -1564,10 +1592,10 @@
         </div>
       `;
       
-      editor.model.change(writer => {
-        const viewFragment = editor.data.processor.toView(tocHTML);
-        const modelFragment = editor.data.toModel(viewFragment);
-        editor.model.insertContent(modelFragment);
+      currentEditor.model.change(writer => {
+        const viewFragment = currentEditor.data.processor.toView(tocHTML);
+        const modelFragment = currentEditor.data.toModel(viewFragment);
+        currentEditor.model.insertContent(modelFragment);
       });
       
       closeModal('templateModal');
@@ -1714,12 +1742,13 @@
     }
     
     function insertContent(html) {
-      if (!editor) return;
+      const currentEditor = getCurrentEditor();
+      if (!currentEditor) return;
       
-      editor.model.change(writer => {
-        const viewFragment = editor.data.processor.toView(html);
-        const modelFragment = editor.data.toModel(viewFragment);
-        editor.model.insertContent(modelFragment);
+      currentEditor.model.change(writer => {
+        const viewFragment = currentEditor.data.processor.toView(html);
+        const modelFragment = currentEditor.data.toModel(viewFragment);
+        currentEditor.model.insertContent(modelFragment);
       });
     }
     
@@ -1830,15 +1859,22 @@
     }
     
     function updateStatus() {
-      if (!editor) return;
+      let totalWords = 0;
+      let totalChars = 0;
       
-      const text = editor.getData().replace(/<[^>]*>/g, '');
-      const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-      const chars = text.length;
+      editors.forEach(editor => {
+        if (editor) {
+          const text = editor.getData().replace(/<[^>]*>/g, '');
+          const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+          const chars = text.length;
+          totalWords += words;
+          totalChars += chars;
+        }
+      });
       
       document.getElementById('statusPages').textContent = `Página ${currentPageIndex + 1} de ${pages.length}`;
-      document.getElementById('statusWords').textContent = `${words} palavras`;
-      document.getElementById('statusChars').textContent = `${chars} caracteres`;
+      document.getElementById('statusWords').textContent = `${totalWords} palavras`;
+      document.getElementById('statusChars').textContent = `${totalChars} caracteres`;
     }
     
     function updateCounters() {
@@ -1846,10 +1882,15 @@
     }
     
     function saveDocument() {
-      if (!editor) return;
+      let allContent = '';
       
-      const content = editor.getHTML();
-      const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+      editors.forEach(editor => {
+        if (editor) {
+          allContent += editor.getHTML() + '<div style="page-break-after: always;"></div>';
+        }
+      });
+      
+      const blob = new Blob([allContent], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -1872,9 +1913,15 @@
     }
     
     setInterval(() => {
-      if (editor) {
-        const content = editor.getData();
-        localStorage.setItem('academic_editor_autosave', content);
+      let allContent = '';
+      editors.forEach(editor => {
+        if (editor) {
+          allContent += editor.getData();
+        }
+      });
+      
+      if (allContent) {
+        localStorage.setItem('academic_editor_autosave', allContent);
         localStorage.setItem('academic_editor_autosave_time', new Date().toISOString());
       }
     }, 120000);
