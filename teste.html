@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Botões com Ícones SVG</title>
+  <style>
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="btn" id="btn-home">
+    assets/icons/home.svg</span>
+    Início
+  </button>
+
+  <button class="btn" id="btn-edit">
+    assets/icons/edit.svg</span>
+    Editar
+  </button>
+
+  <button class="btn" id="btn-delete">
+    assets/icons/delete.svg</span>
+    Excluir
+  </button>
+
+  <script>
+    // Carrega os SVGs locais e insere inline
+    document.querySelectorAll('.icon').forEach(async (el) => {
+      const src = el.getAttribute('data-src');
+      const response = await fetch(src);
+      const svgText = await response.text();
+      el.innerHTML = svgText;
+    });
+  </script>
+
+</body>
+</html>

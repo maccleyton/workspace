@@ -804,7 +804,7 @@ Eixo C — Segurança Ofensiva (Offensive Security﻿)
 
 Eixo D — Detecção e Resposta a Incidentes
 	D1. Monitoramento de Segurança e Análise de Logs﻿: O processo de coletar, correlacionar e analisar logs﻿ de múltiplas fontes para detectar atividades suspeitas.
-	E2. Ferramentas SIEM (Security Information and Event Management﻿): Plataformas centralizadas que agregam e analisam dados de segurança para fornecer uma visão unificada e gerar alertas.
+	D2. Ferramentas SIEM (Security Information and Event Management﻿): Plataformas centralizadas que agregam e analisam dados de segurança para fornecer uma visão unificada e gerar alertas.
 	D3. O Ciclo de Vida da Resposta a Incidentes: As fases de Preparação, Detecção e Análise, Contenção, Erradicação e Recuperação, e Lições Aprendidas (Pós-incidente).​
 	D4. Análise Forense Digital: A coleta e análise de evidências digitais após um incidente para determinar a causa raiz, o impacto e a autoria do ataque.
 
