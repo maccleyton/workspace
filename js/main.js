@@ -245,7 +245,7 @@ document.addEventListener('keydown', e=>{
    LaTeX
    ========================== */
 function renderLatex(){
-  MathJax.typesetPromise([document.getElementById('page')]);
+  MathJax.typesetPromise(Array.from(document.querySelectorAll('.page')));
 }
 
 /* ==========================
