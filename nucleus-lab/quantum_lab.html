@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumLab - Laboratório Virtual</title>
+    <style>
+        /* VARIÁVEIS DE CORES E ESTILOS */
+        :root {
+            --cosmic-dark: #0a0a1f;
+            --quantum-blue: #2563eb;
+            --plasma-purple: #8b5cf6;
+            --radioactive-green: #10b981;
+            --fusion-orange: #f59e0b;
+            --lab-white: #f8fafc;
+            --grid-gray: #374151;
+            --danger-red: #ef4444;
+        }
+
+        /* RESET E ESTILOS GLOBAIS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--cosmic-dark) 0%, #1a1a3e 100%);
+            color: var(--lab-white);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* LAYOUT PRINCIPAL */
+        .lab-container {
+            display: grid;
+            grid-template-areas:
+                "header header"
+                "sidebar main"
+                "status status";
+            grid-template-rows: 60px 1fr 80px;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+            gap: 1px;
+        }
+
+        /* HEADER */
+        .header {
+            grid-area: header;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--grid-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--lab-white);
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--lab-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: var(--quantum-blue);
+            border-color: var(--quantum-blue);
+        }
+
+        .nav-tab:hover {
+            background: rgba(37, 99, 235, 0.3);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: var(--lab-white);
+            width: 200px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--lab-white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            grid-area: sidebar;
+            background: rgba(15, 23, 42, 0.8);
+            border-right: 1px solid var(--grid-gray);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--quantum-blue);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tool-list, .instrument-list, .project-list {
+            list-style: none;
+        }
+
+        .tool-item, .instrument-item, .project-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tool-item:hover, .instrument-item:hover, .project-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--quantum-blue);
+        }
+
+        .tool-item.active {
+            background: rgba(37, 99, 235, 0.2);
+            border-left-color: var(--quantum-blue);
+        }
+
+        /* ÁREA PRINCIPAL */
+        .main-content {
+            grid-area: main;
+            background: rgba(10, 10, 31, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visualization-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .atom-canvas {
+            background:
+                radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .atom-display {
+            width: 400px;
+            height: 400px;
+            position: relative;
+        }
+
+        .nucleus {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, var(--fusion-orange), var(--danger-red));
+            border-radius: 50%;
+            box-shadow: 0 0 30px var(--fusion-orange);
+        }
+
+        .electron {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--quantum-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--quantum-blue);
+        }
+
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .reaction-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--grid-gray);
+            border-radius: 10px;
+            padding: 15px;
+            width: 300px;
+            backdrop-filter: blur(10px);
+        }
+
+        .reaction-formula {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--radioactive-green);
+        }
+
+        .reaction-status {
+            font-size: 0.9rem;
+            color: var(--lab-white);
+            opacity: 0.8;
+        }
+
+        /* PAINEL DE STATUS */
+        .status-bar {
+            grid-area: status;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid var(--grid-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--radioactive-green);
+        }
+
+        .status-dot.offline {
+            background: var(--danger-red);
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--lab-white);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .control-btn.primary {
+            background: var(--quantum-blue);
+            border-color: var(--quantum-blue);
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .lab-container {
+                grid-template-areas:
+                    "header"
+                    "main"
+                    "status";
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 1fr 80px;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .nav-tabs {
+                display: none;
+            }
+        }
+
+        /* ANIMAÇÕES DE PARTÍCULAS */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--quantum-blue);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(20px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lab-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🌌</span>
+                <span>QuantumLab</span>
+            </div>
+
+            <div class="nav-tabs">
+                <div class="nav-tab active">⚛️ Nuclear</div>
+                <div class="nav-tab">🧪 Química</div>
+                <div class="nav-tab">🧬 Orgânica</div>
+                <div class="nav-tab">🔥 Termo</div>
+            </div>
+
+            <div class="header-actions">
+                <input type="text" class="search-bar" placeholder="🔍 Buscar experimento...">
+                <button class="icon-btn">👤</button>
+                <button class="icon-btn">⚙️</button>
+            </div>
+        </header>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="section-title">🧪 Ferramentas</div>
+                <ul class="tool-list">
+                    <li class="tool-item active">
+                        <span>🔬</span>
+                        <span>Selecionar Átomo</span>
+                    </li>
+                    <li class="tool-item">
+                        <span>⚡</span>
+                        <span>Adicionar Energia</span>
+                    </li>
+                    <li class="tool-item">
+                        <span>🧲</span>
+                        <span>Campo Magnético</span>
+                    </li>
+                    <li class="tool-item">
+                        <span>🌡️</span>
+                        <span>Controlar Temperatura</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">📊 Instrumentos</div>
+                <ul class="instrument-list">
+                    <li class="instrument-item">
+                        <span>📡</span>
+                        <span>Espectrômetro</span>
+                    </li>
+                    <li class="instrument-item">
+                        <span>☢️</span>
+                        <span>Detector de Radiação</span>
+                    </li>
+                    <li class="instrument-item">
+                        <span>🎚️</span>
+                        <span>Medidor de pH</span>
+                    </li>
+                    <li class="instrument-item">
+                        <span>🌡️</span>
+                        <span>Termômetro</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">💾 Projetos</div>
+                <ul class="project-list">
+                    <li class="project-item">
+                        <span>✅</span>
+                        <span>Experimento Água</span>
+                    </li>
+                    <li class="project-item">
+                        <span>⏳</span>
+                        <span>Fusão Nuclear Test</span>
+                    </li>
+                    <li class="project-item">
+                        <span>📁</span>
+                        <span>Novo Projeto</span>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- ÁREA PRINCIPAL -->
+        <main class="main-content">
+            <div class="visualization-area">
+                <div class="atom-canvas">
+                    <div class="atom-display">
+                        <!-- Órbitas -->
+                        <div class="orbit" style="width: 200px; height: 200px;"></div>
+                        <div class="orbit" style="width: 300px; height: 300px;"></div>
+
+                        <!-- Núcleo -->
+                        <div class="nucleus"></div>
+
+                        <!-- Elétrons (serão animados via JavaScript) -->
+                        <div class="electron" style="top: 50%; left: calc(50% - 100px);"></div>
+                        <div class="electron" style="top: calc(50% - 100px); left: 50%;"></div>
+                    </div>
+                </div>
+
+                <!-- Painel de Reação -->
+                <div class="reaction-panel">
+                    <div class="reaction-formula">
+                        ²H + ³H → ⁴He + n + 17.6 MeV
+                    </div>
+                    <div class="reaction-status">
+                        ✅ Reação de fusão estável
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- PAINEL DE STATUS -->
+        <footer class="status-bar">
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Sistema Online</span>
+                </div>
+                <div class="status-item">
+                    <span>⚛️ Prótons: 1</span>
+                </div>
+                <div class="status-item">
+                    <span>🧬 Elétrons: 1</span>
+                </div>
+                <div class="status-item">
+                    <span>🔥 Energia: 13.6 eV</span>
+                </div>
+            </div>
+
+            <div class="simulation-controls">
+                <div class="status-item">
+                    <span>📏 Escala: 1nm</span>
+                </div>
+                <div class="status-item">
+                    <span>⏱️ Tempo: 1.0x</span>
+                </div>
+                <button class="control-btn">🎬 Gravar</button>
+                <button class="control-btn primary">▶️ Executar</button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Animação básica dos elétrons
+        document.addEventListener('DOMContentLoaded', function() {
+            const electrons = document.querySelectorAll('.electron');
+            let angle = 0;
+
+            function animateElectrons() {
+                angle += 0.02;
+
+                electrons.forEach((electron, index) => {
+                    const orbitRadius = index === 0 ? 100 : 150;
+                    const x = Math.cos(angle + index * Math.PI) * orbitRadius;
+                    const y = Math.sin(angle + index * Math.PI) * orbitRadius;
+
+                    electron.style.transform = `translate(${x}px, ${y}px)`;
+                });
+
+                requestAnimationFrame(animateElectrons);
+            }
+
+            animateElectrons();
+
+            // Interação com as ferramentas
+            const toolItems = document.querySelectorAll('.tool-item');
+            toolItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    toolItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
