@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Cosmos Editor</title>
-<link href="./css/main_fixed.css" rel="stylesheet" type="text/css"/>
+<link href="./css/main.css" rel="stylesheet" type="text/css"/>
 <!-- Material Icons -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -209,10 +209,17 @@
 	<script src="./js/main_fixed.js"></script>
 	<script src="imageLib.js" type="module"></script>
 	<script src="exportLib.js" type="module"></script>
+	<div id="imageGallery">Galeria de Imagens</div>
+	<div id="exportGallery">Galeria de Exportações</div>
+	<div id="formulaLibrary">&lt;!-- Biblioteca de Fórmulas será renderizada aqui --&gt;</div>
 	<script src="formulaLib.js" type="module"></script>
 	<!-- Biblioteca de visualização de Markdown -->
 	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 	<script type="module" src="articleLib.js"></script>
+
+	<!-- Container do visualizador de Markdown -->
+	<div id="markdownViewer" style="padding:24px; background:#fff; color:#000; font-size:16px; line-height:1.6; border-radius:6px; box-shadow:0 0 20px rgba(0,0,0,0.3); margin:24px auto; max-width:800px;">
+	  <!-- O conteúdo Markdown renderizado será exibido aqui -->
 	</div>
 </body>
 </html>

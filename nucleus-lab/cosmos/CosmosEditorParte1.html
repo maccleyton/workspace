@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cosmos Editor - Parte 1</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #grafico {
+      margin: auto;
+      width: 800px;
+      height: 800px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌌 Cosmos Editor</h1>
+
+  <button onclick="gerarUmaFrase()">🧠 Frase Binária</button>
+  <button onclick="gerarPdfCartas()">🃏 Gerar PDF de Cartas</button>
+
+  <div id="grafico"></div>
+
+  <!-- Scripts -->
+  <script src="binary_universe.js"></script>
+  <script src="cartas_binarias.js"></script>
+  <script src="mapa_cosmico.js"></script>
+</body>
+</html>

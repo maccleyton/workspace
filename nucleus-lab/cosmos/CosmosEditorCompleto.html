@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cosmos Editor Completo</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <style>
+    body {
+      background-color: #000;
+      color: #FFD700;
+      font-family: monospace;
+      padding: 20px;
+    }
+    nav {
+      background-color: #111;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      color: #FFD700;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    section {
+      margin-top: 40px;
+      padding: 20px;
+      border-top: 1px solid #333;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #222;
+      color: #FFD700;
+      border: 1px solid #FFD700;
+    }
+    input {
+      padding: 8px;
+      font-size: 16px;
+      width: 300px;
+      margin-right: 10px;
+    }
+    #grafico {
+      margin: auto;
+      width: 800px;
+      height: 800px;
+    }
+    .output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#frases">Frases Binárias</a>
+    <a href="#gpt">Universe GPT</a>
+    <a href="#quiz">Quiz Cósmico</a>
+    <a href="#conversor">Conversor Binário</a>
+    <a href="#cartas">Cartas Binárias</a>
+    <a href="#mapa">Mapa Cósmico</a>
+  </nav>
+
+  <section id="frases">
+    <h2>🌌 Frases Binárias</h2>
+    <button onclick="mostrarFraseBinaria()">Gerar Frase</button>
+    <div id="saidaFrase" class="output"></div>
+  </section>
+
+  <section id="gpt">
+    <h2>🌠 Universe GPT</h2>
+    <button onclick="universeGPT()">Gerar Frase GPT</button>
+    <div id="saidaGPT" class="output"></div>
+  </section>
+
+  <section id="quiz">
+    <h2>🧠 Quiz Cósmico</h2>
+    <button onclick="iniciarQuiz()">Iniciar Quiz</button>
+    <div id="saidaQuiz" class="output"></div>
+  </section>
+
+  <section id="conversor">
+    <h2>💫 Conversor Binário</h2>
+    <input type="text" id="textoBinario" placeholder="Digite seu texto aqui">
+    <button onclick="converterParaBinario()">Converter</button>
+    <div id="saidaBinario" class="output"></div>
+  </section>
+
+  <section id="cartas">
+    <h2>🃏 Cartas Binárias</h2>
+    <button onclick="gerarPdfCartas()">Gerar PDF</button>
+  </section>
+
+  <section id="mapa">
+    <h2>🧪 Mapa Cósmico dos Elementos</h2>
+    <div id="grafico"></div>
+  </section>
+
+  <!-- Scripts -->
+  <script src="universo_binario.js"></script>
+  <script src="universe_gpt.js"></script>
+  <script src="universe_quiz.js"></script>
+  <script src="binary_universe.js"></script>
+  <script src="cartas_binarias.js"></script>
+  <script src="mapa_cosmico.js"></script>
+
+  <script>
+    // Redirecionar saída do binary_universe.js
+    function mostrarFraseBinaria() {
+      const frase = FRASES[Math.floor(Math.random() * FRASES.length)];
+      const binario = frase.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+      document.getElementById("saidaFrase").innerText = frase + "
+
+" + binario;
+    }
+
+    // Redirecionar saída do universe_gpt.js
+    const originalGPT = console.log;
+    console.log = function(msg) {
+      const div = document.getElementById("saidaGPT");
+      if (div) div.innerText += msg + "
+";
+      originalGPT.apply(console, arguments);
+    }
+
+    // Redirecionar saída do quiz
+    const quizLog = console.log;
+    console.log = function(msg) {
+      const div = document.getElementById("saidaQuiz");
+      if (div && msg.includes("Pergunta") || msg.includes("Explicação") || msg.includes("Pontuação")) {
+        div.innerText += msg + "
+";
+      }
+      quizLog.apply(console, arguments);
+    }
+
+    // Conversor binário
+    function converterParaBinario() {
+      const texto = document.getElementById("textoBinario").value;
+      const binario = texto.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+      document.getElementById("saidaBinario").innerText = binario;
+    }
+  </script>
+</body>
+</html>

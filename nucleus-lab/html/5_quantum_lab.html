@@ -96,6 +96,7 @@
             color: var(--lab-white);
             cursor: pointer;
             transition: all 0.3s ease;
+			text-decoration: none; 
         }
 
         .nav-tab.active {
@@ -106,6 +107,11 @@
         .nav-tab:hover {
             background: rgba(37, 99, 235, 0.3);
         }
+		
+		.nav-tab:focus-visible {
+			outline: 2px solid var(--quantum-blue);
+			outline-offset: 2px;
+		}
 
         .header-actions {
             display: flex;
@@ -873,10 +879,14 @@
             </div>
 
             <div class="nav-tabs">
-                <div class="nav-tab active">⚛️ Nuclear</div>
-                <div class="nav-tab">🧪 Química</div>
-                <div class="nav-tab">🧬 Orgânica</div>
-                <div class="nav-tab">🔥 Termo</div>
+                <div class="nav-tabs">
+					<a class="nav-tab" href="1_nuclear.html">⚛️ Nuclear</a>
+					<a class="nav-tab" href="2_quimica.html">🧪 Química</a>
+					<a class="nav-tab" href="3_organica.html">🧬 Orgânica</a>
+					<a class="nav-tab" href="4_temodinamica.html">🔥 Termo</a>
+					<a class="nav-tab" href="6_nuclear_dance.html">🩰 Atômico</a>
+					<a class="nav-tab" href="7_nucleus_lab.html">⚛️ Física</a>
+				</div>
             </div>
 
             <div class="header-actions">
@@ -2058,6 +2068,14 @@
                 closePeriodicTable();
             }
         });
+		
+		(function () {
+			const path = location.pathname.split('/').pop().toLowerCase() || 'index.html';
+			document.querySelectorAll('.nav-tabs .nav-tab').forEach(a => {
+				const href = a.getAttribute('href')?.toLowerCase();
+				if (href && path.endsWith(href)) a.classList.add('active');
+			});
+		  })();
     </script>
 </body>
 </html>

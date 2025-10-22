@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NUCLEUS LAB — Laboratório de Física Nuclear e de Partículas</title>
+  <style>
+    /* =========================
+       TOKENS DO TEMA (PRINCIPAL)
+       ========================= */
+    :root {
+      --cosmic-dark: #0a0a1f;
+      --quantum-blue: #2563eb;
+      --plasma-purple: #8b5cf6;
+      --radioactive-green: #10b981;
+      --fusion-orange: #f59e0b;
+      --lab-white: #f8fafc;
+      --grid-gray: #374151;
+      --danger-red: #ef4444;
+      --magnetic-blue: #3b82f6;
+      --cold-blue: #60a5fa;
+      --hot-red: #ef4444;
+      --plasma-pink: #ec4899;
+    }
+
+    /* =========================
+       BASE
+       ========================= */
+    body {
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--cosmic-dark) 0%, #1a1a3e 100%);
+      font-family: 'Segoe UI', system-ui, -apple-system, Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--lab-white);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--grid-gray);
+      border-radius: 12px;
+      padding: 16px 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      color: var(--cold-blue);
+      font-size: 2.4em;
+      margin: 0 0 8px 0;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 8px rgba(96, 165, 250, 0.25);
+    }
+
+    p.subtitle {
+      color: rgba(248, 250, 252, 0.75);
+      font-size: 0.95em;
+      margin: 0;
+    }
+
+    /* =========================
+       ABAS
+       ========================= */
+    .tab-container {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .tab {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--lab-white);
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .tab:hover {
+      background: rgba(37, 99, 235, 0.30);
+      border-color: rgba(37, 99, 235, 0.55);
+    }
+
+    .tab.active {
+      background: var(--quantum-blue);
+      color: #081225;
+      border-color: var(--quantum-blue);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.40);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* =========================
+       LAYOUT PRINCIPAL
+       ========================= */
+    main {
+      display: flex;
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* =========================
+       PAINEL: CANVAS
+       ========================= */
+    .canvas-container {
+      flex: 0 0 500px;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 12px;
+      border: 1px solid var(--grid-gray);
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    canvas {
+      background: #0d0e20;
+      border: 1px solid var(--grid-gray);
+      border-radius: 8px;
+      box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.18);
+      max-width: 100%;
+    }
+
+    /* =========================
+       PAINEL: CONTROLES
+       ========================= */
+    .controls-panel {
+      flex: 0 0 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 12px;
+      border: 1px solid var(--grid-gray);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-title {
+      color: var(--cold-blue);
+      font-size: 1.2em;
+      margin: 0 0 15px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      font-weight: 600;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+      gap: 10px;
+    }
+
+    .input-label {
+      color: rgba(248, 250, 252, 0.8);
+      min-width: 80px;
+      font-size: 0.95em;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--lab-white);
+      border: 1px solid var(--quantum-blue);
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.95em;
+      outline: none;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    input[type="number"]:focus {
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+      border-color: var(--quantum-blue);
+    }
+
+    .slider-container {
+      margin: 15px 0;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      color: rgba(248, 250, 252, 0.8);
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.10);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--quantum-blue);
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    }
+
+    /* =========================
+       BOTÕES
+       ========================= */
+    .button-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.10);
+      color: var(--lab-white);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.92em;
+      transition: background 0.2s, transform 0.1s, border-color 0.2s;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.warning {
+      background: var(--danger-red);
+      border-color: var(--danger-red);
+      color: #ffffff;
+    }
+
+    button.success {
+      background: var(--radioactive-green);
+      border-color: var(--radioactive-green);
+      color: #081225;
+    }
+
+    /* =========================
+       PAINEL: RESULTADOS
+       ========================= */
+    .results-panel {
+      flex: 0 0 320px;
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 12px;
+      border: 1px solid var(--grid-gray);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .results-title {
+      color: var(--cold-blue);
+      font-size: 1.2em;
+      margin: 0 0 15px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      font-weight: 600;
+    }
+
+    #info {
+      min-height: 120px;
+      max-height: 200px;
+      padding: 10px;
+      background: rgba(30, 31, 53, 0.9);
+      border-radius: 8px;
+      margin-top: 10px;
+      white-space: pre-line;
+      font-size: 0.92em;
+      color: rgba(248, 250, 252, 0.85);
+      overflow-y: auto;
+      line-height: 1.5;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .particle-log {
+      background: rgba(30, 31, 53, 0.9);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 15px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 0.85em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .log-entry {
+      margin: 4px 0;
+      padding: 4px;
+      border-left: 3px solid var(--quantum-blue);
+      background: rgba(37, 99, 235, 0.10);
+      border-radius: 4px;
+    }
+
+    /* =========================
+       RESPONSIVIDADE
+       ========================= */
+    @media (max-width: 1200px) {
+      main {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .canvas-container,
+      .controls-panel,
+      .results-panel {
+        width: 100%;
+        max-width: 600px;
+      }
+    }
+
+    /* =========================
+       ACELERADOR (TEMA)
+       ========================= */
+    .accelerator-tube {
+      position: relative;
+      width: 100%;
+      height: 80px;
+      background: linear-gradient(90deg, #11183f, #1c2a5e, #11183f);
+      border: 2px solid var(--magnetic-blue);
+      border-radius: 40px;
+      margin: 20px 0;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.25);
+    }
+
+    .beam-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #ffeb3b, transparent);
+      transform: translateY(-50%);
+      filter: drop-shadow(0 0 8px rgba(255, 235, 59, 0.6));
+    }
+
+    .detector {
+      position: absolute;
+      top: 50%;
+      right: 50px;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, var(--plasma-pink), #a31355);
+      border-radius: 50%;
+      transform: translateY(-50%);
+      border: 3px solid #ff80ab;
+      box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>NUCLEUS LAB</h1>
+    <p class="subtitle">Laboratório de Física Nuclear e de Partículas</p>
+  </header>
+
+  <!-- Abas de navegação -->
+  <div class="tab-container">
+    <div class="tab active" data-tab="nuclear">⚛️ Física Nuclear</div>
+    <div class="tab" data-tab="particles">🔬 Física de Partículas</div>
+  </div>
+
+  <!-- Conteúdo da Física Nuclear -->
+  <div class="tab-content active" id="nuclear-tab">
+    <main>
+      <div class="canvas-container">
+        <canvas id="atomCanvas" width="480" height="360"></canvas>
+      </div>
+
+      <div class="controls-panel">
+        <div class="card">
+          <div class="card-title">Criar Átomo</div>
+          <div class="input-group">
+            <span class="input-label">Prótons:</span>
+            <input type="number" id="protons" min="1" max="118" value="1">
+          </div>
+          <div class="input-group">
+            <span class="input-label">Nêutrons:</span>
+            <input type="number" id="neutrons" min="0" value="0">
+          </div>
+          <div class="input-group">
+            <span class="input-label">Elétrons:</span>
+            <input type="number" id="electrons" min="0" value="1">
+          </div>
+          <div class="button-group">
+            <button onclick="createAtom()">Criar</button>
+            <button onclick="absorbPhoton()">Absorver Fóton</button>
+            <button onclick="reset()">Resetar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Fusão Nuclear</div>
+          <div class="button-group">
+            <button onclick="startFusionMode()">Definir Átomo 1</button>
+            <button onclick="setAtom2()">Definir Átomo 2 e Colidir</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Decaimento Radioativo</div>
+          <div class="button-group">
+            <button onclick="simulateAlphaDecay()">Decaimento Alpha</button>
+            <button onclick="simulateBetaDecay()">Decaimento Beta</button>
+            <button class="warning" onclick="simulateFission()">Fissão Nuclear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-panel">
+        <div class="results-title">Resultados Nucleares</div>
+        <div id="info"></div>
+        <div class="button-group">
+          <button class="success" onclick="exportData()">Exportar Dados</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Conteúdo da Física de Partículas -->
+  <div class="tab-content" id="particles-tab">
+    <main>
+      <div class="canvas-container">
+        <canvas id="particleCanvas" width="480" height="400"></canvas>
+        <div class="accelerator-tube">
+          <div class="beam-line" id="beamLine"></div>
+          <div class="detector" id="detector"></div>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <div class="card">
+          <div class="card-title">Acelerador de Partículas</div>
+          
+          <div class="slider-container">
+            <div class="slider-label">
+              <span>Energia do Feixe</span>
+              <span id="energyValue">10 GeV</span>
+            </div>
+            <input type="range" min="1" max="50" value="10" class="slider" id="energySlider">
+          </div>
+
+          <div class="slider-container">
+            <div class="slider-label">
+              <span>Intensidade</span>
+              <span id="intensityValue">50%</span>
+            </div>
+            <input type="range" min="10" max="100" value="50" class="slider" id="intensitySlider">
+          </div>
+
+          <div class="button-group">
+            <button onclick="startAccelerator()">Iniciar Acelerador</button>
+            <button class="warning" onclick="stopAccelerator()">Parar</button>
+            <button onclick="collideParticles()">Colidir Partículas</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Tipos de Partículas</div>
+          <div class="button-group">
+            <button onclick="selectParticle('proton')">Próton</button>
+            <button onclick="selectParticle('electron')">Elétron</button>
+            <button onclick="selectParticle('alpha')">Partícula Alpha</button>
+            <button onclick="selectParticle('photon')">Fóton</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Detetores</div>
+          <div class="button-group">
+            <button onclick="toggleMagneticField()">Campo Magnético</button>
+            <button onclick="toggleCalorimeter()">Calorímetro</button>
+            <button onclick="resetDetectors()">Resetar Detetores</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-panel">
+        <div class="results-title">Resultados das Colisões</div>
+        <div id="particleInfo"></div>
+        <div class="particle-log" id="particleLog">
+          <div class="log-entry">Sistema inicializado</div>
+        </div>
+        <div class="button-group">
+          <button class="success" onclick="analyzeEvent()">Analisar Evento</button>
+          <button onclick="clearLog()">Limpar Log</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="lab2.js"></script>
+  <script>
+    // ====== SISTEMA DE ABAS ======
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Remove classe active de todas as abas e conteúdos
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Adiciona classe active na aba clicada
+        this.classList.add('active');
+        
+        // Mostra o conteúdo correspondente
+        const tabId = this.getAttribute('data-tab') + '-tab';
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // ====== MÓDULO DE FÍSICA DE PARTÍCULAS ======
+    const particleCanvas = document.getElementById('particleCanvas');
+    const particleCtx = particleCanvas.getContext('2d');
+    let acceleratorRunning = false;
+    let selectedParticle = 'proton';
+    let magneticField = false;
+    let calorimeter = false;
+
+    class Particle {
+      constructor(type, energy) {
+        this.type = type;
+        this.energy = energy;
+        this.x = 50;
+        this.y = particleCanvas.height / 2;
+        this.vx = 2 + (energy / 10);
+        this.radius = this.getRadius();
+        this.color = this.getColor();
+        this.trail = [];
+        this.maxTrail = 20;
+      }
+
+      getRadius() {
+        const sizes = {
+          'proton': 6,
+          'electron': 3,
+          'alpha': 8,
+          'photon': 4
+        };
+        return sizes[this.type] || 5;
+      }
+
+      getColor() {
+        const colors = {
+          'proton': '#4fc3f7',
+          'electron': '#ff5252',
+          'alpha': '#66bb6a',
+          'photon': '#ffeb3b'
+        };
+        return colors[this.type] || '#ffffff';
+      }
+
+      update() {
+        // Efeito do campo magnético
+        if (magneticField) {
+          this.y += Math.sin(Date.now() * 0.01) * 0.5;
+        }
+
+        this.x += this.vx;
+        
+        // Adicionar posição ao rastro
+        this.trail.push({x: this.x, y: this.y});
+        if (this.trail.length > this.maxTrail) {
+          this.trail.shift();
+        }
+
+        return this.x < particleCanvas.width + 50;
+      }
+
+      draw() {
+        // Desenhar rastro
+        for (let i = 0; i < this.trail.length; i++) {
+          const point = this.trail[i];
+          const alpha = i / this.trail.length;
+          particleCtx.fillStyle = this.color.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+          particleCtx.beginPath();
+          particleCtx.arc(point.x, point.y, this.radius * alpha, 0, Math.PI * 2);
+          particleCtx.fill();
+        }
+
+        // Desenhar partícula
+        particleCtx.fillStyle = this.color;
+        particleCtx.beginPath();
+        particleCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        particleCtx.fill();
+
+        // Efeito de brilho para partículas energéticas
+        if (this.energy > 20) {
+          particleCtx.strokeStyle = this.color;
+          particleCtx.lineWidth = 2;
+          particleCtx.beginPath();
+          particleCtx.arc(this.x, this.y, this.radius + 3, 0, Math.PI * 2);
+          particleCtx.stroke();
+        }
+      }
+    }
+
+    let particles = [];
+    let collisionParticles = [];
+
+    function startAccelerator() {
+      acceleratorRunning = true;
+      const energy = parseInt(document.getElementById('energySlider').value);
+      const intensity = parseInt(document.getElementById('intensitySlider').value);
+      
+      addToLog(`Acelerador iniciado - Energia: ${energy} GeV, Intensidade: ${intensity}%`);
+      
+      function generateParticles() {
+        if (!acceleratorRunning) return;
+        
+        const count = Math.floor(intensity / 25);
+        for (let i = 0; i < count; i++) {
+          particles.push(new Particle(selectedParticle, energy));
+        }
+        
+        setTimeout(generateParticles, 1000 - (intensity * 8));
+      }
+      
+      generateParticles();
+      animateParticles();
+    }
+
+    function stopAccelerator() {
+      acceleratorRunning = false;
+      addToLog('Acelerador parado');
+    }
+
+    function selectParticle(type) {
+      selectedParticle = type;
+      const names = {
+        'proton': 'Próton',
+        'electron': 'Elétron', 
+        'alpha': 'Partícula Alpha',
+        'photon': 'Fóton'
+      };
+      addToLog(`Partícula selecionada: ${names[type]}`);
+    }
+
+    function collideParticles() {
+      if (particles.length < 2) {
+        addToLog('⚠️ Necessário pelo menos 2 partículas para colisão');
+        return;
+      }
+
+      addToLog('💥 COLISÃO DETETADA! Gerando partículas secundárias...');
+      
+      // Simular produção de partículas na colisão
+      const collisionX = particleCanvas.width / 2;
+      const collisionY = particleCanvas.height / 2;
+      
+      const secondaryParticles = [
+        new Particle('electron', 5),
+        new Particle('photon', 8),
+        new Particle('proton', 12)
+      ];
+      
+      secondaryParticles.forEach(p => {
+        p.x = collisionX;
+        p.y = collisionY;
+        p.vx = (Math.random() - 0.5) * 4;
+        collisionParticles.push(p);
+      });
+
+      // Efeito visual da colisão
+      drawCollisionEffect(collisionX, collisionY);
+    }
+
+    function drawCollisionEffect(x, y) {
+      // Explosão de partículas
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          const angle = (i / 10) * Math.PI * 2;
+          const spark = {
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * 3,
+            vy: Math.sin(angle) * 3,
+            life: 30
+          };
+          
+          function animateSpark() {
+            spark.x += spark.vx;
+            spark.y += spark.vy;
+            spark.life--;
+            
+            particleCtx.fillStyle = `rgba(255, 235, 59, ${spark.life / 30})`;
+            particleCtx.beginPath();
+            particleCtx.arc(spark.x, spark.y, 2, 0, Math.PI * 2);
+            particleCtx.fill();
+            
+            if (spark.life > 0) {
+              requestAnimationFrame(animateSpark);
+            }
+          }
+          
+          animateSpark();
+        }, i * 50);
+      }
+    }
+
+    function animateParticles() {
+      particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+      
+      // Desenhar detetores
+      drawDetectors();
+      
+      // Atualizar e desenhar partículas do acelerador
+      particles = particles.filter(particle => {
+        const alive = particle.update();
+        if (alive) {
+          particle.draw();
+          
+          // Detetar colisões com o detetor
+          if (particle.x > particleCanvas.width - 100 && particle.x < particleCanvas.width - 40) {
+            if (Math.random() < 0.02) {
+              addToLog(`📡 Partícula ${particle.type} detetada no calorímetro`);
+            }
+          }
+        }
+        return alive;
+      });
+      
+      // Atualizar e desenhar partículas de colisão
+      collisionParticles = collisionParticles.filter(particle => {
+        particle.update();
+        particle.draw();
+        return particle.x > 0 && particle.x < particleCanvas.width && particle.y > 0 && particle.y < particleCanvas.height;
+      });
+      
+      if (acceleratorRunning || particles.length > 0 || collisionParticles.length > 0) {
+        requestAnimationFrame(animateParticles);
+      }
+    }
+
+    function drawDetectors() {
+      // Desenhar campo magnético
+      if (magneticField) {
+        particleCtx.strokeStyle = 'rgba(79, 195, 247, 0.3)';
+        particleCtx.setLineDash([5, 5]);
+        particleCtx.beginPath();
+        particleCtx.moveTo(0, particleCanvas.height / 3);
+        particleCtx.lineTo(particleCanvas.width, particleCanvas.height / 3);
+        particleCtx.moveTo(0, particleCanvas.height * 2/3);
+        particleCtx.lineTo(particleCanvas.width, particleCanvas.height * 2/3);
+        particleCtx.stroke();
+        particleCtx.setLineDash([]);
+      }
+      
+      // Desenhar calorímetro
+      if (calorimeter) {
+        particleCtx.fillStyle = 'rgba(229, 115, 115, 0.2)';
+        particleCtx.fillRect(particleCanvas.width - 100, 0, 60, particleCanvas.height);
+      }
+    }
+
+    function toggleMagneticField() {
+      magneticField = !magneticField;
+      addToLog(`Campo magnético ${magneticField ? 'ativado' : 'desativado'}`);
+    }
+
+    function toggleCalorimeter() {
+      calorimeter = !calorimeter;
+      addToLog(`Calorímetro ${calorimeter ? 'ativado' : 'desativado'}`);
+    }
+
+    function resetDetectors() {
+      magneticField = false;
+      calorimeter = false;
+      particles = [];
+      collisionParticles = [];
+      addToLog('Sistema de detetores resetado');
+    }
+
+    function analyzeEvent() {
+      const analyses = [
+        "📊 Análise: Bóson de Higgs detectado!",
+        "📊 Análise: Quark top produzido",
+        "📊 Análise: Decaimento de múon observado", 
+        "📊 Análise: Jatos hadrônicos identificados",
+        "📊 Análise: Fóton de alta energia"
+      ];
+      const randomAnalysis = analyses[Math.floor(Math.random() * analyses.length)];
+      addToLog(randomAnalysis);
+    }
+
+    function addToLog(message) {
+      const log = document.getElementById('particleLog');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('particleLog').innerHTML = '<div class="log-entry">Log limpo</div>';
+    }
+
+    // ====== ATUALIZAÇÕES DO SISTEMA NUCLEAR ======
+    function simulateAlphaDecay() {
+      if (!currentAtom || currentAtom.atomicNumber < 83) {
+        alert("Decaimento Alpha ocorre em elementos pesados (Z ≥ 83). Tente Polônio-210.");
+        return;
+      }
+      document.getElementById('info').innerHTML += `
+        <hr>
+        <p style="color:#ff9800"><strong>Decaimento Alpha!</strong></p>
+        <p>${currentAtom.symbol}-${currentAtom.massNumber} → ${getSymbol(currentAtom.atomicNumber - 2)}-${currentAtom.massNumber - 4} + α</p>
+        <p>Partícula alpha (⁴He) emitida com ~5 MeV</p>
+      `;
+    }
+
+    function simulateBetaDecay() {
+      if (!currentAtom) {
+        alert("Crie um átomo primeiro.");
+        return;
+      }
+      document.getElementById('info').innerHTML += `
+        <hr>
+        <p style="color:#ff5252"><strong>Decaimento Beta!</strong></p>
+        <p>n → p + e⁻ + ν̅ₑ (antineutrino do elétron)</p>
+        <p>Elétron de alta energia emitido</p>
+      `;
+    }
+
+    function exportData() {
+      if (!currentAtom) {
+        alert("Crie um átomo primeiro para exportar dados.");
+        return;
+      }
+      const data = {
+        elemento: currentAtom.symbol,
+        protons: currentAtom.protons,
+        neutrons: currentAtom.neutrons,
+        electrons: currentAtom.electrons,
+        massa: currentAtom.massNumber,
+        carga: currentAtom.charge,
+        estavel: currentAtom.isStable,
+        configuracao: currentAtom.getElectronConfiguration()
+      };
+      const dataStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `atom_${currentAtom.symbol}_${currentAtom.massNumber}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ====== INICIALIZAÇÃO DOS SLIDERS ======
+    document.getElementById('energySlider').addEventListener('input', function(e) {
+      document.getElementById('energyValue').textContent = e.target.value + ' GeV';
+    });
+
+    document.getElementById('intensitySlider').addEventListener('input', function(e) {
+      document.getElementById('intensityValue').textContent = e.target.value + '%';
+    });
+
+    // Inicializar canvas de partículas
+    animateParticles();
+  </script>
+</body>
+</html>
