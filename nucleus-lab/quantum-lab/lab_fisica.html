@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuantumLab - Módulo Físico</title>
+  <link href="./css/style.css" rel="stylesheet" type="text/css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+</head>
+<body>
+  <div class="lab-container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo">
+        <span>⚛</span>
+        <span>QuantumLab - Módulo Físico</span>
+      </div>
+      <div class="nav-tabs">
+        <a class="nav-tab" href="lab_nuclear.html">⚛️ Nuclear</a>
+        <a class="nav-tab" href="lab_quimico.html">🧪 Química</a>
+        <a class="nav-tab" href="lab_organico.html">🧬 Orgânica</a>
+        <a class="nav-tab" href="lab_temodinamico.html">🌡️ Termo</a>
+        <a class="nav-tab" href="lab_atomico.html">⚛️ Atômico</a>
+        <a class="nav-tab active" href="lab_fisica.html">⚛️ Física</a>
+        <a class="nav-tab" href="lab_cosmico.html">🪐 Cósmico</a>
+        <a class="nav-tab" href="md_editor.html">👨‍💻 Editor</a>
+        <a class="nav-tab" href="quantum_lab.html">🌌 QuantumLab</a>
+      </div>
+    </header>
+
+    <!-- SIDEBAR COM AS ABAS -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">🔬 Tipos de Simulação</div>
+        <div class="tab-container">
+          <div class="tab active" data-tab="nuclear" onclick="switchTab('nuclear')">⚛️ Física Nuclear</div>
+          <div class="tab" data-tab="particles" onclick="switchTab('particles')">🔬 Física de Partículas</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">📋 Instruções</div>
+        <p style="font-size: 0.9rem; opacity: 0.8;">
+          Escolha o tipo de simulação no painel acima.<br>
+          Configure os parâmetros e inicie o experimento.
+        </p>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+      <!-- Física Nuclear -->
+      <section class="tab-content active" id="nuclear-tab">
+        <div class="canvas-container">
+          <canvas id="atomCanvas" width="480" height="360"></canvas>
+        </div>
+
+        <div class="control-panel">
+          <div class="panel-section">
+            <h3>⚙️ Criar Átomo</h3>
+            <div class="input-group">
+              <label>Prótons:</label>
+              <input type="number" id="protons" min="1" max="118" value="1">
+            </div>
+            <div class="input-group">
+              <label>Nêutrons:</label>
+              <input type="number" id="neutrons" min="0" value="0">
+            </div>
+            <div class="input-group">
+              <label>Elétrons:</label>
+              <input type="number" id="electrons" min="0" value="1">
+            </div>
+            <div class="button-group">
+              <button class="control-btn primary" onclick="createAtom()">Criar</button>
+              <button class="control-btn" onclick="absorbPhoton()">Absorver Fóton</button>
+              <button class="control-btn warning" onclick="reset()">Resetar</button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h3>💥 Reações Nucleares</h3>
+            <div class="button-group">
+              <button class="control-btn" onclick="startFusionMode()">Definir Átomo 1</button>
+              <button class="control-btn" onclick="setAtom2()">Definir Átomo 2 e Colidir</button>
+              <button class="control-btn" onclick="simulateAlphaDecay()">Decaimento Alpha</button>
+              <button class="control-btn" onclick="simulateBetaDecay()">Decaimento Beta</button>
+              <button class="control-btn warning" onclick="simulateFission()">Fissão</button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h3>📊 Resultados</h3>
+            <div id="info"></div>
+            <button class="control-btn success" onclick="exportData()">Exportar Dados</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Física de Partículas -->
+      <section class="tab-content" id="particles-tab">
+        <div class="canvas-container">
+          <canvas id="particleCanvas" width="480" height="400"></canvas>
+          <div class="accelerator-tube">
+            <div class="beam-line" id="beamLine"></div>
+            <div class="detector" id="detector"></div>
+          </div>
+        </div>
+
+        <div class="control-panel">
+          <div class="panel-section">
+            <h3>🚀 Acelerador de Partículas</h3>
+            <div class="slider-container">
+              <div class="slider-label"><span>Energia do Feixe</span><span id="energyValue">10 GeV</span></div>
+              <input type="range" min="1" max="50" value="10" class="slider" id="energySlider">
+            </div>
+            <div class="slider-container">
+              <div class="slider-label"><span>Intensidade</span><span id="intensityValue">50%</span></div>
+              <input type="range" min="10" max="100" value="50" class="slider" id="intensitySlider">
+            </div>
+            <div class="button-group">
+              <button class="control-btn primary" onclick="startAccelerator()">Iniciar</button>
+              <button class="control-btn warning" onclick="stopAccelerator()">Parar</button>
+              <button class="control-btn" onclick="collideParticles()">Colidir</button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h3>🧬 Tipos de Partículas</h3>
+            <div class="button-group">
+              <button class="control-btn" onclick="selectParticle('proton')">Próton</button>
+              <button class="control-btn" onclick="selectParticle('electron')">Elétron</button>
+              <button class="control-btn" onclick="selectParticle('alpha')">Partícula Alpha</button>
+              <button class="control-btn" onclick="selectParticle('photon')">Fóton</button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h3>🧲 Detetores</h3>
+            <div class="button-group">
+              <button class="control-btn" onclick="toggleMagneticField()">Campo Magnético</button>
+              <button class="control-btn" onclick="toggleCalorimeter()">Calorímetro</button>
+              <button class="control-btn" onclick="resetDetectors()">Resetar</button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h3>📈 Resultados das Colisões</h3>
+            <div id="particleInfo"></div>
+            <div class="particle-log" id="particleLog">
+              <div class="log-entry">Sistema inicializado</div>
+            </div>
+            <div class="button-group">
+              <button class="control-btn success" onclick="analyzeEvent()">Analisar</button>
+              <button class="control-btn" onclick="clearLog()">Limpar Log</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="status-bar">
+      <div class="status-item"><div class="status-dot"></div><span>Simulação Física Ativa</span></div>
+      <div class="status-item"><span>🧪 Modo Atual: <span id="modeStatus">Nuclear</span></span></div>
+      <div class="status-item"><span>⚡ Energia: <span id="energyStatus">10 GeV</span></span></div>
+    </footer>
+  </div>
+
+  <script src="./js/lab_fisica.js"></script>
+</body>
+</html>

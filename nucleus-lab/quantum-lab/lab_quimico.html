@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumLab - Módulo Químico</title>
+    <link href="./css/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <div class="lab-container">
+        <header class="header">
+            <div class="logo">
+                <span>🧪</span>
+                <span>QuantumLab - Módulo Químico</span>
+            </div>
+            <div class="nav-tabs">
+				<a class="nav-tab" href="lab_nuclear.html">⚛️ Nuclear</a>
+				<a class="nav-tab active" href="lab_quimico.html">🧪 Química</a>
+				<a class="nav-tab" href="lab_organico.html">🧬 Orgânica</a>
+				<a class="nav-tab" href="lab_temodinamico.html">🌡️ Termo</a>
+				<a class="nav-tab" href="lab_atomico.html">⚛️ Atômico</a>
+				<a class="nav-tab" href="lab_fisica.html">⚛️ Física</a>
+				<a class="nav-tab" href="lab_cosmico.html">🪐 Cósmico</a>
+				<a class="nav-tab" href="md_editor.html">👨‍💻 Editor</a>
+				<a class="nav-tab" href="quantum_lab.html">🌌 QuantumLab</a>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="section-title">⚗️ Elementos Disponíveis</div>
+                <div class="element-grid">
+                    <button class="element-btn H" data-element="H">H</button>
+                    <button class="element-btn O" data-element="O">O</button>
+                    <button class="element-btn C" data-element="C">C</button>
+                    <button class="element-btn N" data-element="N">N</button>
+                    <button class="element-btn Cl" data-element="Cl">Cl</button>
+                    <button class="element-btn Na" data-element="Na">Na</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">🔬 Reações Pré-definidas</div>
+                <div class="reaction-presets">
+                    <button class="preset-btn" data-reaction="water">💧 Síntese da Água (2H₂ + O₂ → 2H₂O)</button>
+                    <button class="preset-btn" data-reaction="co2">🔥 Combustão (CH₄ + 2O₂ → CO₂ + 2H₂O)</button>
+                    <button class="preset-btn" data-reaction="salt">🧂 Cloreto de Sódio (Na + Cl → NaCl)</button>
+                    <button class="preset-btn" data-reaction="ammonia">🌫️ Amônia (N₂ + 3H₂ → 2NH₃)</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">⚡ Experimento de pH</div>
+                <div class="ph-value" id="phValue">pH = 7.0</div>
+                <input type="range" min="0" max="14" value="7" step="0.1" class="ph-slider" id="phSlider">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                    <span>Ácido</span>
+                    <span>Neutro</span>
+                    <span>Base</span>
+                </div>
+                <button class="control-btn" id="testPhBtn" style="margin-top: 15px;">🧪 Testar com Indicador</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="lab-bench">
+                <div class="molecule-canvas" id="moleculeCanvas">
+                    <!-- Moléculas serão renderizadas aqui -->
+                </div>
+                <div class="reaction-area">
+                    <div class="reaction-equation" id="reactionEquation">
+                        Área de Reação - Arraste os átomos
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="panel-section">
+                    <h3>🎯 Controles de Reação</h3>
+                    <div class="reaction-controls">
+                        <button class="control-btn" id="clearBtn">🗑️ Limpar Bancada</button>
+                        <button class="control-btn success" id="balanceBtn">⚖️ Balancear</button>
+                        <button class="control-btn primary" id="reactBtn">💥 Reagir!</button>
+                        <button class="control-btn" id="optimizeBtn">🔍 Otimizar Molécula</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📊 Informações da Molécula</h3>
+                    <div class="molecule-info">
+                        <div id="moleculeName">Nenhuma molécula formada</div>
+                        <div class="properties-grid">
+                            <div class="property">
+                                <strong>Fórmula:</strong> <span id="moleculeFormula">-</span>
+                            </div>
+                            <div class="property">
+                                <strong>Massa:</strong> <span id="moleculeMass">-</span>
+                            </div>
+                            <div class="property">
+                                <strong>Ligações:</strong> <span id="bondCount">0</span>
+                            </div>
+                            <div class="property">
+                                <strong>Estado:</strong> <span id="moleculeState">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🌈 Indicador de pH</h3>
+                    <div class="ph-indicator" id="phIndicator">
+                        <div class="ph-marker" id="phMarker"></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <span id="phColorName" style="font-weight: bold;">Verde (Neutro)</span>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>⚠️ Reações Ácido-Base</h3>
+                    <button class="control-btn" id="addAcidBtn">➕ Adicionar HCl</button>
+                    <button class="control-btn" id="addBaseBtn">➕ Adicionar NaOH</button>
+                    <button class="control-btn" id="neutralizeBtn">🔄 Neutralizar</button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="status-bar">
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Laboratório Químico Online</span>
+                </div>
+                <div class="status-item">
+                    <span>🧪 Átomos: <span id="atomCount">0</span></span>
+                </div>
+                <div class="status-item">
+                    <span>🔗 Ligações: <span id="totalBonds">0</span></span>
+                </div>
+                <div class="status-item">
+                    <span>⚡ Energia: <span id="reactionEnergy">0 kJ/mol</span></span>
+                </div>
+            </div>
+            <div class="simulation-controls">
+                <button class="control-btn" id="resetBtn">🔄 Reiniciar</button>
+                <button class="control-btn primary" id="helpBtn">❓ Ajuda</button>
+            </div>
+        </footer>
+    </div>
+	<script src="./js/lab_quimico.js"></script>
+</body>
+</html>

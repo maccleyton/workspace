@@ -1,0 +1,1412 @@
+/* =========================
+   VARIÁVEIS CSS CONSOLIDADAS
+   ========================= */
+:root {
+  /* Cores principais */
+  --cosmic-dark: #0a0a1f;
+  --quantum-blue: #2563eb;
+  --plasma-purple: #8b5cf6;
+  --radioactive-green: #10b981;
+  --fusion-orange: #f59e0b;
+  --lab-white: #f8fafc;
+  --grid-gray: #374151;
+  --danger-red: #ef4444;
+  
+  /* Cores estendidas */
+  --magnetic-blue: #3b82f6;
+  --cold-blue: #60a5fa;
+  --hot-red: #ef4444;
+  --plasma-pink: #ec4899;
+  --neutron-gray: #9ca3af;
+  
+  /* Cores específicas para módulos */
+  --organic-green: #10b981;
+  --carbon-black: #1f2937;
+  --hydrogen-gray: #9ca3af;
+  --oxygen-red: #dc2626;
+  --nitrogen-blue: #1d4ed8;
+  --sulfur-yellow: #eab308;
+  --phosphorus-orange: #f97316;
+  --halogen-purple: #8b5cf6;
+  --acid-red: #ef4444;
+  --base-blue: #3b82f6;
+  --thermal-orange: #f97316;
+  --heat-red: #dc2626;
+  --work-purple: #8b5cf6;
+  --entropy-green: #10b981;
+  
+  /* Cores de partículas */
+  --proton-color: #ef4444;
+  --neutron-color: #3b82f6;
+  --electron-color: #2563eb;
+  
+  /* Variáveis de layout */
+  --bg: linear-gradient(135deg, var(--cosmic-dark) 0%, #1a1a3e 100%);
+  --panel: rgba(15,23,42,0.95);
+  --muted: rgba(248,250,252,0.7);
+  --accent: var(--quantum-blue);
+  --page: #ffffff;
+  --shadow: 0 14px 40px rgba(0,0,0,0.6);
+  --dpi-cm: 37.7952755906;
+  --header-h: 64px;
+  --toolbar-h: 56px;
+  --status-h: 40px;
+  --sidebar-w: 260px;
+  --sidebar-collapsed: 64px;
+}
+
+/* =========================
+   RESET E ESTILOS GLOBAIS
+   ========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--lab-white);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================
+   LAYOUT PRINCIPAL
+   ========================= */
+.lab-container {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "status status";
+  grid-template-rows: 60px 1fr 80px;
+  grid-template-columns: 300px 1fr;
+  height: 100vh;
+  gap: 1px;
+}
+
+/* Container alternativo para páginas específicas */
+.container {
+  display: flex;
+  height: calc(100vh - var(--header-h) - var(--toolbar-h) - var(--status-h));
+  overflow: hidden;
+}
+
+/* =========================
+   COMPONENTES COMUNS
+   ========================= */
+
+/* HEADER */
+.header {
+  grid-area: header;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--grid-gray);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--lab-white);
+}
+
+.logo-icon {
+  font-size: 1.8rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-tab {
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--lab-white);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.nav-tab.active {
+  background: var(--quantum-blue);
+  border-color: var(--quantum-blue);
+}
+
+.nav-tab:hover {
+  background: rgba(37, 99, 235, 0.3);
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.search-bar {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 8px 15px;
+  color: var(--lab-white);
+  width: 200px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  grid-area: sidebar;
+  background: rgba(15, 23, 42, 0.8);
+  border-right: 1px solid var(--grid-gray);
+  padding: 20px;
+  overflow-y: auto;
+  transition: width 0.22s ease;
+  backdrop-filter: blur(10px);
+}
+
+.sidebar.collapsed {
+  width: var(--sidebar-collapsed);
+  min-width: var(--sidebar-collapsed);
+  overflow: visible;
+}
+
+.sidebar-section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--quantum-blue);
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tool-list, .instrument-list, .project-list, .element-list {
+  list-style: none;
+}
+
+.tool-item, .instrument-item, .project-item, .element-item {
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool-item:hover, .instrument-item:hover, .project-item:hover, .element-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: var(--quantum-blue);
+}
+
+.tool-item.active, .element-item.active {
+  background: rgba(37, 99, 235, 0.2);
+  border-left-color: var(--quantum-blue);
+}
+
+/* ÁREA PRINCIPAL */
+.main-content {
+  grid-area: main;
+  background: rgba(10, 10, 31, 0.5);
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 20px;
+  padding: 20px;
+}
+
+.main {
+  grid-area: main;
+  background: #0d1020;
+  padding: 14px;
+  overflow: auto;
+}
+
+/* STATUS BAR */
+.status-bar {
+  grid-area: status;
+  background: rgba(15, 23, 42, 0.95);
+  border-top: 1px solid var(--grid-gray);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 0.9rem;
+}
+
+.status-indicators {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--radioactive-green);
+}
+
+.status-dot.offline {
+  background: var(--danger-red);
+}
+
+.simulation-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+/* =========================
+   MÓDULO: FÍSICA ATÔMICA
+   ========================= */
+.visualization-area {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.atom-canvas {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  border-radius: 15px;
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.atom-canvas.cold {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(96, 165, 250, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(59, 130, 246, 0.2) 0%, transparent 50%);
+}
+
+.atom-canvas.hot {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(245, 158, 11, 0.3) 0%, transparent 50%);
+}
+
+.atom-canvas.plasma {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(236, 72, 153, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.4) 0%, transparent 50%);
+  animation: plasma-pulse 2s ease-in-out infinite;
+}
+
+@keyframes plasma-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.atom-display {
+  width: 500px;
+  height: 500px;
+  position: relative;
+}
+
+/* NÚCLEO 3D */
+.nucleus-3d {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: nucleus-rotate 20s infinite linear;
+}
+
+@keyframes nucleus-rotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.nucleus-particle-3d {
+  position: absolute;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.nucleus-particle-3d.proton {
+  background: var(--proton-color);
+  box-shadow: 0 0 10px var(--proton-color);
+}
+
+.nucleus-particle-3d.neutron {
+  background: var(--neutron-color);
+  box-shadow: 0 0 10px var(--neutron-color);
+}
+
+/* ELÉTRONS */
+.electron {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--electron-color);
+  box-shadow: 0 0 15px var(--electron-color);
+  transition: all 0.5s ease;
+}
+
+.electron.excited {
+  background: var(--radioactive-green);
+  box-shadow: 0 0 20px var(--radioactive-green);
+}
+
+.electron.spin-up {
+  background: var(--magnetic-blue);
+  box-shadow: 0 0 20px var(--magnetic-blue);
+}
+
+.electron.spin-down {
+  background: #ec4899;
+  box-shadow: 0 0 20px #ec4899;
+}
+
+.electron.hot {
+  background: var(--hot-red);
+  box-shadow: 0 0 25px var(--hot-red);
+}
+
+.electron.plasma {
+  background: var(--plasma-pink);
+  box-shadow: 0 0 30px var(--plasma-pink);
+  animation: electron-flicker 0.5s ease-in-out infinite;
+}
+
+@keyframes electron-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ÓRBITAS */
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transition: all 0.5s ease;
+}
+
+.orbit.zeeman-split {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.orbit.hot {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+/* CAMPOS E PARTÍCULAS */
+.magnetic-field-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.field-line {
+  position: absolute;
+  background: linear-gradient(to bottom, transparent, var(--magnetic-blue), transparent);
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.field-line:nth-child(2) { transform: translateX(-50%) rotate(45deg); }
+.field-line:nth-child(3) { transform: translateX(-50%) rotate(90deg); }
+.field-line:nth-child(4) { transform: translateX(-50%) rotate(135deg); }
+
+.thermal-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.thermal-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.photon {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--radioactive-green);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+@keyframes photon-emission {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* =========================
+   MÓDULO: FÍSICA NUCLEAR
+   ========================= */
+.nuclear-canvas {
+  background: rgba(15,23,42,0.6);
+  border-radius: 15px;
+  border: 1px solid var(--grid-gray);
+  position: relative;
+  overflow: hidden;
+}
+
+.nuclear-canvas canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+@keyframes nuclearFlash {
+  0%{background-color:transparent;}
+  50%{background-color:rgba(245,158,11,0.3);}
+  100%{background-color:transparent;}
+}
+
+.nuclear-flash {
+  animation: nuclearFlash .5s ease-out;
+}
+
+/* =========================
+   MÓDULO: QUÍMICA
+   ========================= */
+.lab-bench {
+  background: 
+    linear-gradient(45deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%),
+    repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 21px);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.molecule-canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* ÁTOMOS QUÍMICOS */
+.atom {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.atom:active {
+  cursor: grabbing;
+}
+
+.atom.H { 
+  background: radial-gradient(circle, var(--hydrogen-gray), #6b7280); 
+  width: 40px; height: 40px; 
+}
+.atom.O { 
+  background: radial-gradient(circle, var(--oxygen-red), #b91c1c); 
+  width: 60px; height: 60px; 
+}
+.atom.C { 
+  background: radial-gradient(circle, var(--carbon-black), #111827); 
+  width: 70px; height: 70px; 
+}
+.atom.N { 
+  background: radial-gradient(circle, var(--nitrogen-blue), #1e40af); 
+  width: 65px; height: 65px; 
+}
+.atom.Cl { 
+  background: radial-gradient(circle, #22c55e, #15803d); 
+  width: 75px; height: 75px; 
+}
+.atom.Na { 
+  background: radial-gradient(circle, #f97316, #c2410c); 
+  width: 65px; height: 65px; 
+}
+.atom.F, .atom.Br { 
+  background: radial-gradient(circle, var(--halogen-purple), #7c3aed); 
+  width: 60px; height: 60px; 
+}
+.atom.S { 
+  background: radial-gradient(circle, var(--sulfur-yellow), #ca8a04); 
+  width: 70px; height: 70px; 
+}
+.atom.P { 
+  background: radial-gradient(circle, var(--phosphorus-orange), #ea580c); 
+  width: 75px; height: 75px; 
+}
+
+.bond {
+  position: absolute;
+  background: rgba(255,255,255,0.6);
+  transform-origin: 0 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bond.double {
+  background: linear-gradient(to bottom, 
+    rgba(255,255,255,0.8) 0%,
+    rgba(255,255,255,0.8) 40%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255,255,255,0.8) 60%,
+    rgba(255,255,255,0.8) 100%);
+}
+
+.bond.triple {
+  background: linear-gradient(to bottom, 
+    rgba(255,255,255,0.8) 0%,
+    rgba(255,255,255,0.8) 30%,
+    transparent 30%,
+    transparent 40%,
+    rgba(255,255,255,0.8) 40%,
+    rgba(255,255,255,0.8) 60%,
+    transparent 60%,
+    transparent 70%,
+    rgba(255,255,255,0.8) 70%,
+    rgba(255,255,255,0.8) 100%);
+}
+
+/* =========================
+   MÓDULO: QUÍMICA ORGÂNICA
+   ========================= */
+.organic-canvas {
+  background: 
+    linear-gradient(45deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%),
+    repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(16, 185, 129, 0.05) 25px, rgba(16, 185, 129, 0.05) 26px);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.molecule-display {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.carbon-chain {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes rotate3D {
+  0% { transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg); }
+  100% { transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg); }
+}
+
+.rotate-3d {
+  animation: rotate3D 20s infinite linear;
+}
+
+/* =========================
+   MÓDULO: TERMODINÂMICA
+   ========================= */
+.thermo-canvas {
+  background: 
+    linear-gradient(45deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%),
+    repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(249, 115, 22, 0.05) 25px, rgba(249, 115, 22, 0.05) 26px);
+  border: 2px solid rgba(249, 115, 22, 0.3);
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.simulation-area {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* MÁQUINA TÉRMICA */
+.heat-engine {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 200px;
+}
+
+.piston-chamber {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.chamber {
+  position: absolute;
+  width: 120px;
+  height: 180px;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 10px 10px 0 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: hidden;
+}
+
+.piston {
+  position: absolute;
+  width: 110px;
+  height: 20px;
+  background: linear-gradient(90deg, #4b5563, #6b7280);
+  border-radius: 5px 5px 0 0;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: bottom 0.5s ease;
+}
+
+.gas-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+}
+
+.gas-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(59, 130, 246, 0.8);
+  border-radius: 50%;
+  animation: gasMove 2s infinite linear;
+}
+
+@keyframes gasMove {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(10px, -10px); }
+  50% { transform: translate(-5px, -20px); }
+  75% { transform: translate(-10px, -5px); }
+}
+
+.heat-source {
+  position: absolute;
+  width: 140px;
+  height: 20px;
+  background: linear-gradient(90deg, var(--heat-red), #ef4444);
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 5px;
+}
+
+.cold-sink {
+  position: absolute;
+  width: 140px;
+  height: 20px;
+  background: linear-gradient(90deg, var(--cold-blue), #60a5fa);
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 5px;
+}
+
+.crank-shaft {
+  position: absolute;
+  width: 200px;
+  height: 4px;
+  background: #d1d5db;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  transform-origin: center;
+  transition: transform 0.5s ease;
+}
+
+/* DIAGRAMA PV */
+.pv-diagram {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 250px;
+  height: 180px;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.graph-axis {
+  position: absolute;
+  background: rgba(255,255,255,0.5);
+}
+
+.axis-x {
+  width: 100%;
+  height: 1px;
+  bottom: 20px;
+  left: 0;
+}
+
+.axis-y {
+  width: 1px;
+  height: 100%;
+  bottom: 20px;
+  left: 20px;
+}
+
+.thermodynamic-cycle {
+  position: absolute;
+  width: calc(100% - 40px);
+  height: calc(100% - 40px);
+  bottom: 20px;
+  left: 20px;
+}
+
+.cycle-path {
+  fill: none;
+  stroke: var(--work-purple);
+  stroke-width: 2;
+  stroke-dasharray: 5, 5;
+}
+
+/* PARTÍCULAS DE CALOR */
+.heat-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--heat-red);
+  animation: heatRise 3s infinite linear;
+}
+
+.cold-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cold-blue);
+  animation: coldFall 3s infinite linear;
+}
+
+@keyframes heatRise {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+}
+
+@keyframes coldFall {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(100px) scale(0.5); opacity: 0; }
+}
+
+@keyframes pistonMove {
+  0%, 100% { bottom: 40px; }
+  50% { bottom: 120px; }
+}
+
+.piston-moving {
+  animation: pistonMove 2s infinite ease-in-out;
+}
+
+.crank-rotating {
+  animation: crankRotate 2s infinite linear;
+}
+
+@keyframes crankRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* =========================
+   COMPONENTES DE CONTROLE
+   ========================= */
+
+/* PAINÉIS DE CONTROLE */
+.control-panel {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--grid-gray);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-section {
+  margin-bottom: 25px;
+}
+
+/* ESPECTRÔMETRO */
+.spectrometer-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--grid-gray);
+  border-radius: 10px;
+  padding: 20px;
+  width: 350px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.spectrum-display {
+  height: 120px;
+  background: linear-gradient(90deg, 
+    #9400D3, #4B0082, #0000FF, #00FF00, #FFFF00, #FF7F00, #FF0000);
+  border-radius: 8px;
+  margin: 15px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.spectrum-line {
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  background: white;
+  top: 0;
+  opacity: 0.8;
+  transform-origin: bottom;
+}
+
+.wavelength-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.spectrum-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 15px;
+  font-size: 0.8rem;
+}
+
+.spectrum-peak {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* PAINÉIS DE INFORMAÇÃO */
+.energy-panel, .magnetic-panel, .temperature-panel, .element-info-panel, .reaction-panel {
+  position: absolute;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--grid-gray);
+  border-radius: 10px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.energy-panel { top: 20px; left: 20px; width: 300px; }
+.magnetic-panel { top: 20px; left: 20px; width: 300px; }
+.temperature-panel { top: 20px; left: 20px; width: 300px; }
+.element-info-panel { top: 20px; right: 20px; width: 300px; }
+.reaction-panel { bottom: 20px; left: 20px; width: 300px; }
+
+/* CONTROLES DE TEMPERATURA */
+.temperature-controls {
+  margin: 15px 0;
+}
+
+.temperature-slider {
+  width: 100%;
+  margin: 10px 0;
+  background: linear-gradient(to right, var(--cold-blue), var(--lab-white), var(--hot-red));
+  border-radius: 10px;
+  height: 8px;
+  outline: none;
+}
+
+.temperature-value {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 15px 0;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.temperature-value.cold { color: var(--cold-blue); }
+.temperature-value.normal { color: var(--lab-white); }
+.temperature-value.hot { color: var(--hot-red); }
+.temperature-value.plasma { color: var(--plasma-pink); }
+
+.state-indicator {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.state-markers {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
+/* =========================
+   ELEMENTOS DE UI
+   ========================= */
+
+/* BOTÕES */
+.control-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--lab-white);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.control-btn.primary {
+  background: var(--quantum-blue);
+  border-color: var(--quantum-blue);
+}
+
+.control-btn.energy {
+  background: var(--radioactive-green);
+  border-color: var(--radioactive-green);
+  color: black;
+  font-weight: bold;
+}
+
+.control-btn.magnetic {
+  background: var(--magnetic-blue);
+  border-color: var(--magnetic-blue);
+  color: white;
+  font-weight: bold;
+}
+
+.control-btn.success {
+  background: var(--radioactive-green);
+}
+
+.control-btn.warning {
+  background: var(--phosphorus-orange);
+}
+
+/* BOTÕES DE REAÇÃO */
+.reaction-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.reaction-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  color: var(--lab-white);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.reaction-btn.fusion {
+  background: linear-gradient(135deg, var(--fusion-orange), var(--danger-red));
+}
+
+.reaction-btn.fission {
+  background: linear-gradient(135deg, var(--radioactive-green), #059669);
+}
+
+.reaction-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* BOTÕES DE ELEMENTOS */
+.element-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.element-btn {
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  color: var(--lab-white);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.element-btn:hover {
+  background: rgba(255,255,255,0.1);
+  transform: scale(1.05);
+}
+
+.element-btn.alkali { border-left: 3px solid #ef4444; }
+.element-btn.alkaline { border-left: 3px solid #f97316; }
+.element-btn.transition { border-left: 3px solid #eab308; }
+.element-btn.basic { border-left: 3px solid #22c55e; }
+.element-btn.semi { border-left: 3px solid #06b6d4; }
+.element-btn.nonmetal { border-left: 3px solid #3b82f6; }
+.element-btn.halogen { border-left: 3px solid #8b5cf6; }
+.element-btn.noble { border-left: 3px solid #ec4899; }
+
+/* SLIDERS E CONTROLES */
+.control-group {
+  margin-bottom: 20px;
+}
+
+.control-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  margin: 10px 0;
+}
+
+.slider-value {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  opacity: 0.8;
+}
+
+/* INDICADORES */
+.energy-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.energy-level {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid var(--radioactive-green);
+}
+
+.energy-level.active {
+  background: rgba(16, 185, 129, 0.2);
+  border-left-color: var(--radioactive-green);
+}
+
+.energy-value {
+  font-weight: bold;
+  color: var(--radioactive-green);
+}
+
+/* GRÁFICOS E DISPLAYS */
+.spectrum-graph {
+  height: 120px;
+  background: linear-gradient(90deg, 
+    #9400D3 0%, #4B0082 16.67%, #0000FF 33.33%, 
+    #00FF00 50%, #FFFF00 66.67%, #FF7F00 83.33%, #FF0000 100%);
+  border-radius: 8px;
+  margin: 15px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.spectrum-peak {
+  position: absolute;
+  bottom: 0;
+  width: 3px;
+  background: white;
+  opacity: 0.8;
+  transform-origin: bottom;
+}
+
+/* MODAIS E DIÁLOGOS */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: var(--panel);
+  border: 1px solid var(--grid-gray);
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: var(--lab-white);
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.modal-close:hover {
+  opacity: 1;
+}
+
+/* =========================
+   ANIMAÇÕES E EFEITOS
+   ========================= */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(37, 99, 235, 0.8); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pulse { animation: pulse 2s infinite; }
+.glow { animation: glow 2s infinite; }
+.spin { animation: spin 1s linear infinite; }
+
+/* Efeitos de partículas */
+.particle-effect {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* =========================
+   UTILITÁRIOS
+   ========================= */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.grid { display: grid; }
+.text-center { text-align: center; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+
+/* =========================
+   RESPONSIVIDADE
+   ========================= */
+@media (max-width: 1200px) {
+  .lab-container {
+    grid-template-columns: 250px 1fr;
+  }
+  
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .spectrometer-panel {
+    position: relative;
+    width: 100%;
+    bottom: auto;
+    right: auto;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .lab-container {
+    grid-template-areas:
+      "header"
+      "main"
+      "status";
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px 1fr 60px;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+  
+  .header-actions {
+    display: none;
+  }
+  
+  .atom-display {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .control-panel {
+    padding: 15px;
+  }
+  
+  .element-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 10px;
+  }
+  
+  .logo {
+    font-size: 1.2rem;
+  }
+  
+  .nav-tabs {
+    gap: 4px;
+  }
+  
+  .nav-tab {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .atom-display {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .element-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
+   ESTILOS ESPECÍFICOS PARA CANVAS
+   ========================= */
+canvas {
+  display: block;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* =========================
+   ESTADOS ESPECIAIS
+   ========================= */
+.dragging {
+  opacity: 0.8;
+  transform: scale(1.05);
+  cursor: grabbing !important;
+}
+
+.highlight {
+  box-shadow: 0 0 20px var(--radioactive-green);
+  animation: pulse 1s infinite;
+}
+
+.warning {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-color: var(--fusion-orange) !important;
+}
+
+.danger {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: var(--danger-red) !important;
+}
+
+.success {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: var(--radioactive-green) !important;
+}

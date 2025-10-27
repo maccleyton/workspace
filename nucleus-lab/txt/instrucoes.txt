@@ -1,4 +1,0 @@
-pip install matplotlib numpy
-
-pip install reportlab
-

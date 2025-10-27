@@ -1,0 +1,55 @@
+# ========================================
+# 🔢 CÁLCULO NUMÉRICO E MATEMÁTICA BASE
+# ========================================
+numpy
+scipy
+sympy
+
+# ========================================
+# 📊 ANÁLISE DE DADOS E ESTATÍSTICA
+# ========================================
+pandas
+statsmodels
+
+# ========================================
+# 🧠 MACHINE LEARNING E IA
+# ========================================
+scikit-learn
+xgboost
+lightgbm
+
+# ========================================
+# 📈 GRÁFICOS E VISUALIZAÇÃO
+# ========================================
+matplotlib
+seaborn
+plotly
+
+# ========================================
+# ⚙️ CÁLCULO FÍSICO E CIENTÍFICO
+# ========================================
+pint
+quantities
+uncertainties
+
+# ========================================
+# 🔬 SIMULAÇÃO E ENGENHARIA
+# ========================================
+numba
+simpy
+pyomo
+openpyxl
+
+# ========================================
+# 🧬 VISUALIZAÇÃO 3D E MODELAGEM
+# ========================================
+mayavi
+vtk
+pyvista
+
+# ========================================
+# ⚡ UTILITÁRIOS E INTERFACE INTERATIVA
+# ========================================
+tqdm
+ipywidgets
+jupyterlab

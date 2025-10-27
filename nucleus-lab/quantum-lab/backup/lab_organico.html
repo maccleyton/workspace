@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumLab - Módulo Orgânico</title>
+    <style>
+        /* VARIÁVEIS E ESTILOS BASE */
+        :root {
+            --cosmic-dark: #0a0a1f;
+            --organic-green: #10b981;
+            --carbon-black: #1f2937;
+            --hydrogen-gray: #9ca3af;
+            --oxygen-red: #dc2626;
+            --nitrogen-blue: #1d4ed8;
+            --sulfur-yellow: #eab308;
+            --phosphorus-orange: #f97316;
+            --halogen-purple: #8b5cf6;
+            --lab-white: #f8fafc;
+            --grid-gray: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--cosmic-dark) 0%, #1a1a3e 100%);
+            color: var(--lab-white);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .lab-container {
+            display: grid;
+            grid-template-areas:
+                "header header"
+                "sidebar main"
+                "status status";
+            grid-template-rows: 60px 1fr 80px;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+            gap: 1px;
+        }
+
+        /* HEADER */
+        .header {
+            grid-area: header;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--grid-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .logo { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+        }
+
+        .nav-tabs { 
+            display: flex; 
+            gap: 8px; 
+        }
+
+        .nav-tab { 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            background: rgba(255,255,255,0.1); 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+        }
+
+        .nav-tab.active { 
+            background: var(--organic-green); 
+        }
+
+        .nav-tab:hover {
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        /* SIDEBAR ORGÂNICA */
+        .sidebar {
+            grid-area: sidebar;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            color: var(--organic-green);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .element-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .element-btn {
+            padding: 12px 5px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            color: var(--lab-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .element-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .element-btn.C { background: linear-gradient(135deg, var(--carbon-black), #111827); }
+        .element-btn.H { background: linear-gradient(135deg, var(--hydrogen-gray), #6b7280); }
+        .element-btn.O { background: linear-gradient(135deg, var(--oxygen-red), #b91c1c); }
+        .element-btn.N { background: linear-gradient(135deg, var(--nitrogen-blue), #1e40af); }
+        .element-btn.Cl, .element-btn.F, .element-btn.Br { 
+            background: linear-gradient(135deg, var(--halogen-purple), #7c3aed); 
+        }
+        .element-btn.S { background: linear-gradient(135deg, var(--sulfur-yellow), #ca8a04); }
+        .element-btn.P { background: linear-gradient(135deg, var(--phosphorus-orange), #ea580c); }
+
+        .functional-group-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .group-btn {
+            padding: 10px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--organic-green);
+            border-radius: 6px;
+            color: var(--lab-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .group-btn:hover {
+            background: rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .molecule-presets {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .preset-btn {
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: var(--lab-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .preset-btn:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: var(--halogen-purple);
+        }
+
+        /* ÁREA PRINCIPAL ORGÂNICA */
+        .main-content {
+            grid-area: main;
+            background: rgba(10, 10, 31, 0.5);
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .organic-canvas {
+            background: 
+                linear-gradient(45deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(16, 185, 129, 0.05) 25px, rgba(16, 185, 129, 0.05) 26px);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .molecule-display {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .carbon-chain {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .atom {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .atom:active {
+            cursor: grabbing;
+        }
+
+        .atom.C { 
+            background: radial-gradient(circle at 30% 30%, var(--carbon-black), #111827); 
+            width: 70px; height: 70px; 
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .atom.H { 
+            background: radial-gradient(circle at 30% 30%, var(--hydrogen-gray), #6b7280); 
+            width: 40px; height: 40px; 
+            font-size: 0.7rem;
+        }
+        .atom.O { 
+            background: radial-gradient(circle at 30% 30%, var(--oxygen-red), #b91c1c); 
+            width: 65px; height: 65px; 
+        }
+        .atom.N { 
+            background: radial-gradient(circle at 30% 30%, var(--nitrogen-blue), #1e40af); 
+            width: 65px; height: 65px; 
+        }
+        .atom.Cl, .atom.F, .atom.Br { 
+            background: radial-gradient(circle at 30% 30%, var(--halogen-purple), #7c3aed); 
+            width: 60px; height: 60px; 
+        }
+        .atom.S { 
+            background: radial-gradient(circle at 30% 30%, var(--sulfur-yellow), #ca8a04); 
+            width: 70px; height: 70px; 
+        }
+        .atom.P { 
+            background: radial-gradient(circle at 30% 30%, var(--phosphorus-orange), #ea580c); 
+            width: 75px; height: 75px; 
+        }
+
+        .bond {
+            position: absolute;
+            background: rgba(255,255,255,0.8);
+            transform-origin: 0 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .bond.double {
+            background: linear-gradient(to bottom, 
+                rgba(255,255,255,0.8) 0%,
+                rgba(255,255,255,0.8) 40%,
+                transparent 40%,
+                transparent 60%,
+                rgba(255,255,255,0.8) 60%,
+                rgba(255,255,255,0.8) 100%);
+        }
+
+        .bond.triple {
+            background: linear-gradient(to bottom, 
+                rgba(255,255,255,0.8) 0%,
+                rgba(255,255,255,0.8) 30%,
+                transparent 30%,
+                transparent 40%,
+                rgba(255,255,255,0.8) 40%,
+                rgba(255,255,255,0.8) 60%,
+                transparent 60%,
+                transparent 70%,
+                rgba(255,255,255,0.8) 70%,
+                rgba(255,255,255,0.8) 100%);
+        }
+
+        /* PAINEL DE CONTROLE ORGÂNICA */
+        .control-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--grid-gray);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .reaction-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .control-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: var(--lab-white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .control-btn.primary {
+            background: var(--organic-green);
+        }
+
+        .control-btn.warning {
+            background: var(--phosphorus-orange);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .molecule-info {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .property {
+            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .isomer-view {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--organic-green);
+            margin-top: 15px;
+        }
+
+        .isomer-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .isomer-btn {
+            flex: 1;
+            padding: 8px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 6px;
+            color: var(--lab-white);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .isomer-btn.active {
+            background: var(--organic-green);
+        }
+
+        /* STATUS BAR */
+        .status-bar {
+            grid-area: status;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid var(--grid-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--organic-green);
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* ANIMAÇÕES */
+        @keyframes reactionFlash {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(16, 185, 129, 0.3); }
+            100% { background-color: transparent; }
+        }
+
+        @keyframes rotate3D {
+            0% { transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg); }
+            100% { transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg); }
+        }
+
+        .reaction-flash {
+            animation: reactionFlash 0.5s ease-out;
+        }
+
+        .rotate-3d {
+            animation: rotate3D 20s infinite linear;
+        }
+    </style>
+</head>
+<body>
+    <div class="lab-container">
+        <header class="header">
+            <div class="logo">
+                <span>🧬</span>
+                <span>QuantumLab - Módulo Orgânica</span>
+            </div>
+            <div class="nav-tabs">
+                <div class="nav-tab">⚛️ Nuclear</div>
+                <div class="nav-tab">🧪 Química</div>
+                <div class="nav-tab active">🧬 Orgânica</div>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="section-title">⚗️ Elementos Orgânicos</div>
+                <div class="element-grid">
+                    <button class="element-btn C" data-element="C">C</button>
+                    <button class="element-btn H" data-element="H">H</button>
+                    <button class="element-btn O" data-element="O">O</button>
+                    <button class="element-btn N" data-element="N">N</button>
+                    <button class="element-btn Cl" data-element="Cl">Cl</button>
+                    <button class="element-btn S" data-element="S">S</button>
+                    <button class="element-btn P" data-element="P">P</button>
+                    <button class="element-btn F" data-element="F">F</button>
+                    <button class="element-btn Br" data-element="Br">Br</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">🔬 Grupos Funcionais</div>
+                <div class="functional-group-grid">
+                    <button class="group-btn" data-group="hydroxyl">-OH (Hidroxila)</button>
+                    <button class="group-btn" data-group="carbonyl">C=O (Carbonila)</button>
+                    <button class="group-btn" data-group="carboxyl">-COOH (Carboxila)</button>
+                    <button class="group-btn" data-group="amino">-NH₂ (Amino)</button>
+                    <button class="group-btn" data-group="aldehyde">-CHO (Aldeído)</button>
+                    <button class="group-btn" data-group="ketone">C=O (Cetona)</button>
+                    <button class="group-btn" data-group="ester">-COO- (Éster)</button>
+                    <button class="group-btn" data-group="ether">-O- (Éter)</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">📚 Moléculas Orgânicas</div>
+                <div class="molecule-presets">
+                    <button class="preset-btn" data-molecule="methane">CH₄ - Metano</button>
+                    <button class="preset-btn" data-molecule="ethane">C₂H₆ - Etano</button>
+                    <button class="preset-btn" data-molecule="ethene">C₂H₄ - Eteno</button>
+                    <button class="preset-btn" data-molecule="ethyne">C₂H₂ - Etino</button>
+                    <button class="preset-btn" data-molecule="benzene">C₆H₆ - Benzeno</button>
+                    <button class="preset-btn" data-molecule="ethanol">C₂H₅OH - Etanol</button>
+                    <button class="preset-btn" data-molecule="acetic-acid">CH₃COOH - Ácido Acético</button>
+                    <button class="preset-btn" data-molecule="glucose">C₆H₁₂O₆ - Glicose</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">🧪 Reações Orgânicas</div>
+                <div class="molecule-presets">
+                    <button class="preset-btn" data-reaction="combustion">🔥 Combustão</button>
+                    <button class="preset-btn" data-reaction="substitution">🔄 Substituição</button>
+                    <button class="preset-btn" data-reaction="addition">➕ Adição</button>
+                    <button class="preset-btn" data-reaction="elimination">➖ Eliminação</button>
+                    <button class="preset-btn" data-reaction="esterification">⚗️ Esterificação</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="organic-canvas">
+                <div class="molecule-display" id="moleculeCanvas">
+                    <!-- Moléculas orgânicas serão renderizadas aqui -->
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="panel-section">
+                    <h3>🎯 Controles da Molécula</h3>
+                    <div class="reaction-controls">
+                        <button class="control-btn" id="clearBtn">🗑️ Limpar</button>
+                        <button class="control-btn" id="optimizeBtn">⚡ Otimizar</button>
+                        <button class="control-btn primary" id="analyzeBtn">🔍 Analisar</button>
+                        <button class="control-btn warning" id="reactBtn">💥 Reagir</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📊 Informações da Molécula</h3>
+                    <div class="molecule-info">
+                        <div id="moleculeName">Nenhuma molécula carregada</div>
+                        <div class="properties-grid">
+                            <div class="property">
+                                <strong>Fórmula:</strong> <span id="moleculeFormula">-</span>
+                            </div>
+                            <div class="property">
+                                <strong>Massa Molar:</strong> <span id="moleculeMass">-</span>
+                            </div>
+                            <div class="property">
+                                <strong>Ligações:</strong> <span id="bondCount">0</span>
+                            </div>
+                            <div class="property">
+                                <strong>Grupos:</strong> <span id="functionalGroups">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🔄 Isomeria</h3>
+                    <div class="isomer-view">
+                        <div>Visualizar Isômeros:</div>
+                        <div class="isomer-buttons">
+                            <button class="isomer-btn active" data-isomer="structural">Estrutural</button>
+                            <button class="isomer-btn" data-isomer="geometric">Geométrico</button>
+                            <button class="isomer-btn" data-isomer="optical">Óptico</button>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: #9ca3af;">
+                            <span id="isomerInfo">Isômeros estruturais mostrados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>⚡ Propriedades Físicas</h3>
+                    <div class="properties-grid">
+                        <div class="property">
+                            <strong>Ponto de Fusão:</strong> <span id="meltingPoint">-</span>
+                        </div>
+                        <div class="property">
+                            <strong>Ponto de Ebulição:</strong> <span id="boilingPoint">-</span>
+                        </div>
+                        <div class="property">
+                            <strong>Solubilidade:</strong> <span id="solubility">-</span>
+                        </div>
+                        <div class="property">
+                            <strong>Polaridade:</strong> <span id="polarity">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🔬 Análise Espectral</h3>
+                    <button class="control-btn" id="irBtn">📊 IR</button>
+                    <button class="control-btn" id="nmrBtn">🧲 NMR</button>
+                    <button class="control-btn" id="massBtn">⚖️ Espectrometria</button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="status-bar">
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Laboratório Orgânico Online</span>
+                </div>
+                <div class="status-item">
+                    <span>🧬 Átomos: <span id="atomCount">0</span></span>
+                </div>
+                <div class="status-item">
+                    <span>🔗 Ligações: <span id="totalBonds">0</span></span>
+                </div>
+                <div class="status-item">
+                    <span>⚡ Hibridação: <span id="hybridization">-</span></span>
+                </div>
+            </div>
+            <div class="simulation-controls">
+                <button class="control-btn" id="resetBtn">🔄 Reiniciar</button>
+                <button class="control-btn primary" id="helpBtn">❓ Ajuda</button>
+            </div>
+        </footer>
+    </div>
+	<script src="./js/lab_organico.js"></script>
+</body>
+</html>

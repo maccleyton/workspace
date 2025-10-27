@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumLab - Módulo Nuclear</title>
+  <style>
+    :root {
+      --cosmic-dark: #0a0a1f;
+      --quantum-blue: #2563eb;
+      --plasma-purple: #8b5cf6;
+      --radioactive-green: #10b981;
+      --fusion-orange: #f59e0b;
+      --lab-white: #f8fafc;
+      --grid-gray: #374151;
+      --danger-red: #ef4444;
+      --neutron-gray: #9ca3af;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--cosmic-dark) 0%, #1a1a3e 100%);
+      color: var(--lab-white); overflow:hidden; height:100vh;
+    }
+    .lab-container {
+      display:grid;
+      grid-template-areas: "header header" "sidebar main" "status status";
+      grid-template-rows:60px 1fr 80px; grid-template-columns:300px 1fr;
+      height:100vh; gap:1px;
+    }
+    .header {
+      grid-area: header; background: rgba(15,23,42,0.95);
+      backdrop-filter: blur(10px); border-bottom:1px solid var(--grid-gray);
+      display:flex; align-items:center; justify-content:space-between; padding:0 20px;
+    }
+    .logo { display:flex; align-items:center; gap:12px; font-size:1.5rem; font-weight:bold; }
+    .nav-tabs { display:flex; gap:8px; }
+    .nav-tab { padding:8px 16px; border-radius:6px; background:rgba(255,255,255,0.1); cursor:pointer; transition:.3s; }
+    .nav-tab.active { background: var(--quantum-blue); }
+    .sidebar { grid-area: sidebar; background: rgba(15,23,42,0.8); padding:20px; overflow-y:auto; }
+    .sidebar-section { margin-bottom:30px; }
+    .section-title { font-size:.9rem; color:var(--quantum-blue); margin-bottom:15px; text-transform:uppercase; }
+    .tool-list,.element-list { list-style:none; }
+    .tool-item,.element-item {
+      padding:10px 15px; margin-bottom:8px; background:rgba(255,255,255,0.05);
+      border-radius:6px; cursor:pointer; transition:.3s; display:flex; align-items:center; gap:10px;
+    }
+    .tool-item:hover,.element-item:hover { background:rgba(255,255,255,0.1); border-left:3px solid var(--quantum-blue); }
+    .tool-item.active,.element-item.active { background:rgba(37,99,235,0.2); border-left:3px solid var(--quantum-blue); }
+
+    .main-content {
+      grid-area: main; background: rgba(10,10,31,0.5); position:relative; overflow:hidden;
+      display:grid; grid-template-columns: 1fr 400px; gap:20px; padding:20px;
+    }
+    .nuclear-canvas {
+      background: rgba(15,23,42,0.6); border-radius:15px; border:1px solid var(--grid-gray);
+      position:relative; overflow:hidden;
+    }
+    /* Canvas WebGL ocupa todo o container */
+    .nuclear-canvas canvas { position:absolute; inset:0; display:block; }
+
+    .control-panel {
+      background: rgba(15,23,42,0.8); border:1px solid var(--grid-gray);
+      border-radius:15px; padding:20px; backdrop-filter: blur(10px);
+    }
+    .panel-section { margin-bottom:25px; }
+    .slider-container { margin:15px 0; }
+    .slider-label { display:flex; justify-content:space-between; margin-bottom:5px; font-size:.9rem; }
+    .slider { width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; outline:none; -webkit-appearance:none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--quantum-blue); cursor:pointer; }
+    .reaction-buttons { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0; }
+    .reaction-btn {
+      padding:12px; border:none; border-radius:8px; background:rgba(255,255,255,0.1);
+      color:var(--lab-white); cursor:pointer; transition:.3s; font-weight:600;
+    }
+    .reaction-btn.fusion { background: linear-gradient(135deg, var(--fusion-orange), var(--danger-red)); }
+    .reaction-btn.fission { background: linear-gradient(135deg, var(--radioactive-green), #059669); }
+    .reaction-btn:hover { transform: translateY(-2px); box-shadow:0 5px 15px rgba(0,0,0,0.3); }
+
+    .energy-display { background: rgba(0,0,0,0.3); padding:15px; border-radius:10px; text-align:center; margin:15px 0; }
+    .energy-value { font-size:2rem; font-weight:bold; color:var(--radioactive-green); text-shadow:0 0 10px currentColor; }
+
+    .particle-counter { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px; }
+    .counter { background: rgba(255,255,255,0.05); padding:10px; border-radius:8px; text-align:center; }
+    .counter-value { font-size:1.5rem; font-weight:bold; color:var(--plasma-purple); }
+
+    @keyframes nuclearFlash {
+      0%{background-color:transparent;} 50%{background-color:rgba(245,158,11,0.3);} 100%{background-color:transparent;}
+    }
+    .nuclear-flash { animation: nuclearFlash .5s ease-out; }
+
+    .status-bar {
+      grid-area: status; background: rgba(15,23,42,0.95); border-top:1px solid var(--grid-gray);
+      display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:.9rem;
+    }
+    .status-indicators { display:flex; gap:30px; align-items:center; }
+    .status-item { display:flex; align-items:center; gap:8px; }
+    .simulation-controls { display:flex; gap:15px; align-items:center; }
+    .control-btn {
+      background: rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+      color:var(--lab-white); padding:6px 12px; border-radius:6px; cursor:pointer; transition:.3s;
+    }
+    .control-btn.primary { background: var(--quantum-blue); }
+  </style>
+  <!-- Three.js para renderização 3D -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+</head>
+<body>
+  <div class="lab-container">
+    <header class="header">
+      <div class="logo"><span>🌌</span><span>QuantumLab - Módulo Nuclear</span></div>
+      <div class="nav-tabs">
+        <div class="nav-tab active">⚛️ Nuclear</div>
+        <div class="nav-tab">🧪 Química</div>
+        <div class="nav-tab">🧬 Orgânica</div>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">🔧 Ferramentas Nucleares</div>
+        <ul class="tool-list">
+          <li class="tool-item active" data-tool="select">🔬 Selecionar Elemento</li>
+          <li class="tool-item" data-tool="add-proton">⊕ Adicionar Próton</li>
+          <li class="tool-item" data-tool="add-neutron">⊘ Adicionar Nêutron</li>
+          <li class="tool-item" data-tool="decay">☢️ Decaimento Radioativo</li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="section-title">🧪 Elementos</div>
+        <ul class="element-list">
+          <li class="element-item" data-element="H">H - Hidrogênio (1p)</li>
+          <li class="element-item" data-element="He">He - Hélio (2p)</li>
+          <li class="element-item" data-element="Li">Li - Lítio (3p)</li>
+          <li class="element-item" data-element="U">U - Urânio-235 (92p)</li>
+          <li class="element-item" data-element="Pu">Pu - Plutônio-239 (94p)</li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="nuclear-canvas" id="nuclearCanvas"></div>
+      <div class="control-panel">
+        <div class="panel-section">
+          <h3>⚡ Controles de Energia</h3>
+          <div class="slider-container">
+            <div class="slider-label"><span>Energia de Colisão</span><span id="energyValue">5.0 MeV</span></div>
+            <input type="range" min="1" max="20" value="5" step="0.1" class="slider" id="energySlider">
+          </div>
+          <div class="slider-container">
+            <div class="slider-label"><span>Temperatura</span><span id="tempValue">1.000 K</span></div>
+            <input type="range" min="100" max="100000" value="1000" step="100" class="slider" id="tempSlider">
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>💥 Reações Nucleares</h3>
+          <div class="reaction-buttons">
+            <button class="reaction-btn fusion" id="fusionBtn">Fusão Nuclear</button>
+            <button class="reaction-btn fission" id="fissionBtn">Fissão Nuclear</button>
+          </div>
+          <div class="energy-display">
+            <div>Energia Liberada</div>
+            <div class="energy-value" id="releasedEnergy">0.0 MeV</div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>📊 Partículas</h3>
+          <div class="particle-counter">
+            <div class="counter"><div>Prótons</div><div class="counter-value" id="protonCount">1</div></div>
+            <div class="counter"><div>Nêutrons</div><div class="counter-value" id="neutronCount">0</div></div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>⚠️ Decaimento</h3>
+          <button class="reaction-btn" id="alphaDecayBtn">Decaimento Alpha</button>
+          <button class="reaction-btn" id="betaDecayBtn">Decaimento Beta</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="status-bar">
+      <div class="status-indicators">
+        <div class="status-item"><div class="status-dot"></div><span>Sistema Nuclear Online</span></div>
+        <div class="status-item"><span>⚛️ Elemento: <span id="currentElement">Hidrogênio</span></span></div>
+        <div class="status-item"><span>🧪 Massa: <span id="currentMass">1.008 u</span></span></div>
+        <div class="status-item"><span>☢️ Estabilidade: <span id="stability">Estável</span></span></div>
+      </div>
+      <div class="simulation-controls">
+        <button class="control-btn" id="resetBtn">🔄 Reiniciar</button>
+        <button class="control-btn primary" id="simulateBtn">▶️ Simular</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./js/lab_nuclear.js"></script>
+</body>
+</html>

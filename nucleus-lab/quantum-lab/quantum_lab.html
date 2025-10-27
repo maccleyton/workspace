@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumLab - Laboratório Virtual</title>
+    <link href="./css/style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <div class="lab-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🌌</span>
+                <span>QuantumLab</span>
+            </div>
+
+            <div class="nav-tabs">
+                <div class="nav-tabs">
+                    <a class="nav-tab" href="lab_nuclear.html">⚛️ Nuclear</a>
+                    <a class="nav-tab" href="lab_quimico.html">🧪 Química</a>
+                    <a class="nav-tab" href="lab_organico.html">🧬 Orgânica</a>
+                    <a class="nav-tab" href="lab_temodinamico.html">🌡️ Termo</a>
+                    <a class="nav-tab" href="lab_atomico.html">⚛️ Atômico</a>
+                    <a class="nav-tab" href="lab_fisica.html">⚛️ Física</a>
+                    <a class="nav-tab" href="lab_cosmico.html">🪐 Cósmico</a>
+                    <a class="nav-tab" href="md_editor.html">👨‍💻 Editor</a>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <input type="text" class="search-bar" placeholder="🔍 Buscar experimento...">
+                <button class="icon-btn">👤</button>
+                <button class="icon-btn">⚙️</button>
+            </div>
+        </header>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="section-title">🧪 Ferramentas</div>
+                <ul class="tool-list">
+                    <li class="tool-item active" data-tool="select-atom">
+                        <span>🔬</span>
+                        <span>Selecionar Átomo</span>
+                    </li>
+                    <li class="tool-item" data-tool="add-energy">
+                        <span>⚡</span>
+                        <span>Adicionar Energia</span>
+                    </li>
+                    <li class="tool-item" data-tool="magnetic-field">
+                        <span>🧲</span>
+                        <span>Campo Magnético</span>
+                    </li>
+                    <li class="tool-item" data-tool="control-temperature">
+                        <span>🌡️</span>
+                        <span>Controlar Temperatura</span>
+                    </li>
+                    <li class="tool-item" data-tool="spectrometer">
+                        <span>📡</span>
+                        <span>Espectrômetro</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">📊 Instrumentos</div>
+                <ul class="instrument-list">
+                    <li class="instrument-item">
+                        <span>📡</span>
+                        <span>Espectrômetro</span>
+                    </li>
+                    <li class="instrument-item">
+                        <span>☢️</span>
+                        <span>Detector de Radiação</span>
+                    </li>
+                    <li class="instrument-item">
+                        <span>🎚️</span>
+                        <span>Medidor de pH</span>
+                    </li>
+                    <li class="instrument-item">
+                        <span>🌡️</span>
+                        <span>Termômetro</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">💾 Projetos</div>
+                <ul class="project-list">
+                    <li class="project-item">
+                        <span>✅</span>
+                        <span>Experimento Água</span>
+                    </li>
+                    <li class="project-item">
+                        <span>⏳</span>
+                        <span>Fusão Nuclear Test</span>
+                    </li>
+                    <li class="project-item">
+                        <span>📁</span>
+                        <span>Novo Projeto</span>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- ÁREA PRINCIPAL -->
+        <main class="main-content">
+            <div class="visualization-area">
+                <div class="atom-canvas" id="atom-canvas">
+                    <div class="atom-display" id="atom-display">
+                        <!-- Núcleo 3D -->
+                        <div class="nucleus-3d" id="nucleus-3d"></div>
+                        
+                        <!-- Partículas térmicas -->
+                        <div class="thermal-particles" id="thermal-particles"></div>
+                        
+                        <!-- Linhas de campo magnético -->
+                        <div class="magnetic-field-lines" id="magnetic-field-lines">
+                            <div class="field-line"></div>
+                            <div class="field-line"></div>
+                            <div class="field-line"></div>
+                            <div class="field-line"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel do Espectrômetro -->
+                <div class="spectrometer-panel" id="spectrometer-panel" style="display: none;">
+                    <h3>📡 Espectrômetro</h3>
+                    <div class="spectrum-display" id="spectrum-display">
+                        <!-- Linhas espectrais serão geradas aqui -->
+                    </div>
+                    <div class="wavelength-scale">
+                        <span>380nm</span>
+                        <span>450nm</span>
+                        <span>495nm</span>
+                        <span>570nm</span>
+                        <span>590nm</span>
+                        <span>620nm</span>
+                        <span>750nm</span>
+                    </div>
+                    <div class="spectrum-info">
+                        <div class="spectrum-peak">
+                            <div class="property-label">Linha Principal</div>
+                            <div class="property-value" id="main-line">656.3 nm</div>
+                        </div>
+                        <div class="spectrum-peak">
+                            <div class="property-label">Intensidade</div>
+                            <div class="property-value" id="intensity">85%</div>
+                        </div>
+                        <div class="spectrum-peak">
+                            <div class="property-label">Série</div>
+                            <div class="property-value" id="series">Balmer</div>
+                        </div>
+                        <div class="spectrum-peak">
+                            <div class="property-label">Transição</div>
+                            <div class="property-value" id="transition">n=3→2</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button class="control-btn" id="analyze-spectrum-btn">Analisar Espectro</button>
+                    </div>
+                </div>
+
+                <!-- Painel de Energia -->
+                <div class="energy-panel" id="energy-panel" style="display: none;">
+                    <h3>⚡ Adicionar Energia</h3>
+                    <div class="energy-controls">
+                        <label>Nível de Energia (eV):</label>
+                        <input type="range" class="energy-slider" id="energy-slider" min="1" max="20" value="5" step="0.1">
+                        <div class="energy-value" id="energy-value">5.0 eV</div>
+                    </div>
+                    <div class="energy-buttons">
+                        <button class="control-btn energy" id="excite-btn">Excitar Elétrons</button>
+                        <button class="control-btn" id="reset-energy-btn">Resetar</button>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.8rem; opacity: 0.8;">
+                        <div>🎯 Elétrons excitados: <span id="excited-count">0</span></div>
+                        <div>💫 Fótons emitidos: <span id="photon-count">0</span></div>
+                    </div>
+                </div>
+
+                <!-- Painel Magnético -->
+                <div class="magnetic-panel" id="magnetic-panel" style="display: none;">
+                    <h3>🧲 Campo Magnético</h3>
+                    <div class="magnetic-controls">
+                        <label>Intensidade do Campo (T):</label>
+                        <input type="range" class="magnetic-slider" id="magnetic-slider" min="0" max="10" value="0" step="0.1">
+                        <div class="magnetic-value" id="magnetic-value">0.0 T</div>
+                        
+                        <label style="margin-top: 15px; display: block;">Direção do Campo:</label>
+                        <div class="field-direction">
+                            <button class="direction-btn active" data-direction="up">↑ Norte</button>
+                            <button class="direction-btn" data-direction="down">↓ Sul</button>
+                        </div>
+                    </div>
+                    <div class="magnetic-buttons">
+                        <button class="control-btn magnetic" id="apply-magnetic-btn">Aplicar Campo</button>
+                        <button class="control-btn" id="reset-magnetic-btn">Desligar</button>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.8rem; opacity: 0.8;">
+                        <div>🎯 Efeito Zeeman: <span id="zeeman-effect">Inativo</span></div>
+                        <div>🧭 Spin alinhados: <span id="spin-aligned">0</span></div>
+                    </div>
+                </div>
+
+                <!-- Painel de Temperatura -->
+                <div class="temperature-panel" id="temperature-panel" style="display: none;">
+                    <h3>🌡️ Controlar Temperatura</h3>
+                    <div class="temperature-controls">
+                        <label>Temperatura (°C):</label>
+                        <input type="range" class="temperature-slider" id="temperature-slider" min="-273" max="10000" value="25" step="1">
+                        
+                        <div class="state-indicator">
+                            <span>❄️ Sólido</span>
+                            <span>💧 Líquido</span>
+                            <span>🔥 Gás</span>
+                            <span>⚡ Plasma</span>
+                        </div>
+                        
+                        <div class="state-markers">
+                            <span>-273°C</span>
+                            <span>0°C</span>
+                            <span>100°C</span>
+                            <span>10000°C</span>
+                        </div>
+                        
+                        <div class="temperature-value normal" id="temperature-value">25°C</div>
+                        
+                        <div class="preset-temperatures">
+                            <button class="preset-btn cold" data-temp="-200">❄️ Criogênico</button>
+                            <button class="preset-btn normal" data-temp="25">🌡 Ambiente</button>
+                            <button class="preset-btn hot" data-temp="500">🔥 Quente</button>
+                            <button class="preset-btn plasma" data-temp="5000">⚡ Plasma</button>
+                        </div>
+                    </div>
+                    <div class="temperature-buttons">
+                        <button class="control-btn temperature" id="apply-temperature-btn">Aplicar Temperatura</button>
+                        <button class="control-btn" id="reset-temperature-btn">Resetar</button>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.8rem; opacity: 0.8;">
+                        <div>🎯 Estado Físico: <span id="physical-state">Gasoso</span></div>
+                        <div>📈 Energia Térmica: <span id="thermal-energy">0 eV</span></div>
+                    </div>
+                </div>
+
+                <!-- Painel de Informações do Elemento -->
+                <div class="element-info-panel" id="element-info">
+                    <div class="element-header">
+                        <div class="element-symbol" id="info-symbol">H</div>
+                        <div>
+                            <div class="element-name" id="info-name">Hidrogênio</div>
+                            <div id="info-group">Não Metal</div>
+                        </div>
+                    </div>
+                    <div class="property-grid">
+                        <div class="property">
+                            <div class="property-label">Número Atômico</div>
+                            <div class="property-value" id="info-atomic-number">1</div>
+                        </div>
+                        <div class="property">
+                            <div class="property-label">Massa Atômica</div>
+                            <div class="property-value" id="info-atomic-mass">1.008 u</div>
+                        </div>
+                        <div class="property">
+                            <div class="property-label">Configuração Eletrônica</div>
+                            <div class="property-value" id="info-electron-config">1s¹</div>
+                        </div>
+                        <div class="property">
+                            <div class="property-label">Eletronegatividade</div>
+                            <div class="property-value" id="info-electronegativity">2.20</div>
+                        </div>
+                        <div class="property">
+                            <div class="property-label">Ponto de Fusão</div>
+                            <div class="property-value" id="info-melting-point">-259°C</div>
+                        </div>
+                        <div class="property">
+                            <div class="property-label">Ponto de Ebulição</div>
+                            <div class="property-value" id="info-boiling-point">-253°C</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel de Reação -->
+                <div class="reaction-panel">
+                    <div class="reaction-formula" id="reaction-formula">
+                        Átomo Selecionado
+                    </div>
+                    <div class="reaction-status" id="reaction-status">
+                        ✅ Sistema estável
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- PAINEL DE STATUS -->
+        <footer class="status-bar">
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Sistema Online</span>
+                </div>
+                <div class="status-item">
+                    <span>⚛️ Elemento: <span id="current-element">Hidrogênio</span></span>
+                </div>
+                <div class="status-item">
+                    <span>🧬 Elétrons: <span id="electron-count">1</span></span>
+                </div>
+                <div class="status-item">
+                    <span>🔥 Estado: <span id="element-state">Gasoso</span></span>
+                </div>
+                <div class="status-item">
+                    <span>🌡️ Temperatura: <span id="current-temperature">25°C</span></span>
+                </div>
+            </div>
+
+            <div class="simulation-controls">
+                <div class="status-item">
+                    <span>📏 Escala: <span id="scale-value">1nm</span></span>
+                </div>
+                <div class="status-item">
+                    <span>⏱️ Tempo: <span id="time-scale">1.0x</span></span>
+                </div>
+                <button class="control-btn">🎬 Gravar</button>
+                <button class="control-btn primary" id="play-pause-btn">⏸️ Pausar</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODAL DA TABELA PERIÓDICA -->
+    <div class="modal-overlay" id="periodic-table-modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px; text-align: center;">🌌 Tabela Periódica - Selecione um Elemento</h2>
+            <div class="periodic-table" id="periodic-table">
+                <!-- A tabela periódica será gerada via JavaScript -->
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="control-btn" onclick="closePeriodicTable()">Fechar</button>
+            </div>
+        </div>
+    </div>
+	<script src="./js/quantum_lab.js"></script>
+</body>
+</html>

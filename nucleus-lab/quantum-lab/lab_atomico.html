@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuantumLab - Módulo Atômico</title>
+  <link href="./css/style.css" rel="stylesheet" type="text/css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+</head>
+<body>
+  <div class="lab-container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo">
+        <span>⚛</span>
+        <span>QuantumLab - Módulo Atômico</span>
+      </div>
+      <div class="nav-tabs">
+        <a class="nav-tab" href="lab_nuclear.html">⚛️ Nuclear</a>
+        <a class="nav-tab" href="lab_quimico.html">🧪 Química</a>
+        <a class="nav-tab" href="lab_organico.html">🧬 Orgânica</a>
+        <a class="nav-tab" href="lab_temodinamico.html">🌡️ Termo</a>
+        <a class="nav-tab active" href="lab_atomico.html">⚛️ Atômico</a>
+        <a class="nav-tab" href="lab_fisica.html">⚛️ Física</a>
+        <a class="nav-tab" href="lab_cosmico.html">🪐 Cósmico</a>
+        <a class="nav-tab" href="md_editor.html">👨‍💻 Editor</a>
+        <a class="nav-tab" href="quantum_lab.html">🌌 QuantumLab</a>
+      </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">🎮 Controles de Partículas</div>
+        <div class="particle-controls">
+          <div class="particle-group">
+            <div class="particle-title">⚛️ Prótons (+1)</div>
+            <button onclick="addParticle('proton')">➕ Adicionar</button>
+            <button class="secondary" onclick="removeParticle('proton')">➖ Remover</button>
+          </div>
+          <div class="particle-group">
+            <div class="particle-title">⚪ Nêutrons (0)</div>
+            <button onclick="addParticle('neutron')">➕ Adicionar</button>
+            <button class="secondary" onclick="removeParticle('neutron')">➖ Remover</button>
+          </div>
+          <div class="particle-group">
+            <div class="particle-title">🔵 Elétrons (-1)</div>
+            <button onclick="addParticle('electron')">➕ Adicionar</button>
+            <button class="secondary" onclick="removeParticle('electron')">➖ Remover</button>
+          </div>
+          <div class="particle-group">
+            <div class="particle-title">⚡ Ações</div>
+            <button class="success" onclick="analyzeAtom()">🔍 Analisar</button>
+            <button class="warning" onclick="resetAll()">🗑️ Limpar Tudo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-title">📊 Informações do Elemento</div>
+        <div class="element-info">
+          <div class="element-name" id="elementName">Nenhum átomo criado</div>
+          <div class="element-stats">
+            <div class="stat"><div class="stat-value" id="protonCount">0</div><div class="stat-label">Prótons</div></div>
+            <div class="stat"><div class="stat-value" id="neutronCount">0</div><div class="stat-label">Nêutrons</div></div>
+            <div class="stat"><div class="stat-value" id="electronCount">0</div><div class="stat-label">Elétrons</div></div>
+            <div class="stat"><div class="stat-value" id="massNumber">0</div><div class="stat-label">Nº de Massa</div></div>
+          </div>
+          <div class="stability-indicator" id="stabilityIndicator">Crie um átomo para ver sua estabilidade</div>
+          <div id="elementDetails" style="font-size:0.95em; line-height:1.4;">
+            <p><strong>Carga:</strong> <span id="charge">0</span></p>
+            <p><strong>Configuração eletrônica:</strong> <span id="electronConfig">-</span></p>
+            <p><strong>Meia-vida:</strong> <span id="halfLife">-</span></p>
+            <p><strong>Energia de ligação:</strong> <span id="bindingEnergy">-</span></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <div class="atom-lab">
+        <!-- Canvas 3D -->
+        <div class="creation-area">
+          <div id="atom3d"></div>
+          <div class="controls-3d">
+            <button class="control-btn" onclick="resetCamera()">🔄 Resetar Câmera</button>
+            <button class="control-btn" onclick="toggleAutoRotate()">⏸️ Rotação</button>
+            <button class="control-btn" onclick="toggleElectronOrbits()">🌀 Órbitas</button>
+          </div>
+        </div>
+
+        <!-- Tabela Periódica -->
+        <div class="periodic-table-section">
+          <div class="section-title">🧪 Tabela Periódica dos Elementos</div>
+          <div class="table-controls">
+            <button class="control-btn" onclick="showAllElements()">Todos</button>
+            <button class="control-btn" onclick="showStableElements()">Estáveis</button>
+            <button class="control-btn" onclick="showRadioactiveElements()">Radioativos</button>
+            <button class="control-btn" onclick="showUserElements()">Meus Elementos</button>
+          </div>
+          <div class="periodic-table" id="periodicTable"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="status-bar">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span>Sistema Atômico Online</span>
+      </div>
+      <div class="status-item">
+        <span>🧪 Elemento Atual: <span id="footerElement">Nenhum</span></span>
+      </div>
+      <div class="status-item">
+        <span>⚛️ Carga Total: <span id="footerCharge">0</span></span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./js/lab_atomico.js"></script>
+</body>
+</html>

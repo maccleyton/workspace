@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Laboratório Atômico — QuantumLab</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.min.js"></script>
+  <link href="./css/nucleuslab.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+  <header>
+    <h1>Laboratório Atômico — QuantumLab</h1>
+    <p>Simulador de Física Nuclear Interativa (2D + 3D)</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-target="criacao">🧩 Criação de Átomos</div>
+    <div class="tab" data-target="fusao">☢️ Fusão de Elementos</div>
+    <div class="tab" data-target="colisor">💥 Colisor de Partículas</div>
+  </div>
+
+  <!-- MODO 1: CRIAÇÃO DE ÁTOMOS -->
+  <div id="criacao" class="module active">
+    <div class="canvas-area">
+      <div class="canvas-header">
+        <strong>Visualização</strong>
+        <div class="view-switch">
+          <button id="btn2D_cr" class="btn small active">2D</button>
+          <button id="btn3D_cr" class="btn small">3D</button>
+          <label class="zoom-wrap">Zoom <input id="zoomCriacao" type="range" min="50" max="200" value="100"/></label>
+        </div>
+      </div>
+
+      <!-- Canvas 2D -->
+      <canvas id="canvasCriacao" width="640" height="480"></canvas>
+
+      <!-- Canvas 3D -->
+      <div id="canvasCriacao3D" class="three-wrap"></div>
+
+      <div class="chrono" id="chronoCriacao">⏱️ 00:00</div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="card-title">Partículas</div>
+      <label>Prótons (Z): <b id="protonVal">1</b></label>
+      <input type="range" min="1" max="118" value="1" id="protonRange">
+      <label>Nêutrons (N): <b id="neutronVal">0</b></label>
+      <input type="range" min="0" max="200" value="0" id="neutronRange">
+      <label>Elétrons (e⁻): <b id="electronVal">1</b></label>
+      <input type="range" min="0" max="200" value="1" id="electronRange">
+
+      <div style="margin-top:8px">
+        <button class="success" onclick="analyzeCriacao()">Analisar Estabilidade</button>
+        <button class="warning" onclick="resetCriacao()">Resetar</button>
+      </div>
+
+      <div class="card-title">Variáveis Físicas</div>
+      <div class="slider-container">
+        <div class="slider-label"><span>Temperatura</span><span id="tempValue">25°C</span></div>
+        <input type="range" min="0" max="100" value="25" id="tempSlider">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label"><span>Pressão</span><span id="pressValue">1 atm</span></div>
+        <input type="range" min="1" max="10" value="1" id="pressSlider">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label"><span>Campo Magnético</span><span id="magValue">50%</span></div>
+        <input type="range" min="0" max="100" value="50" id="magSlider">
+      </div>
+
+      <div class="radiation-detector">
+        <strong>☢️ Detector de Radiação</strong>
+        <div class="radiation-meter"><div class="radiation-bar" id="radBar"></div></div>
+        <div id="radLabel">Seguro</div>
+      </div>
+    </div>
+
+    <div class="results-panel">
+      <div class="card-title">Resultados</div>
+      <div id="log"></div>
+
+      <div class="card-title" style="margin-top:10px;">Informações do Elemento</div>
+      <div id="elementInfo" class="info-grid">
+        <div><b>Nome:</b> <span id="elName">—</span></div>
+        <div><b>Símbolo:</b> <span id="elSymbol">—</span></div>
+        <div><b>Z:</b> <span id="elZ">—</span></div>
+        <div><b>N:</b> <span id="elN">—</span></div>
+        <div><b>Config. Eletrônica:</b> <span id="elCfg">—</span></div>
+        <div><b>Estabilidade:</b> <span id="elStab">—</span></div>
+        <div><b>Meia-vida:</b> <span id="elHalf">—</span></div>
+        <div><b>Ponto Fusão:</b> <span id="elMP">—</span></div>
+        <div><b>Ponto Ebulição:</b> <span id="elBP">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODO 2: FUSÃO DE ELEMENTOS -->
+  <div id="fusao" class="module">
+    <div class="canvas-area">
+      <canvas id="canvasFusao" width="640" height="480"></canvas>
+      <div id="canvasFusao3D" class="three-wrap"></div>
+      <div class="chrono" id="chronoFusao">⏱️ 00:00</div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="card-title">Selecionar Elementos</div>
+      <label>Elemento 1</label>
+      <select id="el1Select"></select>
+      <button onclick="useCurrentAs(1)">Usar átomo atual</button>
+
+      <label style="margin-top:8px">Elemento 2</label>
+      <select id="el2Select"></select>
+      <button onclick="useCurrentAs(2)">Usar átomo atual</button>
+
+      <div style="margin-top:10px">
+        <button class="success" onclick="fuseElements()">Iniciar Fusão</button>
+        <button class="warning" onclick="resetFusao()">Resetar</button>
+      </div>
+
+      <div class="card-title" style="margin-top:10px;">Controles</div>
+      <div class="slider-container">
+        <div class="slider-label"><span>Temperatura</span><span id="tempFusaoValue">5000K</span></div>
+        <input type="range" min="0" max="10000" value="5000" id="tempFusao">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label"><span>Pressão</span><span id="pressFusaoValue">5 atm</span></div>
+        <input type="range" min="1" max="20" value="5" id="pressFusao">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label"><span>Campo Magnético</span><span id="magFusaoValue">70%</span></div>
+        <input type="range" min="0" max="100" value="70" id="magFusao">
+      </div>
+
+      <div class="radiation-detector">
+        <strong>☢️ Detector de Radiação</strong>
+        <div class="radiation-meter"><div class="radiation-bar" id="radBarFusao"></div></div>
+        <div id="radLabelFusao">Aguardando Fusão...</div>
+      </div>
+    </div>
+
+    <div class="results-panel">
+      <div class="card-title">Resultados da Fusão</div>
+      <div id="logFusao"></div>
+    </div>
+  </div>
+
+  <!-- MODO 3: COLISOR DE PARTÍCULAS -->
+  <div id="colisor" class="module">
+    <div class="canvas-area">
+      <canvas id="canvasColisor" width="640" height="480"></canvas>
+      <div id="canvasColisor3D" class="three-wrap"></div>
+      <div class="chrono" id="chronoColisor">⏱️ 00:00</div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="card-title">Partículas do Feixe</div>
+      <label>Feixe A</label>
+      <select id="beamA"></select>
+      <label style="margin-top:8px">Feixe B</label>
+      <select id="beamB"></select>
+
+      <div class="card-title" style="margin-top:12px">Configurar Feixe</div>
+      <div class="slider-container">
+        <div class="slider-label"><span>Energia</span><span id="energiaValue">10 GeV</span></div>
+        <input type="range" min="1" max="100" value="10" id="energiaSlider">
+      </div>
+      <div class="slider-container">
+        <div class="slider-label"><span>Intensidade</span><span id="intValue">50%</span></div>
+        <input type="range" min="10" max="100" value="50" id="intSlider">
+      </div>
+
+      <button onclick="startCollider()">Iniciar Colisor</button>
+      <button class="warning" onclick="stopCollider()">Parar</button>
+      <button class="success" onclick="analyzeCollision()">Analisar Evento</button>
+
+      <div class="radiation-detector">
+        <strong>☢️ Detector de Radiação</strong>
+        <div class="radiation-meter"><div class="radiation-bar" id="radBarColisor"></div></div>
+        <div id="radLabelColisor">Sistema Inicializado</div>
+      </div>
+    </div>
+
+    <div class="results-panel">
+      <div class="card-title">Resultados do Colisor</div>
+      <div id="logColisor"></div>
+    </div>
+  </div>
+
+  <!-- Dados dos elementos (118) -->
+  <script src="./js/elements_data.js"></script>
+  <!-- Lógica -->
+  <script src="./js/lab_atomico.js"></script>
+
+  <script>
+    // Alternar módulos
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.target).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

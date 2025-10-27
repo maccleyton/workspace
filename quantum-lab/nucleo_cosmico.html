@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuantumLab — Módulo Cósmico</title>
+  <style>
+    /* ========================================
+       TEMAS CÓSMICOS
+       ======================================== */
+    :root {
+      --space-black: #0a0b1a;
+      --quantum-blue: #2563eb;
+      --cosmic-cyan: #4fc3f7;
+      --stellar-gold: #ffd700;
+      --nebula-purple: #8b5cf6;
+      --stable-green: #10b981;
+      --unstable-red: #ef4444;
+      --lab-gray: #1e293b;
+      --lab-border: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+    }
+
+    /* ========================================
+       RESET & BASE
+       ======================================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--space-black);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .lab-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-areas:
+        "header header"
+        "sidebar main"
+        "footer footer";
+      grid-template-columns: 280px 1fr;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+      height: calc(100vh - 32px);
+    }
+
+    /* ========================================
+       HEADER
+       ======================================== */
+    .header {
+      grid-area: header;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--lab-border);
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo {
+      font-size: 1.4em;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo span:first-child {
+      font-size: 1.8em;
+    }
+
+    /* ========================================
+       SIDEBAR
+       ======================================== */
+    .sidebar {
+      grid-area: sidebar;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--lab-border);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .sidebar-section .section-title {
+      color: var(--cosmic-cyan);
+      font-size: 1.2em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar p {
+      color: var(--text-secondary);
+      font-size: 0.95em;
+      line-height: 1.6;
+    }
+
+    /* ========================================
+       MAIN CONTENT
+       ======================================== */
+    .main-content {
+      grid-area: main;
+      overflow: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 24px;
+      padding: 12px;
+    }
+
+    section {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--lab-border);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    section h3 {
+      color: var(--cosmic-cyan);
+      margin-bottom: 16px;
+      font-size: 1.3em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Inputs e botões */
+    textarea, input[type="range"] {
+      width: 100%;
+      padding: 10px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--lab-border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      background: var(--quantum-blue);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    button.warning {
+      background: var(--unstable-red);
+    }
+
+    button.warning:hover {
+      background: #dc2626;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      color: var(--text-secondary);
+      font-family: ui-monospace, SFMono-Regular, 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    .small {
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .pill {
+      background: var(--lab-gray);
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      margin: 8px 0;
+      color: var(--cosmic-cyan);
+    }
+
+    /* ========================================
+       CARTAS BINÁRIAS
+       ======================================== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 16px;
+      border: 2px dashed var(--quantum-blue);
+      border-radius: 10px;
+      min-height: 140px;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--quantum-blue);
+      border-radius: 10px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .card:hover {
+      background: rgba(37, 99, 235, 0.3);
+      transform: translateY(-3px);
+    }
+
+    .card.selected {
+      border-color: var(--stellar-gold);
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+    }
+
+    .card-symbol {
+      font-size: 1.6em;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .card-label {
+      font-size: 0.85em;
+      opacity: 0.85;
+    }
+
+    .drop-zone {
+      min-height: 100px;
+      border: 2px dashed var(--cosmic-cyan);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .stats {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 14px;
+      border-radius: 10px;
+      margin-top: 14px;
+      font-size: 0.95em;
+    }
+
+    .stats div {
+      margin: 6px 0;
+    }
+
+    /* ========================================
+       FOOTER / STATUS
+       ======================================== */
+    .status-bar {
+      grid-area: footer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--lab-border);
+      border-radius: 12px;
+      padding: 0 24px;
+      height: 50px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--stable-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--stable-green);
+    }
+
+    /* ========================================
+       RESPONSIVIDADE
+       ======================================== */
+    @media (max-width: 1200px) {
+      .lab-container {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "header"
+          "main"
+          "sidebar"
+          "footer";
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="lab-container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo">
+        <span>🪐</span>
+        <span>QuantumLab — Módulo Cósmico</span>
+      </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">🪐 Experimentos Cósmicos</div>
+        <p>
+          Explore simulações onde dados, física e poesia se entrelaçam.
+          Cada ferramenta é uma janela para o funcionamento do universo.
+        </p>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+      <div class="grid">
+        <!-- Conversor Texto/Binário -->
+        <section>
+          <h3>🪐 Conversor texto ↔ binário</h3>
+          <textarea id="txtInput" rows="4" placeholder="Digite texto para converter em binário ou cole binário (separado por espaços)..."></textarea>
+          <div class="row">
+            <button id="btnToBin">Texto → Binário</button>
+            <button id="btnToTxt">Binário → Texto</button>
+            <button id="btnClear">Limpar</button>
+          </div>
+          <pre id="txtOutput" class="mono"></pre>
+          <p class="small">Conversão Unicode com padding mínimo de 8 bits por caractere.</p>
+        </section>
+
+        <!-- Mapa Cósmico -->
+        <section>
+          <h3>🌌 Mapa cósmico (Canvas)</h3>
+          <canvas id="cosmicCanvas" width="800" height="500"></canvas>
+          <div class="row" style="margin-top:12px;">
+            <button id="btnCosmicDraw">Desenhar</button>
+            <button id="btnCosmicStart">Iniciar animação</button>
+            <button id="btnCosmicStop" disabled>Parar</button>
+            <div style="flex:1;"></div>
+            <div style="display:flex; flex-direction:column; width:180px;">
+              <label class="small" for="speedRange">Velocidade</label>
+              <input id="speedRange" type="range" min="0" max="3" value="1" step="0.1" />
+            </div>
+          </div>
+          <p class="small">Galáxia espiral com rotação e pulsação periódica.</p>
+        </section>
+
+        <!-- Universe GPT -->
+        <section>
+          <h3>✨ Universe GPT</h3>
+          <div class="row">
+            <button id="btnGptOne">Gerar frase</button>
+            <button id="btnGptLoop">Iniciar loop</button>
+            <button id="btnGptStop" disabled>Parar loop</button>
+          </div>
+          <div style="margin-top:16px;">
+            <div class="pill">Frase</div>
+            <pre id="gptPhrase"></pre>
+            <div class="pill">Binário</div>
+            <pre id="gptBinary" class="mono"></pre>
+          </div>
+          <p class="small">Frases poético-científicas geradas localmente.</p>
+        </section>
+
+        <!-- Quiz Cósmico -->
+        <section>
+          <h3>❓ Quiz cósmico (V/F)</h3>
+          <div class="row">
+            <button id="btnQuizStart">Iniciar quiz</button>
+          </div>
+          <div id="quizRoot" style="margin-top:16px;"></div>
+          <p class="small">Teste seu conhecimento sobre o cosmos.</p>
+        </section>
+
+        <!-- Cartas Binárias -->
+        <section>
+          <h3>⚛️ Cartas binárias</h3>
+          <div class="row">
+            <button id="btnCardsGen">Gerar cartas</button>
+            <button id="btnCardsReset" disabled>Resetar</button>
+          </div>
+          <div class="row" style="margin-top:16px; gap:20px;">
+            <div style="flex:2;">
+              <div id="cardsRoot" class="cards-grid"></div>
+            </div>
+            <div style="flex:1;">
+              <div class="pill">Núcleo (arraste aqui)</div>
+              <div id="nucleusZone" class="drop-zone">Solte partículas</div>
+              <div id="nucleusStats" class="stats"></div>
+            </div>
+          </div>
+          <p class="small">Combine prótons e elétrons para formar nêutrons. Construa núcleos estáveis.</p>
+        </section>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="status-bar">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span>Simulações Cósmicas Ativas</span>
+      </div>
+      <div class="status-item">
+        <span>🪐 Estado: <span id="cosmicStatus">Pronto</span></span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./js/lab_cosmico.js"></script>
+</body>
+</html>

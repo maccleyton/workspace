@@ -1,0 +1,562 @@
+/* VARIÁVEIS E ESTILOS BASE */
+:root {
+	--cosmic-dark: #0a0a1f;
+	--thermal-orange: #f97316;
+	--heat-red: #dc2626;
+	--cold-blue: #3b82f6;
+	--work-purple: #8b5cf6;
+	--entropy-green: #10b981;
+	--lab-white: #f8fafc;
+	--grid-gray: #374151;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background: linear-gradient(135deg, var(--cosmic-dark) 0%, #1a1a3e 100%);
+	color: var(--lab-white);
+	overflow: hidden;
+	height: 100vh;
+}
+
+.lab-container {
+	display: grid;
+	grid-template-areas:
+		"header header"
+		"sidebar main"
+		"status status";
+	grid-template-rows: 60px 1fr 80px;
+	grid-template-columns: 300px 1fr;
+	height: 100vh;
+	gap: 1px;
+}
+
+/* HEADER */
+.header {
+	grid-area: header;
+	background: rgba(15, 23, 42, 0.95);
+	backdrop-filter: blur(10px);
+	border-bottom: 1px solid var(--grid-gray);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+}
+
+.logo { 
+	display: flex; 
+	align-items: center; 
+	gap: 12px; 
+	font-size: 1.5rem; 
+	font-weight: bold; 
+}
+
+.nav-tabs { 
+	display: flex; 
+	gap: 8px; 
+}
+
+.nav-tab { 
+	padding: 8px 16px; 
+	border-radius: 6px; 
+	background: rgba(255,255,255,0.1); 
+	cursor: pointer; 
+	transition: all 0.3s ease; 
+}
+
+.nav-tab.active { 
+	background: var(--thermal-orange); 
+}
+
+.nav-tab:hover {
+	background: rgba(249, 115, 22, 0.3);
+}
+
+/* SIDEBAR TERMODINÂMICA */
+.sidebar {
+	grid-area: sidebar;
+	background: rgba(15, 23, 42, 0.8);
+	padding: 20px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+}
+
+.sidebar-section {
+	background: rgba(255,255,255,0.05);
+	border-radius: 10px;
+	padding: 15px;
+}
+
+.section-title {
+	font-size: 0.9rem;
+	color: var(--thermal-orange);
+	margin-bottom: 15px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.system-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	margin-bottom: 15px;
+}
+
+.system-btn {
+	padding: 12px 8px;
+	background: rgba(255,255,255,0.1);
+	border: 1px solid rgba(255,255,255,0.2);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+	font-size: 0.8rem;
+}
+
+.system-btn:hover {
+	background: rgba(249, 115, 22, 0.3);
+	transform: translateY(-2px);
+}
+
+.system-btn.active {
+	background: var(--thermal-orange);
+	border-color: var(--thermal-orange);
+}
+
+.process-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.process-btn {
+	padding: 10px;
+	background: rgba(255,255,255,0.05);
+	border: 1px solid rgba(255,255,255,0.1);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: left;
+	font-size: 0.9rem;
+}
+
+.process-btn:hover {
+	background: rgba(59, 130, 246, 0.3);
+	border-color: var(--cold-blue);
+}
+
+.process-btn.active {
+	background: rgba(59, 130, 246, 0.5);
+	border-color: var(--cold-blue);
+}
+
+.law-buttons {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 8px;
+}
+
+.law-btn {
+	padding: 10px;
+	background: rgba(16, 185, 129, 0.2);
+	border: 1px solid var(--entropy-green);
+	border-radius: 6px;
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+	font-size: 0.9rem;
+}
+
+.law-btn:hover {
+	background: rgba(16, 185, 129, 0.4);
+}
+
+/* ÁREA PRINCIPAL TERMODINÂMICA */
+.main-content {
+	grid-area: main;
+	background: rgba(10, 10, 31, 0.5);
+	display: grid;
+	grid-template-columns: 1fr 400px;
+	gap: 20px;
+	padding: 20px;
+}
+
+.thermo-canvas {
+	background: 
+		linear-gradient(45deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%),
+		repeating-linear-gradient(0deg, transparent, transparent 25px, rgba(249, 115, 22, 0.05) 25px, rgba(249, 115, 22, 0.05) 26px);
+	border: 2px solid rgba(249, 115, 22, 0.3);
+	border-radius: 15px;
+	position: relative;
+	overflow: hidden;
+}
+
+.simulation-area {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+/* MÁQUINA TÉRMICA */
+.heat-engine {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 300px;
+	height: 200px;
+}
+
+.piston-chamber {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.chamber {
+	position: absolute;
+	width: 120px;
+	height: 180px;
+	background: rgba(255,255,255,0.1);
+	border: 2px solid rgba(255,255,255,0.3);
+	border-radius: 10px 10px 0 0;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	overflow: hidden;
+}
+
+.piston {
+	position: absolute;
+	width: 110px;
+	height: 20px;
+	background: linear-gradient(90deg, #4b5563, #6b7280);
+	border-radius: 5px 5px 0 0;
+	bottom: 40px;
+	left: 50%;
+	transform: translateX(-50%);
+	transition: bottom 0.5s ease;
+}
+
+.gas-particles {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	bottom: 0;
+}
+
+.gas-particle {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background: rgba(59, 130, 246, 0.8);
+	border-radius: 50%;
+	animation: gasMove 2s infinite linear;
+}
+
+.heat-source {
+	position: absolute;
+	width: 140px;
+	height: 20px;
+	background: linear-gradient(90deg, var(--heat-red), #ef4444);
+	bottom: -25px;
+	left: 50%;
+	transform: translateX(-50%);
+	border-radius: 5px;
+}
+
+.cold-sink {
+	position: absolute;
+	width: 140px;
+	height: 20px;
+	background: linear-gradient(90deg, var(--cold-blue), #60a5fa);
+	top: -25px;
+	left: 50%;
+	transform: translateX(-50%);
+	border-radius: 5px;
+}
+
+.crank-shaft {
+	position: absolute;
+	width: 200px;
+	height: 4px;
+	background: #d1d5db;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) rotate(0deg);
+	transform-origin: center;
+	transition: transform 0.5s ease;
+}
+
+/* DIAGRAMA PV */
+.pv-diagram {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	width: 250px;
+	height: 180px;
+	background: rgba(0,0,0,0.7);
+	border: 1px solid rgba(255,255,255,0.2);
+	border-radius: 8px;
+	padding: 10px;
+}
+
+.graph-axis {
+	position: absolute;
+	background: rgba(255,255,255,0.5);
+}
+
+.axis-x {
+	width: 100%;
+	height: 1px;
+	bottom: 20px;
+	left: 0;
+}
+
+.axis-y {
+	width: 1px;
+	height: 100%;
+	bottom: 20px;
+	left: 20px;
+}
+
+.thermodynamic-cycle {
+	position: absolute;
+	width: calc(100% - 40px);
+	height: calc(100% - 40px);
+	bottom: 20px;
+	left: 20px;
+}
+
+.cycle-path {
+	fill: none;
+	stroke: var(--work-purple);
+	stroke-width: 2;
+	stroke-dasharray: 5, 5;
+}
+
+/* PARTÍCULAS DE CALOR */
+.heat-particle {
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--heat-red);
+	animation: heatRise 3s infinite linear;
+}
+
+.cold-particle {
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--cold-blue);
+	animation: coldFall 3s infinite linear;
+}
+
+/* PAINEL DE CONTROLE TERMODINÂMICA */
+.control-panel {
+	background: rgba(15, 23, 42, 0.8);
+	border: 1px solid var(--grid-gray);
+	border-radius: 15px;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.parameter-controls {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
+}
+
+.control-group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.slider-container {
+	margin: 10px 0;
+}
+
+.slider-label {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 5px;
+	font-size: 0.9rem;
+}
+
+.slider {
+	width: 100%;
+	height: 6px;
+	background: rgba(255,255,255,0.1);
+	border-radius: 3px;
+	outline: none;
+	-webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: var(--thermal-orange);
+	cursor: pointer;
+}
+
+.value-display {
+	background: rgba(0,0,0,0.3);
+	padding: 10px;
+	border-radius: 8px;
+	text-align: center;
+	font-family: 'Courier New', monospace;
+}
+
+.value-large {
+	font-size: 1.8rem;
+	font-weight: bold;
+	margin: 5px 0;
+}
+
+.energy-flow {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin: 15px 0;
+}
+
+.flow-item {
+	background: rgba(255,255,255,0.05);
+	padding: 10px;
+	border-radius: 8px;
+	text-align: center;
+}
+
+.flow-value {
+	font-size: 1.2rem;
+	font-weight: bold;
+	margin-top: 5px;
+}
+
+.control-buttons {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.control-btn {
+	padding: 12px;
+	border: none;
+	border-radius: 8px;
+	background: rgba(255,255,255,0.1);
+	color: var(--lab-white);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	font-weight: 600;
+}
+
+.control-btn.primary {
+	background: var(--thermal-orange);
+}
+
+.control-btn.success {
+	background: var(--entropy-green);
+}
+
+.control-btn.warning {
+	background: var(--heat-red);
+}
+
+.control-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* STATUS BAR */
+.status-bar {
+	grid-area: status;
+	background: rgba(15, 23, 42, 0.95);
+	border-top: 1px solid var(--grid-gray);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+	font-size: 0.9rem;
+}
+
+.status-indicators {
+	display: flex;
+	gap: 30px;
+	align-items: center;
+}
+
+.status-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.status-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--thermal-orange);
+}
+
+.simulation-controls {
+	display: flex;
+	gap: 15px;
+	align-items: center;
+}
+
+/* ANIMAÇÕES */
+@keyframes gasMove {
+	0%, 100% { transform: translate(0, 0); }
+	25% { transform: translate(10px, -10px); }
+	50% { transform: translate(-5px, -20px); }
+	75% { transform: translate(-10px, -5px); }
+}
+
+@keyframes heatRise {
+	0% { transform: translateY(0) scale(1); opacity: 1; }
+	100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+}
+
+@keyframes coldFall {
+	0% { transform: translateY(0) scale(1); opacity: 1; }
+	100% { transform: translateY(100px) scale(0.5); opacity: 0; }
+}
+
+@keyframes pistonMove {
+	0%, 100% { bottom: 40px; }
+	50% { bottom: 120px; }
+}
+
+.piston-moving {
+	animation: pistonMove 2s infinite ease-in-out;
+}
+
+.crank-rotating {
+	animation: crankRotate 2s infinite linear;
+}
+
+@keyframes crankRotate {
+	0% { transform: translate(-50%, -50%) rotate(0deg); }
+	100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

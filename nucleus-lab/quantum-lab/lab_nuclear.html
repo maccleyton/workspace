@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumLab - Módulo Nuclear</title>
+  <link href="./css/style.css" rel="stylesheet" type="text/css"/>
+  <!-- Three.js para renderização 3D -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+</head>
+<body>
+  <div class="lab-container">
+    <header class="header">
+      <div class="logo">
+			<span>🌌</span>
+			<span>QuantumLab - Módulo Nuclear</span></div>
+      <div class="nav-tabs">
+		<a class="nav-tab active" href="lab_nuclear.html">⚛️ Nuclear</a>
+		<a class="nav-tab" href="lab_quimico.html">🧪 Química</a>
+		<a class="nav-tab" href="lab_organico.html">🧬 Orgânica</a>
+		<a class="nav-tab" href="lab_temodinamico.html">🌡️ Termo</a>
+		<a class="nav-tab" href="lab_atomico.html">⚛️ Atômico</a>
+		<a class="nav-tab" href="lab_fisica.html">⚛️ Física</a>
+		<a class="nav-tab" href="lab_cosmico.html">🪐 Cósmico</a>
+		<a class="nav-tab" href="md_editor.html">👨‍💻 Editor</a>
+		<a class="nav-tab" href="quantum_lab.html">🌌 QuantumLab</a>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">🔧 Ferramentas Nucleares</div>
+        <ul class="tool-list">
+          <li class="tool-item active" data-tool="select">🔬 Selecionar Elemento</li>
+          <li class="tool-item" data-tool="add-proton">⊕ Adicionar Próton</li>
+          <li class="tool-item" data-tool="add-neutron">⊘ Adicionar Nêutron</li>
+          <li class="tool-item" data-tool="decay">☢️ Decaimento Radioativo</li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="section-title">🧪 Elementos</div>
+        <ul class="element-list">
+          <li class="element-item" data-element="H">H - Hidrogênio (1p)</li>
+          <li class="element-item" data-element="He">He - Hélio (2p)</li>
+          <li class="element-item" data-element="Li">Li - Lítio (3p)</li>
+          <li class="element-item" data-element="U">U - Urânio-235 (92p)</li>
+          <li class="element-item" data-element="Pu">Pu - Plutônio-239 (94p)</li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="nuclear-canvas" id="nuclearCanvas"></div>
+      <div class="control-panel">
+        <div class="panel-section">
+          <h3>⚡ Controles de Energia</h3>
+          <div class="slider-container">
+            <div class="slider-label"><span>Energia de Colisão</span><span id="energyValue">5.0 MeV</span></div>
+            <input type="range" min="1" max="20" value="5" step="0.1" class="slider" id="energySlider">
+          </div>
+          <div class="slider-container">
+            <div class="slider-label"><span>Temperatura</span><span id="tempValue">1.000 K</span></div>
+            <input type="range" min="100" max="100000" value="1000" step="100" class="slider" id="tempSlider">
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>💥 Reações Nucleares</h3>
+          <div class="reaction-buttons">
+            <button class="reaction-btn fusion" id="fusionBtn">Fusão Nuclear</button>
+            <button class="reaction-btn fission" id="fissionBtn">Fissão Nuclear</button>
+          </div>
+          <div class="energy-display">
+            <div>Energia Liberada</div>
+            <div class="energy-value" id="releasedEnergy">0.0 MeV</div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>📊 Partículas</h3>
+          <div class="particle-counter">
+            <div class="counter"><div>Prótons</div><div class="counter-value" id="protonCount">1</div></div>
+            <div class="counter"><div>Nêutrons</div><div class="counter-value" id="neutronCount">0</div></div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>⚠️ Decaimento</h3>
+          <button class="reaction-btn" id="alphaDecayBtn">Decaimento Alpha</button>
+          <button class="reaction-btn" id="betaDecayBtn">Decaimento Beta</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="status-bar">
+      <div class="status-indicators">
+        <div class="status-item"><div class="status-dot"></div><span>Sistema Nuclear Online</span></div>
+        <div class="status-item"><span>⚛️ Elemento: <span id="currentElement">Hidrogênio</span></span></div>
+        <div class="status-item"><span>🧪 Massa: <span id="currentMass">1.008 u</span></span></div>
+        <div class="status-item"><span>☢️ Estabilidade: <span id="stability">Estável</span></span></div>
+      </div>
+      <div class="simulation-controls">
+        <button class="control-btn" id="resetBtn">🔄 Reiniciar</button>
+        <button class="control-btn primary" id="simulateBtn">▶️ Simular</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./js/lab_nuclear.js"></script>
+</body>
+</html>
