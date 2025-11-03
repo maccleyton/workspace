@@ -1,0 +1,105 @@
+Funções C5
+
+---
+
+### 🧠 Funções utilitárias
+
+- **`function $(s)`**  
+  Atalho para `document.querySelector(s)`, usado para selecionar elementos do DOM com CSS selectors.
+
+- **`debounce(fn, w)`**  
+  Evita que uma função seja chamada muitas vezes em sequência. Espera `w` milissegundos após a última chamada antes de executar.
+
+- **`escapeHtml(s)`**  
+  Escapa caracteres especiais (`<`, `>`, `&`) para evitar problemas ao exibir código HTML.
+
+---
+
+### 🖊️ Editor e informações
+
+- **`setCaretInfo()`**  
+  Atualiza a posição do cursor no editor, mostrando linha e coluna.
+
+- **`setCountInfo()`**  
+  Exibe a contagem de caracteres do texto no editor.
+
+---
+
+### 📐 Markdown + LaTeX
+
+- **`renderLatex(text)`**  
+  Converte fórmulas LaTeX delimitadas por `$...$` ou `$$...$$` em HTML usando KaTeX. Protege blocos de código e tabelas durante o processo.
+
+- **`mdToHtml(md)`**  
+  Converte Markdown em HTML. Suporta cabeçalhos, listas, blocos de código, tabelas, citações, tarefas, links, imagens, e LaTeX. Usa `renderLatex` internamente.
+
+---
+
+### 📄 Renderização e páginas
+
+- **`applySettings()`**  
+  Aplica estilos visuais definidos em `settings` (cores, espaçamento, zoom etc.) aos elementos da página renderizada.
+
+- **`splitIntoPages(html)`**  
+  Divide o conteúdo HTML em páginas separadas, criando uma nova página ao encontrar `h1` ou `h2`.
+
+- **`createPage()`**  
+  Cria a estrutura de uma nova página com `.page` e `.page-inner`.
+
+- **`render()`**  
+  Função principal de renderização. Converte Markdown em HTML, divide em páginas, aplica estilos e atualiza contadores. Usa `debounce`.
+
+---
+
+### ✍️ Inserções e atalhos
+
+- **`wrapSelection(prefix, suffix, placeholder)`**  
+  Envolve o texto selecionado com prefixo/sufixo (ex: `**texto**` para negrito). Se nada estiver selecionado, insere um placeholder.
+
+- **`insertLine(prefix, placeholder)`**  
+  Insere uma linha no início da linha atual com prefixo (ex: `- ` para listas).
+
+- **`insertLatexBlock()`**  
+  Insere um bloco de LaTeX de exemplo no editor.
+
+- **`insertTable()`**  
+  Insere uma tabela Markdown de exemplo no editor.
+
+---
+
+### 📦 Exportações
+
+- **Exportar PDF (`#exportPDF`)**  
+  Usa `html2pdf` para gerar um PDF do conteúdo renderizado.
+
+- **Exportar HTML (`#exportHTML`)**  
+  Gera um arquivo `.html` com o conteúdo renderizado e estilos embutidos.
+
+- **Baixar Markdown (`#downloadMD`)**  
+  Salva o conteúdo do editor como um arquivo `.md`.
+
+---
+
+### 🌗 Tema e configurações
+
+- **`themeBtn.addEventListener('click')`**  
+  Alterna entre tema claro e escuro, salvando a preferência no `localStorage`.
+
+- **`toggleSettings()`**  
+  Mostra ou oculta o painel de configurações.
+
+- **Listeners de input (`#h1-color`, `#margin`, etc.)**  
+  Atualizam os valores em `settings` e reaplicam os estilos ao conteúdo.
+
+- **`resetSettings()`**  
+  Restaura os valores padrão de estilo e reaplica.
+
+---
+
+### 🧩 Inicialização
+
+- **`(function(){ ... })()`**  
+  Carrega o conteúdo salvo do `localStorage`, aplica o tema e renderiza o conteúdo ao iniciar.
+
+---
+

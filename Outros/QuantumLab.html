@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8"/>
+	<meta content="width=device-width,initial-scale=1" name="viewport"/>
+	<title>QuantumLab Editor</title>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+	<style>
+:root {
+	--cosmic-dark:#0a0a1f;
+	--quantum-blue:#2563eb;
+	--plasma-purple:#8b5cf6;
+	--radioactive-green:#10b981;
+	--fusion-orange:#f59e0b;
+	--lab-white:#f8fafc;
+	--grid-gray:#374151;
+	--danger-red:#ef4444;
+	--magnetic-blue:#3b82f6;
+	--cold-blue:#60a5fa;
+	--hot-red:#ef4444;
+	--plasma-pink:#ec4899;
+	--lab-black:#0a0a1f;
+	
+	--bg: linear-gradient(135deg, var(--cosmic-dark) 0%, #1a1a3e 100%);
+	--panel: rgba(15,23,42,0.95);
+	--muted: rgba(248,250,252,0.7);
+	--accent: var(--quantum-blue);
+	--page: #ffffff;
+	--shadow: 0 14px 40px rgba(0,0,0,0.6);
+	--header-h:64px;
+	--toolbar-h:56px;
+	--status-h:40px;
+	--sidebar-w:260px;
+	--sidebar-collapsed:64px;
+}
+
+* {
+	box-sizing:border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html, body {
+	height:100%;
+	font-family:"Segoe UI", Roboto, Arial, sans-serif;
+	background:var(--bg);
+	color:var(--lab-white);
+	-webkit-font-smoothing:antialiased;
+}
+
+.header {
+	display:flex;
+	align-items:center;
+	gap:12px;
+	padding:12px 16px;
+	height:var(--header-h);
+	background:rgba(15,23,42,0.95);
+	border-bottom:1px solid var(--grid-gray);
+	backdrop-filter:blur(10px);
+	box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+.logo {
+	font-weight:800;
+	font-size:22px;
+	color:var(--cold-blue);
+	text-shadow:0 1px 8px rgba(96,165,250,0.25);
+}
+
+.toolbar {
+	display:flex;
+	align-items:center;
+	gap:8px;
+	padding:8px 14px;
+	height:var(--toolbar-h);
+	background: rgba(15,23,42,0.95);
+	border-bottom:1px solid var(--grid-gray);
+	backdrop-filter: blur(10px);
+	flex-wrap: wrap;
+	overflow-x: auto;
+}
+
+.group {
+	display:flex;
+	align-items:center;
+	gap:6px;
+}
+
+.icon-btn {
+	background: rgba(255,255,255,0.08);
+	color: var(--lab-white);
+	width: 36px;
+	height:36px;
+	border-radius:6px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	cursor:pointer;
+	border:1px solid rgba(255,255,255,0.18);
+	transition: background .2s, border-color .2s, transform .1s;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.icon-btn:hover {
+	background: rgba(37,99,235,0.30);
+	border-color: var(--quantum-blue);
+	transform: translateY(-1px);
+}
+
+.sep {
+	width:1px;
+	height:28px;
+	background: rgba(255,255,255,0.08);
+	margin:0 8px;
+}
+
+.container {
+	display: flex;
+	height: calc(100vh - var(--header-h) - var(--toolbar-h) - var(--toolbar-h) - var(--status-h));
+	overflow: hidden;
+}
+
+.sidebar {
+	width:var(--sidebar-w);
+	min-width:var(--sidebar-w);
+	background: var(--panel);
+	padding:14px;
+	border-right:1px solid var(--grid-gray);
+	transition: width .22s ease;
+	overflow:auto;
+	backdrop-filter: blur(10px);
+}
+
+.sidebar.collapsed {
+	width:var(--sidebar-collapsed);
+	min-width:var(--sidebar-collapsed);
+}
+
+.sidebar .item {
+	color:var(--muted);
+	margin-bottom:10px;
+}
+
+.sidebar .btn-small {
+	display:flex;
+	align-items:center;
+	gap:8px;
+	background: rgba(255,255,255,0.08);
+	padding:8px;
+	border-radius:6px;
+	border:1px solid rgba(255,255,255,0.18);
+	cursor:pointer;
+	color:var(--lab-white);
+	transition: background .2s, transform .1s;
+	width: 100%;
+	font-size: 13px;
+}
+
+.sidebar .btn-small:hover {
+	background: rgba(37,99,235,0.30);
+	border-color: var(--quantum-blue);
+	transform: translateY(-1px);
+}
+
+.sidebar.collapsed .text {
+	display:none;
+}
+
+.editor-area {
+	flex:1;
+	display:flex;
+	justify-content:center;
+	align-items:flex-start;
+	padding:20px;
+	overflow:auto;
+	background: linear-gradient(180deg, rgba(15,23,42,0.8), rgba(10,10,31,0.9));
+}
+
+.page-viewport {
+	position:relative;
+	padding:24px;
+	display:flex;
+	flex-direction: column;
+	gap: 20px;
+	justify-content:center;
+	align-items:center;
+	min-height:100%;
+}
+
+.sheet {
+	background: var(--page);
+	width: 794px;
+	min-height: 1123px;
+	box-shadow: var(--shadow);
+	position:relative;
+	transform-origin: top center;
+	overflow:visible;
+	border-radius: 8px;
+	border: 1px solid rgba(0,0,0,0.08);
+	margin-bottom: 20px;
+}
+
+.page-wrap {
+	width:100%;
+	min-height:1123px;
+	padding:72px 64px;
+	color:#0b0b0b;
+	font-size:16px;
+	line-height:1.6;
+	outline:none;
+}
+
+.page-wrap:focus {
+	outline: 2px solid var(--quantum-blue);
+	outline-offset: -2px;
+}
+
+.page-wrap h1 {
+	font-size: 32px;
+	margin-bottom: 20px;
+	color: #1a1a1a;
+	border-bottom: 3px solid #2563eb;
+	padding-bottom: 10px;
+}
+
+.page-wrap h2 {
+	font-size: 26px;
+	margin-bottom: 16px;
+	color: #2a2a2a;
+	border-bottom: 2px solid #059669;
+	padding-bottom: 8px;
+}
+
+.page-wrap h3 {
+	font-size: 22px;
+	margin-bottom: 12px;
+	color: #3a3a3a;
+}
+
+.page-wrap p {
+	margin-bottom: 16px;
+	text-align: justify;
+}
+
+.page-wrap ul, .page-wrap ol {
+	margin-bottom: 16px;
+	padding-left: 30px;
+}
+
+.page-wrap li {
+	margin-bottom: 8px;
+}
+
+.page-wrap blockquote {
+	border-left: 4px solid #667eea;
+	padding: 12px 16px;
+	margin: 16px 0;
+	color: #666;
+	font-style: italic;
+	background: #f9f9f9;
+	border-radius: 4px;
+}
+
+.page-wrap hr {
+	border: none;
+	border-top: 2px solid #e0e0e0;
+	margin: 24px 0;
+}
+
+.page-wrap table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 16px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.page-wrap table thead {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+}
+
+.page-wrap table th,
+.page-wrap table td {
+	border: 1px solid #ddd;
+	padding: 12px;
+	text-align: left;
+}
+
+.page-wrap table tbody tr:nth-child(even) {
+	background: #f9f9f9;
+}
+
+.page-wrap code {
+	background: #f4f4f4;
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-family: monospace;
+	font-size: 14px;
+	color: #e83e8c;
+}
+
+.page-wrap pre {
+	background: #e3f2fd;
+	color: #1e3a8a;
+	padding: 16px;
+	border-radius: 6px;
+	overflow-x: auto;
+	margin-bottom: 16px;
+	border-left: 4px solid #667eea;
+}
+
+.page-wrap pre code {
+	background: none;
+	padding: 0;
+	color: inherit;
+}
+
+.page-wrap img {
+	max-width: 100%;
+	height: auto;
+	margin: 16px 0;
+	border-radius: 6px;
+}
+
+.page-wrap .katex-display {
+	background: #f3e8ff;
+	padding: 16px;
+	border-radius: 6px;
+	margin: 20px 0;
+	overflow-x: auto;
+}
+
+.statusbar {
+	height: var(--status-h);
+	background: rgba(15,23,42,0.95);
+	border-top:1px solid var(--grid-gray);
+	display:flex;
+	align-items:center;
+	padding:8px 12px;
+	color:var(--muted);
+	backdrop-filter: blur(8px);
+	box-shadow: 0 -4px 20px rgba(0,0,0,0.35);
+}
+
+.statusbar .left {
+	display:flex;
+	gap:12px;
+}
+
+.zoom {
+	margin-left:auto;
+	display:flex;
+	align-items:center;
+	gap:8px;
+}
+
+.zoom input {
+	width:200px;
+	accent-color: var(--quantum-blue);
+}
+
+@media (max-width:1100px){
+	.sidebar{ display:none; }
+}
+
+.material-icon {
+	font-family:'Material Icons';
+	font-size:20px;
+}
+	</style>
+</head>
+<body>
+	<div class="header">
+		<div class="logo">QuantumLab - Markdown Editor</div>
+	</div>
+
+	<div class="toolbar">
+		<div class="group">
+			<div class="icon-btn" onclick="execCmd('bold')" title="Negrito (Ctrl+B)"><strong>B</strong></div>
+			<div class="icon-btn" onclick="execCmd('italic')" title="Itálico (Ctrl+I)"><em>I</em></div>
+			<div class="icon-btn" onclick="execCmd('underline')" title="Sublinhado (Ctrl+U)"><u>U</u></div>
+			<div class="icon-btn" onclick="execCmd('strikeThrough')" title="Tachado"><s>S</s></div>
+		</div>
+		<div class="sep"></div>
+		<div class="group">
+			<div class="icon-btn" onclick="formatHeading('h1')" title="Título 1">H1</div>
+			<div class="icon-btn" onclick="formatHeading('h2')" title="Título 2">H2</div>
+			<div class="icon-btn" onclick="formatHeading('h3')" title="Título 3">H3</div>
+		</div>
+		<div class="sep"></div>
+		<div class="group">
+			<div class="icon-btn" onclick="execCmd('justifyLeft')" title="Alinhar à Esquerda">⬅</div>
+			<div class="icon-btn" onclick="execCmd('justifyCenter')" title="Centralizar">↔</div>
+			<div class="icon-btn" onclick="execCmd('justifyRight')" title="Alinhar à Direita">➡</div>
+			<div class="icon-btn" onclick="execCmd('justifyFull')" title="Justificar">⬌</div>
+		</div>
+		<div class="sep"></div>
+		<div class="group">
+			<div class="icon-btn" onclick="execCmd('insertUnorderedList')" title="Lista">•</div>
+			<div class="icon-btn" onclick="execCmd('insertOrderedList')" title="Lista Numerada">1.</div>
+			<div class="icon-btn" onclick="insertBlockquote()" title="Citação">"</div>
+			<div class="icon-btn" onclick="insertHR()" title="Linha Horizontal">—</div>
+		</div>
+		<div class="sep"></div>
+		<div class="group">
+			<div class="icon-btn" onclick="insertTable()" title="Tabela">⊞</div>
+			<div class="icon-btn" onclick="insertLatex()" title="Fórmula LaTeX">∫</div>
+			<div class="icon-btn" onclick="insertCode()" title="Código">&lt;/&gt;</div>
+			<div class="icon-btn" onclick="insertImage()" title="Imagem">🖼</div>
+		</div>
+	</div>
+
+	<div class="toolbar">
+		<div class="group">
+			<div class="icon-btn" onclick="newDocument()" title="Novo">📄</div>
+			<div class="icon-btn" onclick="openFile()" title="Abrir">📂</div>
+			<div class="icon-btn" onclick="saveAsMarkdown()" title="Salvar MD">💾</div>
+			<div class="icon-btn" onclick="exportHTML()" title="Exportar HTML">🌐</div>
+			<div class="icon-btn" onclick="exportPDF()" title="Exportar PDF">📑</div>
+			<div class="icon-btn" onclick="printDoc()" title="Imprimir">🖨</div>
+		</div>
+		<div class="sep"></div>
+		<div class="group">
+			<div class="icon-btn" onclick="execCmd('undo')" title="Desfazer">↶</div>
+			<div class="icon-btn" onclick="execCmd('redo')" title="Refazer">↷</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<aside class="sidebar" id="sidebar">
+			<button class="btn-small" id="toggleSidebar" onclick="toggleSidebar()">
+				<span class="material-icon">chevron_left</span>
+				<span class="text">Recolher</span>
+			</button>
+			<div class="item">
+				<div style="margin-bottom:8px">
+					<strong style="color:#fff">Navegação</strong>
+				</div>
+				<div style="display:flex;flex-direction:column;gap:8px">
+					<button class="btn-small"><span class="text">Títulos</span></button>
+					<button class="btn-small"><span class="text">Páginas</span></button>
+					<button class="btn-small"><span class="text">Referências</span></button>
+				</div>
+			</div>
+		</aside>
+
+		<main class="editor-area" id="editorArea">
+			<div class="page-viewport" id="viewport">
+				<article class="sheet">
+					<div class="page-wrap" contenteditable="true" id="editor" spellcheck="true">
+						<h1>Bem-vindo ao QuantumLab Editor</h1>
+						<p>Este é um editor visual que salva em <strong>Markdown</strong>!</p>
+						<p>Digite normalmente e use os botões da barra de ferramentas para formatar.</p>
+						<h2>Recursos</h2>
+						<ul>
+							<li>Edição visual tipo Word</li>
+							<li>Salva em formato Markdown</li>
+							<li>Suporte a LaTeX, tabelas e código</li>
+							<li>Exportação para PDF e HTML</li>
+						</ul>
+					</div>
+				</article>
+			</div>
+		</main>
+	</div>
+
+	<div class="statusbar">
+		<div class="left">
+			<span id="pageInfo">Página 1</span> • 
+			<span id="wordCount">0 palavras</span>
+		</div>
+		<div class="zoom">
+			<label>Zoom</label>
+			<input id="zoomRange" max="200" min="50" type="range" value="100" oninput="applyZoom(this.value)"/>
+			<span id="zoomLabel">100%</span>
+		</div>
+	</div>
+
+	<input type="file" id="fileInput" accept=".md,.markdown,.txt" style="display:none" onchange="handleFileOpen(event)">
+
+	<script>
+const editor = document.getElementById('editor');
+const viewport = document.getElementById('viewport');
+
+// Comandos básicos
+function execCmd(command, value = null) {
+	document.execCommand(command, false, value);
+	editor.focus();
+}
+
+// Formatação de títulos
+function formatHeading(tag) {
+	document.execCommand('formatBlock', false, tag);
+	editor.focus();
+}
+
+// Inserir linha horizontal
+function insertHR() {
+	document.execCommand('insertHTML', false, '<hr>');
+}
+
+// Inserir blockquote
+function insertBlockquote() {
+	document.execCommand('formatBlock', false, 'blockquote');
+}
+
+// Inserir tabela
+function insertTable() {
+	const html = `<table>
+		<thead>
+			<tr><th>Coluna 1</th><th>Coluna 2</th><th>Coluna 3</th></tr>
+		</thead>
+		<tbody>
+			<tr><td>A</td><td>B</td><td>C</td></tr>
+			<tr><td>D</td><td>E</td><td>F</td></tr>
+		</tbody>
+	</table><p><br></p>`;
+	document.execCommand('insertHTML', false, html);
+}
+
+// Inserir LaTeX
+function insertLatex() {
+	const formula = prompt('Digite a fórmula LaTeX:', 'E = mc^2');
+	if (formula) {
+		try {
+			const rendered = katex.renderToString(formula, { displayMode: true, throwOnError: false });
+			document.execCommand('insertHTML', false, `<div class="katex-display">${rendered}</div><p><br></p>`);
+		} catch(e) {
+			alert('Erro ao renderizar LaTeX');
+		}
+	}
+}
+
+// Inserir código
+function insertCode() {
+	const code = prompt('Digite o código:', 'console.log("Hello");');
+	if (code) {
+		const html = `<pre><code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre><p><br></p>`;
+		document.execCommand('insertHTML', false, html);
+	}
+}
+
+// Inserir imagem
+function insertImage() {
+	const url = prompt('URL da imagem:');
+	if (url) {
+		document.execCommand('insertImage', false, url);
+	}
+}
+
+// Converter HTML para Markdown
+function htmlToMarkdown(html) {
+	let md = html;
+	
+	// Títulos
+	md = md.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '\n# $1\n\n');
+	md = md.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '\n## $1\n\n');
+	md = md.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '\n### $1\n\n');
+	
+	// Negrito e itálico
+	md = md.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+	md = md.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+	md = md.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+	md = md.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+	md = md.replace(/<u[^>]*>(.*?)<\/u>/gi, '<u>$1</u>');
+	md = md.replace(/<s[^>]*>(.*?)<\/s>/gi, '~~$1~~');
+	
+	// Links e imagens
+	md = md.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+	md = md.replace(/<img[^>]*src="([^"]*)"[^>]*alt="([^"]*)"[^>]*>/gi, '![$2]($1)');
+	md = md.replace(/<img[^>]*src="([^"]*)"[^>]*>/gi, '![]($1)');
+	
+	// Listas
+	md = md.replace(/<ul[^>]*>(.*?)<\/ul>/gis, function(match, content) {
+		return content.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n');
+	});
+	md = md.replace(/<ol[^>]*>(.*?)<\/ol>/gis, function(match, content) {
+		let counter = 1;
+		return content.replace(/<li[^>]*>(.*?)<\/li>/gi, function(m, c) {
+			return (counter++) + '. ' + c + '\n';
+		});
+	});
+	
+	// Código
+	md = md.replace(/<code[^>]*>(.*?)<\/code>/gi, '`$1`');
+	md = md.replace(/<pre[^>]*><code[^>]*>(.*?)<\/code><\/pre>/gis, '\n```\n$1\n```\n\n');
+	
+	// Blockquote
+	md = md.replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gis, function(m, c) {
+		return '\n> ' + c.replace(/<br[^>]*>/gi, '\n> ').trim() + '\n\n';
+	});
+	
+	// HR
+	md = md.replace(/<hr[^>]*>/gi, '\n---\n\n');
+	
+	// Parágrafos
+	md = md.replace(/<p[^>]*>(.*?)<\/p>/gis, '$1\n\n');
+	md = md.replace(/<div[^>]*>(.*?)<\/div>/gis, '$1\n\n');
+	md = md.replace(/<br[^>]*>/gi, '\n');
+	
+	// LaTeX (preservar)
+	md = md.replace(/<div class="katex-display"[^>]*>(.*?)<\/div>/gis, '\n$$\nLaTeX aqui\n$$\n\n');
+	
+	// Tabelas (simplificado)
+	md = md.replace(/<table[^>]*>(.*?)<\/table>/gis, function(match, content) {
+		let tablemd = '\n';
+		const rows = content.match(/<tr[^>]*>(.*?)<\/tr>/gis) || [];
+		rows.forEach((row, idx) => {
+			const cells = row.match(/<t[hd][^>]*>(.*?)<\/t[hd]>/gis) || [];
+			tablemd += '| ' + cells.map(c => c.replace(/<[^>]+>/g, '').trim()).join(' | ') + ' |\n';
+			if (idx === 0) {
+				tablemd += '| ' + cells.map(() => '---').join(' | ') + ' |\n';
+			}
+		});
+		return tablemd + '\n';
+	});
+	
+	// Limpar tags restantes
+	md = md.replace(/<[^>]+>/g, '');
+	md = md.replace(/&nbsp;/gi, ' ');
+	md = md.replace(/&lt;/gi, '<');
+	md = md.replace(/&gt;/gi, '>');
+	md = md.replace(/&amp;/gi, '&');
+	
+	// Limpar espaços extras
+	md = md.replace(/\n{3,}/g, '\n\n');
+	md = md.trim();
+	
+	return md;
+}
+
+// Converter Markdown para HTML
+function markdownToHTML(md) {
+	let html = md;
+	
+	// Proteção de blocos de código
+	const codeBlocks = [];
+	html = html.replace(/```([\s\S]*?)```/g, (m, code) => {
+		codeBlocks.push(code);
+		return `__CODEBLOCK_${codeBlocks.length - 1}__`;
+	});
+	
+	// Títulos
+	html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+	html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+	html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+	
+	// Negrito e itálico
+	html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+	html = html.replace(/~~(.+?)~~/g, '<s>$1</s>');
+	
+	// Links e imagens
+	html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+	html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+	
+	// Código inline
+	html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+	
+	// Listas
+	html = html.replace(/^\- (.+)$/gim, '<li>$1</li>');
+	html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+	html = html.replace(/^\d+\. (.+)$/gim, '<li>$1</li>');
+	
+	// Blockquote
+	html = html.replace(/^> (.+)$/gim, '<blockquote>$1</blockquote>');
+	
+	// HR
+	html = html.replace(/^---$/gim, '<hr>');
+	
+	// Parágrafos
+	html = html.split('\n\n').map(p => {
+		if (!p.match(/^<[h|u|o|b]/)) {
+			return '<p>' + p + '</p>';
+		}
+		return p;
+	}).join('\n');
+	
+	// Restaurar blocos de código
+	html = html.replace(/__CODEBLOCK_(\d+)__/g, (m, idx) => {
+		return '<pre><code>' + codeBlocks[idx].replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>';
+	});
+	
+	return html;
+}
+
+// Salvar como Markdown
+function saveAsMarkdown() {
+	const html = editor.innerHTML;
+	const md = htmlToMarkdown(html);
+	const blob = new Blob([md], { type: 'text/markdown' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = 'documento.md';
+	a.click();
+	URL.revokeObjectURL(url);
+}
+
+// Exportar HTML
+function exportHTML() {
+	const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Documento</title></head>
+<body style="max-width:800px;margin:40px auto;font-family:sans-serif;line-height:1.6">
+${editor.innerHTML}
+</body></html>`;
+	const blob = new Blob([html], { type: 'text/html' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = 'documento.html';
+	a.click();
+	URL.revokeObjectURL(url);
+}
+
+// Exportar PDF
+function exportPDF() {
+	const element = editor.cloneNode(true);
+	const opt = {
+		margin: 10,
+		filename: 'documento.pdf',
+		image: { type: 'jpeg', quality: 0.98 },
+		html2canvas: { scale: 2 },
+		jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+	};
+	html2pdf().set(opt).from(element).save();
+}
+
+// Imprimir
+function printDoc() {
+	window.print();
+}
+
+// Abrir arquivo
+function openFile() {
+	document.getElementById('fileInput').click();
+}
+
+function handleFileOpen(event) {
+	const file = event.target.files[0];
+	if (file) {
+		const reader = new FileReader();
+		reader.onload = function(e) {
+			const content = e.target.result;
+			// Detectar se é Markdown e converter para HTML
+			if (file.name.endsWith('.md') || file.name.endsWith('.markdown')) {
+				editor.innerHTML = markdownToHTML(content);
+			} else {
+				editor.innerHTML = content;
+			}
+			updateWordCount();
+		};
+		reader.readAsText(file);
+	}
+}
+
+// Aplicar zoom
+function applyZoom(value) {
+	const sheets = document.querySelectorAll('.sheet');
+	sheets.forEach(sheet => {
+		sheet.style.transform = `scale(${value / 100})`;
+	});
+	document.getElementById('zoomLabel').textContent = value + '%';
+}
+
+// Atualizar contador de palavras
+function updateWordCount() {
+	const text = editor.innerText || '';
+	const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+	document.getElementById('wordCount').textContent = words + ' palavras';
+}
+
+// Toggle sidebar
+function toggleSidebar() {
+	const sidebar = document.getElementById('sidebar');
+	sidebar.classList.toggle('collapsed');
+	const btn = document.getElementById('toggleSidebar');
+	const icon = btn.querySelector('.material-icon');
+	const text = btn.querySelector('.text');
+	
+	if (sidebar.classList.contains('collapsed')) {
+		icon.textContent = 'chevron_right';
+		if (text) text.textContent = 'Expandir';
+	} else {
+		icon.textContent = 'chevron_left';
+		if (text) text.textContent = 'Recolher';
+	}
+}
+
+// Paginação automática
+function autoPaginate() {
+	const content = editor.innerHTML;
+	const sheets = Array.from(viewport.querySelectorAll('.sheet'));
+	
+	// Manter apenas a primeira página
+	while (sheets.length > 1) {
+		sheets.pop().remove();
+	}
+	
+	// Verificar altura do conteúdo
+	const firstSheet = sheets[0];
+	const pageWrap = firstSheet.querySelector('.page-wrap');
+	
+	if (pageWrap.scrollHeight > 1123) {
+		// Criar nova página
+		const newSheet = document.createElement('article');
+		newSheet.className = 'sheet';
+		const newPageWrap = document.createElement('div');
+		newPageWrap.className = 'page-wrap';
+		newPageWrap.contentEditable = 'true';
+		newPageWrap.spellcheck = true;
+		newPageWrap.innerHTML = '<p><br></p>';
+		newSheet.appendChild(newPageWrap);
+		viewport.appendChild(newSheet);
+		
+		// Event listeners na nova página
+		newPageWrap.addEventListener('input', handleInput);
+		newPageWrap.addEventListener('paste', handlePaste);
+	}
+	
+	// Atualizar contador de páginas
+	const pageCount = viewport.querySelectorAll('.sheet').length;
+	document.getElementById('pageInfo').textContent = `Página ${pageCount}`;
+}
+
+// Handler de input
+function handleInput() {
+	updateWordCount();
+	// Comentado para melhor performance - pode descomentar se quiser paginação automática
+	// autoPaginate();
+}
+
+// Handler de paste
+function handlePaste(e) {
+	e.preventDefault();
+	const text = e.clipboardData.getData('text/plain');
+	document.execCommand('insertText', false, text);
+}
+
+// Event listeners
+editor.addEventListener('input', handleInput);
+editor.addEventListener('paste', handlePaste);
+
+// Atalhos de teclado
+document.addEventListener('keydown', function(e) {
+	if (e.ctrlKey || e.metaKey) {
+		switch(e.key.toLowerCase()) {
+			case 'b':
+				e.preventDefault();
+				execCmd('bold');
+				break;
+			case 'i':
+				e.preventDefault();
+				execCmd('italic');
+				break;
+			case 'u':
+				e.preventDefault();
+				execCmd('underline');
+				break;
+			case 's':
+				e.preventDefault();
+				saveAsMarkdown();
+				break;
+			case 'o':
+				e.preventDefault();
+				openFile();
+				break;
+			case 'p':
+				e.preventDefault();
+				printDoc();
+				break;
+		}
+	}
+});
+
+// Inicialização
+updateWordCount();
+
+// Auto-save no localStorage a cada 30 segundos
+setInterval(() => {
+	localStorage.setItem('quantumlab-autosave', editor.innerHTML);
+}, 30000);
+
+// Recuperar auto-save ao carregar
+window.addEventListener('load', () => {
+	const autosave = localStorage.getItem('quantumlab-autosave');
+	if (autosave && confirm('Recuperar documento salvo automaticamente?')) {
+		editor.innerHTML = autosave;
+		updateWordCount();
+	}
+});
+
+// Prevenir perda de dados ao fechar
+window.addEventListener('beforeunload', (e) => {
+	if (editor.innerHTML.trim() !== '') {
+		e.preventDefault();
+		e.returnValue = '';
+	}
+});
+
+// Estilo para impressão
+const printStyles = document.createElement('style');
+printStyles.textContent = `
+@media print {
+	body {
+		background: white !important;
+	}
+	.header, .toolbar, .sidebar, .statusbar {
+		display: none !important;
+	}
+	.container {
+		height: auto !important;
+	}
+	.editor-area {
+		padding: 0 !important;
+		background: white !important;
+	}
+	.page-viewport {
+		padding: 0 !important;
+	}
+	.sheet {
+		box-shadow: none !important;
+		border: none !important;
+		page-break-after: always;
+		transform: none !important;
+		margin: 0 !important;
+	}
+	.sheet:last-child {
+		page-break-after: auto;
+	}
+	.page-wrap {
+		padding: 20mm !important;
+	}
+}
+`;
+document.head.appendChild(printStyles);
+	</script>
+</body>
+</html>
