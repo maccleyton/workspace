@@ -113,6 +113,11 @@ body {
 	transition: all 0.3s ease;
 }
 
+hr {
+	color: blue;
+	border: 2px solid blue; /* espessura e cor */
+}
+
 /* ====== CABEÇALHO E BOTÕES ====== */
 .header {
 	display: flex;

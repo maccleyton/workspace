@@ -44,32 +44,33 @@
                 <span>✏️ Editor Markdown</span>
                 <span id="wordCount">0 palavras</span>
             </div>
-            <textarea class="editor" id="editor" placeholder="Digite seu Markdown aqui..."># 📘 **Guia de Bolso: LaTeX para Programadores e Estudantes**
+            <textarea class="editor" id="editor" placeholder="Digite seu Markdown aqui...">
+# Exemplos de texto em Markdown
 
-### 🟢 **Fundamentos do LaTeX (1–3 meses)**
+### Digite seu texto aqui
 
-**Vocabulário Básico com Tradução**
-| Termo | Tradução |
-|-------|----------|
-| `documentclass` | classe do documento |
-| `\begin{}` / `\end{}` | início / fim de ambiente |
-| `\section{}` | seção |
-| `\textbf{}` | negrito |
-| `\emph{}` | ênfase (itálico) |
-| `\item` | item de lista |
+---
 
-**Exemplos Práticos**
-```latex
-\documentclass{article} % classe do documento
-\begin{document}        % início do conteúdo
-\section{Introdução}    % título de seção
-Este é um texto em \textbf{negrito}. % texto em negrito
-\end{document}          % fim do conteúdo
+**Código inline:**
+
+`console.log("Hello Word!");`
+
+**Código em bloco:**
+
+```python
+print("Hello Word!)
 ```
 
-**Mini Desafios**
-- Traduza: "Este é um item de lista." → _This is a list item._  
-- Escreva uma seção chamada "Resumo" com um parágrafo simples.</textarea>
+**LaTeX inline:**
+
+$ E=mc^2 $
+
+**LaTeX em bloco:**
+
+$$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
+
+---
+			</textarea>
             <div class="status-info">
                 <span id="cursorInfo">Lin 1, Col 1</span>
                 <span id="charCount">0 caracteres</span>
