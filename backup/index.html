@@ -10,12 +10,12 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: #212121;
-            color: #ffffff;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
             min-height: 100vh;
             padding: 20px;
         }
@@ -34,16 +34,16 @@
         h1 {
             font-size: 2.8rem;
             margin-bottom: 10px;
-            background: linear-gradient(to right, #019875, #02b48a);
+            background: linear-gradient(to right, #4cc9f0, #4361ee);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 2px 10px rgba(1, 152, 117, 0.3);
+            text-shadow: 0 2px 10px rgba(76, 201, 240, 0.3);
         }
 
         .subtitle {
             font-size: 1.2rem;
-            color: #cfcfcf;
+            color: #b8b8d1;
             margin-bottom: 30px;
         }
 
@@ -58,20 +58,19 @@
             padding: 15px 20px;
             border-radius: 50px;
             border: none;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             color: white;
             font-size: 1rem;
             padding-left: 50px;
-            border: 1px solid #545454;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
 
         .search-bar input:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 15px rgba(1, 152, 117, 0.3);
-            border-color: #019875;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.3);
         }
 
         .search-bar i {
@@ -79,7 +78,7 @@
             left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: #cfcfcf;
+            color: #b8b8d1;
         }
 
         .modules-grid {
@@ -89,48 +88,29 @@
         }
 
         .module-card {
-            background: #121212;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
             padding: 25px;
             transition: all 0.3s ease;
             cursor: pointer;
-            border: 1px solid #545454;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             height: 100%;
             display: flex;
             flex-direction: column;
-            text-decoration: none;
-            color: inherit;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .module-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #019875;
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .module-card:hover::before {
-            transform: scaleX(1);
         }
 
         .module-card:hover {
             transform: translateY(-5px);
-            background: #1a1a1a;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            border-color: #019875;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(76, 201, 240, 0.3);
         }
 
         .card-icon {
             font-size: 2.5rem;
             margin-bottom: 15px;
-            color: #019875;
+            color: #4cc9f0;
         }
 
         .card-title {
@@ -140,7 +120,7 @@
         }
 
         .card-desc {
-            color: #cfcfcf;
+            color: #b8b8d1;
             font-size: 0.95rem;
             line-height: 1.5;
             flex-grow: 1;
@@ -156,67 +136,27 @@
         }
 
         .status-ready {
-            background: rgba(1, 152, 117, 0.2);
-            color: #019875;
-            border: 1px solid rgba(1, 152, 117, 0.3);
+            background: rgba(76, 201, 240, 0.2);
+            color: #4cc9f0;
         }
 
         .status-dev {
-            background: rgba(220, 38, 38, 0.2);
-            color: #dc2626;
-            border: 1px solid rgba(220, 38, 38, 0.3);
+            background: rgba(247, 37, 133, 0.2);
+            color: #f72585;
         }
 
         .status-planning {
-            background: rgba(234, 88, 12, 0.2);
-            color: #ea580c;
-            border: 1px solid rgba(234, 88, 12, 0.3);
-        }
-
-        .card-link {
-            display: flex;
-            align-items: center;
-            margin-top: 15px;
-            color: #019875;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .card-link i {
-            margin-left: 5px;
-            font-size: 0.8rem;
-            transition: transform 0.3s ease;
-        }
-
-        .module-card:hover .card-link i {
-            transform: translateX(3px);
+            background: rgba(114, 9, 183, 0.2);
+            color: #7209b7;
         }
 
         footer {
             text-align: center;
             margin-top: 50px;
             padding: 20px;
-            color: #cfcfcf;
+            color: #b8b8d1;
             font-size: 0.9rem;
-            border-top: 1px solid #545454;
-        }
-
-        /* Efeito de textura sutil como no editor */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                radial-gradient(circle at 15% 20%, rgba(255,255,255,0.03) 1px, transparent 2px),
-                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.02) 1.5px, transparent 2.5px),
-                radial-gradient(circle at 75% 50%, rgba(255,255,255,0.01) 1px, transparent 2px);
-            background-repeat: repeat;
-            background-size: 100px 100px;
-            pointer-events: none;
-            z-index: -1;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         @media (max-width: 768px) {
@@ -226,24 +166,6 @@
             
             h1 {
                 font-size: 2.2rem;
-            }
-            
-            body {
-                padding: 15px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .modules-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .module-card {
-                padding: 20px;
             }
         }
     </style>
@@ -262,86 +184,95 @@
 
         <div class="modules-grid">
             <!-- Módulos existentes -->
-            <a href="modules/markdown-editor.html" target="_blank" class="module-card">
+            <div class="module-card">
                 <div class="card-icon">
                     <i class="fas fa-file-alt"></i>
                 </div>
                 <h3 class="card-title">Editor de Markdown</h3>
                 <p class="card-desc">Editor avançado para criação e formatação de documentos Markdown com suporte a sintaxe científica.</p>
                 <span class="card-status status-ready">PRONTO</span>
-                <div class="card-link">
-                    Abrir módulo <i class="fas fa-external-link-alt"></i>
-                </div>
-            </a>
+            </div>
 
-            <a href="modules/formulas-interativas.html" target="_blank" class="module-card">
+            <div class="module-card">
                 <div class="card-icon">
                     <i class="fas fa-square-root-alt"></i>
                 </div>
                 <h3 class="card-title">Fórmulas Interativas</h3>
                 <p class="card-desc">Crie, edite e visualize fórmulas matemáticas complexas com interface intuitiva e recursos avançados.</p>
                 <span class="card-status status-ready">PRONTO</span>
-                <div class="card-link">
-                    Abrir módulo <i class="fas fa-external-link-alt"></i>
-                </div>
-            </a>
+            </div>
 
             <!-- Novos módulos planejados -->
-            <a href="modules/simulador-quantico.html" target="_blank" class="module-card">
+            <div class="module-card">
                 <div class="card-icon">
                     <i class="fas fa-atom"></i>
                 </div>
                 <h3 class="card-title">Simulador Quântico</h3>
                 <p class="card-desc">Simulações de sistemas quânticos e experimentos virtuais com visualização em tempo real.</p>
                 <span class="card-status status-dev">EM DESENVOLVIMENTO</span>
-                <div class="card-link">
-                    Abrir módulo <i class="fas fa-external-link-alt"></i>
-                </div>
-            </a>
+            </div>
 
-            <a href="modules/laboratorio-virtual.html" target="_blank" class="module-card">
+            <div class="module-card">
                 <div class="card-icon">
                     <i class="fas fa-vial"></i>
                 </div>
                 <h3 class="card-title">Laboratório Virtual</h3>
                 <p class="card-desc">Ambiente virtual para experimentos químicos e físicos com materiais e instrumentos simulados.</p>
                 <span class="card-status status-planning">PLANEJAMENTO</span>
-                <div class="card-link">
-                    Abrir módulo <i class="fas fa-external-link-alt"></i>
-                </div>
-            </a>
+            </div>
 
-            <div class="module-card" onclick="showComingSoon()">
+            <div class="module-card">
                 <div class="card-icon">
                     <i class="fas fa-chart-bar"></i>
                 </div>
                 <h3 class="card-title">Análise de Dados</h3>
                 <p class="card-desc">Ferramentas avançadas para análise estatística e visualização de dados científicos.</p>
                 <span class="card-status status-dev">EM DESENVOLVIMENTO</span>
-                <div class="card-link">
-                    Em breve <i class="fas fa-clock"></i>
-                </div>
             </div>
 
-            <div class="module-card" onclick="showComingSoon()">
+            <div class="module-card">
                 <div class="card-icon">
                     <i class="fas fa-code"></i>
                 </div>
                 <h3 class="card-title">Editor de Código</h3>
                 <p class="card-desc">Ambiente de desenvolvimento integrado com suporte a múltiplas linguagens de programação.</p>
                 <span class="card-status status-planning">PLANEJAMENTO</span>
-                <div class="card-link">
-                    Em breve <i class="fas fa-clock"></i>
+            </div>
+
+            <div class="module-card">
+                <div class="card-icon">
+                    <i class="fas fa-database"></i>
                 </div>
+                <h3 class="card-title">Repositório de Dados</h3>
+                <p class="card-desc">Sistema de armazenamento e gerenciamento de dados de pesquisa com versionamento.</p>
+                <span class="card-status status-planning">PLANEJAMENTO</span>
+            </div>
+
+            <div class="module-card">
+                <div class="card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="card-title">Colaboração</h3>
+                <p class="card-desc">Ferramentas para trabalho em equipe, compartilhamento de projetos e revisão colaborativa.</p>
+                <span class="card-status status-dev">EM DESENVOLVIMENTO</span>
             </div>
         </div>
 
         <footer>
-            <p>Workspace Platform &copy; 2023 - Desenvolvido para integração de projetos científicos</p>
+            <p>Plataforma Workspace &copy; 2023 - Desenvolvido para integração de projetos científicos</p>
         </footer>
     </div>
 
     <script>
+        // Adiciona interação aos cards
+        document.querySelectorAll('.module-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const title = this.querySelector('.card-title').textContent;
+                alert(`Abrindo módulo: ${title}`);
+                // Aqui você pode adicionar a lógica para abrir o módulo específico
+            });
+        });
+
         // Adiciona funcionalidade de busca
         const searchInput = document.querySelector('.search-bar input');
         searchInput.addEventListener('input', function() {
@@ -356,26 +287,6 @@
                     card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
-                }
-            });
-        });
-
-        // Função para módulos em desenvolvimento
-        function showComingSoon() {
-            alert('Este módulo está em desenvolvimento e será disponibilizado em breve!');
-        }
-
-        // Prevenir quebra para módulos não prontos
-        document.querySelectorAll('.module-card[href]').forEach(card => {
-            card.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (href && href.includes('.html')) {
-                    // Verifica se o arquivo existe (simulação)
-                    const status = this.querySelector('.card-status').textContent;
-                    if (status === 'PLANEJAMENTO' || status === 'EM DESENVOLVIMENTO') {
-                        e.preventDefault();
-                        showComingSoon();
-                    }
                 }
             });
         });

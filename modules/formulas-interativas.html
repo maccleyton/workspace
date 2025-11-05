@@ -3,188 +3,491 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Calculadora de Funções</title>
+  <title>Fórmulas Interativas - Workspace</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root{
-      --bg:#0b0c10; --panel:#111319; --ink:#e5e7eb; --muted:#97a3b6;
-      --brand:#7c3aed; --accent:#10b981; --danger:#ef4444; --sheet:#ffffff;
-      --border:#1f2540; --hover:#303a63;
+      --bg: #212121;           /* Fundo principal */
+      --panel: #121212;        /* Painéis */
+      --text: #ffffff;         /* Texto principal */
+      --muted: #cfcfcf;        /* Texto secundário */
+      --border: #545454;       /* Bordas */
+      --accent: #019875;       /* Destaque principal */
+      --accent-hover: #02b48a; /* Destaque hover */
+      --danger: #dc2626;       /* Perigo */
+      --sheet: #ffffff;        /* Folha branca */
+      --hover: #1a1a1a;        /* Hover */
     }
-    *{box-sizing:border-box; margin:0; padding:0}
-    body{
-      margin:0; background:var(--bg); color:var(--ink); 
-      font:14px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    * {
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0;
+      font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0; 
+      background: var(--bg); 
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
     }
 
     /* Header */
-    .header{
-      display:flex; justify-content:space-between; align-items:center;
-      padding:14px 20px; background:#0f1220; border-bottom:1px solid var(--border);
-      box-shadow:0 2px 8px rgba(0,0,0,.3);
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,.5);
     }
-    .header .logo{
-      font-weight:700; font-size:18px; color:var(--brand);
-      display:flex; align-items:center; gap:8px;
+
+    .header .logo {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .header .logo::before{content:'⚡'; font-size:22px}
+
+    .header .logo::before {
+      content: '⚡';
+      font-size: 22px;
+    }
 
     /* Layout */
-    .layout{
-      display:grid; grid-template-columns:320px 1fr; 
-      min-height:calc(100vh - 60px); gap:0;
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: calc(100vh - 60px);
+      gap: 0;
     }
 
     /* Sidebar */
-    aside{
-      background:#0f1220; border-right:1px solid var(--border); 
-      padding:16px; overflow-y:auto; max-height:calc(100vh - 60px);
+    aside {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      max-height: calc(100vh - 60px);
     }
-    .section-title{
-      margin:12px 0 12px; color:#cbd5e1; font-weight:600; 
-      font-size:13px; text-transform:uppercase; letter-spacing:0.5px;
+
+    .section-title {
+      margin: 12px 0 12px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .search{
-      width:100%; padding:10px 12px; border:1px solid var(--border); 
-      border-radius:10px; background:#0e1222; color:#e2e8f0; 
-      outline:none; transition:border .2s;
+
+    .search {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      outline: none;
+      transition: border .2s;
     }
-    .search:focus{border-color:var(--brand)}
+
+    .search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
+    }
 
     /* Cards */
-    .cards{display:grid; grid-template-columns:1fr; gap:10px; margin-top:12px}
-    .card{
-      border:1px solid var(--border); border-radius:10px; 
-      background:#0e1222; padding:12px; cursor:pointer;
-      transition:all .2s; position:relative;
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
     }
-    .card:hover{
-      outline:2px solid var(--hover); transform:translateY(-2px);
-      box-shadow:0 4px 12px rgba(124,58,237,.2);
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 12px;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden;
     }
-    .card.active{
-      outline:2px solid var(--brand); background:#171a2b;
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
     }
-    .card .name{
-      font-weight:600; margin-bottom:6px; color:#e5e7eb;
-      display:flex; align-items:center; gap:6px;
+
+    .card:hover::before {
+      transform: scaleX(1);
     }
-    .card .category{
-      font-size:11px; color:var(--muted); text-transform:uppercase;
-      margin-bottom:4px; letter-spacing:0.5px;
+
+    .card:hover {
+      transform: translateY(-2px);
+      background: var(--hover);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent);
     }
-    .card .preview{
-      background:#0d1226; border-radius:8px; padding:8px; 
-      color:#cbd5e1; font-size:13px; overflow:hidden;
+
+    .card.active {
+      outline: 2px solid var(--accent);
+      background: var(--hover);
+    }
+
+    .card.active::before {
+      transform: scaleX(1);
+    }
+
+    .card .name {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card .category {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .card .preview {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      overflow: hidden;
     }
 
     /* Main Area */
-    main{
-      padding:20px; display:flex; flex-direction:column; gap:16px;
-      overflow-y:auto; max-height:calc(100vh - 60px);
+    main {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      max-height: calc(100vh - 60px);
     }
-    .toolbar{
-      display:flex; gap:10px; flex-wrap:wrap; padding:12px;
-      background:#0f1220; border-radius:12px; border:1px solid var(--border);
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px;
+      background: var(--panel);
+      border-radius: 8px;
+      border: 1px solid var(--border);
     }
-    .btn{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:10px 14px; border-radius:10px; border:1px solid var(--border);
-      background:#171a2b; color:#e5e7eb; cursor:pointer;
-      font-weight:500; transition:all .2s; font-size:13px;
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all .2s;
+      font-size: 13px;
+      text-decoration: none;
     }
-    .btn:hover{background:#1f2540; transform:translateY(-1px)}
-    .btn:active{transform:translateY(1px)}
-    .btn.primary{background:var(--brand); border-color:var(--brand)}
-    .btn.primary:hover{background:#6d28d9}
-    .btn.success{background:var(--accent); border-color:var(--accent)}
-    .btn.success:hover{background:#059669}
+
+    .btn:hover {
+      background: var(--hover);
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn.success {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .btn.success:hover {
+      background: var(--accent-hover);
+    }
 
     /* Calculator Panel */
-    .calculator{
-      background:#0f1220; border:1px solid var(--border);
-      border-radius:12px; padding:20px;
+    .calculator {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
     }
-    .calc-header{
-      font-size:20px; font-weight:700; margin-bottom:16px;
-      color:var(--brand); display:flex; align-items:center; gap:8px;
-    }
-    .formula-display{
-      background:#0e1222; border-radius:10px; padding:16px;
-      margin:12px 0; min-height:80px; display:flex;
-      align-items:center; justify-content:center;
-    }
-    .inputs-grid{
-      display:grid; gap:12px; margin:16px 0;
-    }
-    .input-group{
-      display:flex; flex-direction:column; gap:6px;
-    }
-    .input-group label{
-      font-weight:600; color:#cbd5e1; font-size:13px;
-    }
-    .input-group input{
-      padding:10px 12px; border:1px solid var(--border);
-      border-radius:8px; background:#0e1222; color:#e5e7eb;
-      outline:none; transition:border .2s; font-size:14px;
-    }
-    .input-group input:focus{border-color:var(--brand)}
 
-    .result-box{
-      background:linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
-      border-radius:12px; padding:20px; margin:16px 0;
-      color:white; text-align:center; display:none;
+    .calc-header {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .result-box.show{display:block; animation:slideIn .3s ease}
-    .result-label{font-size:13px; opacity:0.9; margin-bottom:6px}
-    .result-value{font-size:28px; font-weight:700}
-    .result-unit{font-size:16px; opacity:0.9; margin-top:4px}
 
-    .steps-box{
-      background:#0f1220; border:1px solid var(--border);
-      border-radius:10px; padding:16px; margin:12px 0; display:none;
+    .formula-display {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
     }
-    .steps-box.show{display:block; animation:slideIn .3s ease}
-    .steps-title{
-      font-weight:600; margin-bottom:12px; color:#cbd5e1;
-      display:flex; align-items:center; gap:6px;
+
+    .inputs-grid {
+      display: grid;
+      gap: 12px;
+      margin: 16px 0;
     }
-    .step{
-      padding:10px 12px; background:#0e1222; border-radius:8px;
-      margin:8px 0; border-left:3px solid var(--brand);
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .input-group input {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      outline: none;
+      transition: border .2s;
+      font-size: 14px;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
+    }
+
+    .result-box {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 16px 0;
+      color: white;
+      text-align: center;
+      display: none;
+    }
+
+    .result-box.show {
+      display: block;
+      animation: slideIn .3s ease;
+    }
+
+    .result-label {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .result-value {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .result-unit {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .steps-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      display: none;
+    }
+
+    .steps-box.show {
+      display: block;
+      animation: slideIn .3s ease;
+    }
+
+    .steps-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .step {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      margin: 8px 0;
+      border-left: 3px solid var(--accent);
     }
 
     /* Animations */
-    @keyframes slideIn{
-      from{opacity:0; transform:translateY(-10px)}
-      to{opacity:1; transform:translateY(0)}
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* KaTeX styling */
-    .katex{font-size:1.1em}
-    .katex-display{
-      margin:12px 0; overflow-x:auto; overflow-y:hidden;
+    .katex {
+      font-size: 1.1em;
+    }
+
+    .katex-display {
+      margin: 12px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    /* Efeito de textura sutil */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.03) 1px, transparent 2px),
+        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.02) 1.5px, transparent 2.5px),
+        radial-gradient(circle at 75% 50%, rgba(255,255,255,0.01) 1px, transparent 2px);
+      background-repeat: repeat;
+      background-size: 100px 100px;
+      pointer-events: none;
+      z-index: -1;
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar{width:8px; height:8px}
-    ::-webkit-scrollbar-track{background:#0b0c10}
-    ::-webkit-scrollbar-thumb{background:#1f2540; border-radius:4px}
-    ::-webkit-scrollbar-thumb:hover{background:#303a63}
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
 
     /* Responsive */
-    @media (max-width: 768px){
-      .layout{grid-template-columns:1fr}
-      aside{max-height:40vh; border-right:none; border-bottom:1px solid var(--border)}
+    @media (max-width: 768px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      
+      aside {
+        max-height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .toolbar {
+        justify-content: center;
+      }
+      
+      .btn {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 12px 15px;
+      }
+      
+      .header .logo {
+        font-size: 16px;
+      }
+      
+      main {
+        padding: 15px;
+      }
+      
+      .calculator {
+        padding: 15px;
+      }
+      
+      .calc-header {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div class="logo">Calculadora de Funções</div>
+    <div class="logo">Fórmulas Interativas</div>
+    <a href="../index.html" class="btn">
+      <i class="fas fa-arrow-left"></i> Voltar ao Workspace
+    </a>
   </div>
 
   <div class="layout">
@@ -196,18 +499,27 @@
 
     <main>
       <div class="toolbar">
-        <button class="btn primary" onclick="calculate()">▶️ Calcular</button>
-        <button class="btn" onclick="clearInputs()">🔄 Limpar</button>
-        <button class="btn success" onclick="exportResult()">📥 Exportar</button>
+        <button class="btn primary" onclick="calculate()">
+          <i class="fas fa-play"></i> Calcular
+        </button>
+        <button class="btn" onclick="clearInputs()">
+          <i class="fas fa-redo"></i> Limpar
+        </button>
+        <button class="btn success" onclick="exportResult()">
+          <i class="fas fa-download"></i> Exportar
+        </button>
       </div>
 
       <div class="calculator">
         <div class="calc-header">
+          <i class="fas fa-calculator"></i>
           <span id="formulaTitle">Selecione uma fórmula</span>
         </div>
 
         <div class="formula-display" id="formulaDisplay">
-          <div style="color:var(--muted)">Escolha uma fórmula da lista ao lado</div>
+          <div style="color:var(--muted)">
+            <i class="fas fa-hand-point-left"></i> Escolha uma fórmula da lista ao lado
+          </div>
         </div>
 
         <div class="inputs-grid" id="inputsGrid"></div>
@@ -219,7 +531,9 @@
         </div>
 
         <div class="steps-box" id="stepsBox">
-          <div class="steps-title">📝 Passos da Resolução</div>
+          <div class="steps-title">
+            <i class="fas fa-list-ol"></i> Passos da Resolução
+          </div>
           <div id="stepsContent"></div>
         </div>
       </div>
@@ -227,6 +541,7 @@
   </div>
 
   <script>
+    // ... (o JavaScript permanece EXATAMENTE o mesmo que você forneceu)
     const formulas = [
       {
         id: 'velocidade',
