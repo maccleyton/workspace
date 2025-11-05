@@ -213,49 +213,46 @@ button:hover {
 }
 
 /* ====== PREVIEW E SISTEMA DE PÁGINAS ====== */
+/* ====== PREVIEW E SISTEMA DE PÁGINAS - MODO CONTÍNUO ====== */
+
 .preview {
-	flex: 1;
-	padding: 15px;
-	overflow-y: auto;
-	background-color: var(--a4-bg);
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background-color: var(--a4-bg);
 }
 
 .pages-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 25px;
-	padding: 20px 0;
-	transform: scale(var(--zoom-level));
-	transform-origin: top center;
-	transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    transform: scale(var(--zoom-level));
+    transform-origin: top center;
+    transition: transform 0.3s ease;
 }
 
 .a4-page {
     width: 210mm;
-    height: 297mm !important; /* ← TAMANHO FIXO A4 */
-    min-height: 297mm !important; /* ← MÍNIMO FIXO */
+    min-height: auto !important; /* Remove altura fixa */
+    height: auto !important; /* Cresce conforme o conteúdo */
     background-color: var(--page-bg) !important;
     color: #111827 !important;
-    box-shadow: none;
     position: relative;
     border-radius: 0;
     margin: 0 auto;
-    page-break-inside: avoid;
-    break-inside: avoid;
     display: flex;
     flex-direction: column;
 }
 
 .a4-page .page-content {
-	background: #ffffff !important;
-	color: #111827 !important;
+    background: #ffffff !important;
+    color: #111827 !important;
 }
 
 .page-content {
     padding: var(--page-margins);
-    height: 100% !important; /* ← OCUPA TODA A ALTURA */
-    min-height: calc(297mm - (var(--page-margins) * 2)) !important;
+    min-height: auto !important; /* Remove altura mínima */
     overflow: visible;
     position: relative;
     text-align: var(--text-align);
@@ -264,6 +261,12 @@ button:hover {
     word-spacing: var(--word-spacing);
     font-size: var(--font-size-base);
     flex: 1;
+}
+
+/* Remove cabeçalhos e contadores de página */
+.page-counter,
+.page-header {
+    display: none !important;
 }
 
 /* ====== CONFIGURAÇÕES ====== */
@@ -829,3 +832,81 @@ button:hover {
 
 /* CORREÇÃO DO TAMANHO DA PÁGINA */
 
+.a4-page .page-content > :first-child {
+  margin-top: 0 !important;
+}
+
+.page-content h1 + ul,
+.page-content h2 + ul,
+.page-content h3 + ul,
+.page-content h4 + ul,
+.page-content h5 + ul,
+.page-content h6 + ul {
+  margin-top: .25em !important;
+
+/* ====== TOGGLE DE PAGINAÇÃO ====== */
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+    background: var(--button);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.toggle-label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background: var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.toggle-switch.active {
+    background: var(--accent);
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-switch.active .toggle-slider {
+    transform: translateX(26px);
+}
+
+/* ====== MODO CONTÍNUO ====== */
+
+.pages-container.continuous-mode {
+    gap: 0;
+    padding: 0;
+}
+
+.pages-container.continuous-mode .a4-page {
+    height: auto !important;
+    min-height: auto !important;
+    margin: 0;
+    box-shadow: 0 0 20px rgba(0,0,0,0.15);
+}
+
+.pages-container.continuous-mode .page-counter,
+.pages-container.continuous-mode .page-header {
+    display: none;
+}

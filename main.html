@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Markdown com Preview</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        /* ====== VARIÁVEIS CSS E ESTILOS GLOBAIS ====== */
+        :root {
+            --bg: #0f172a;
+            --panel: #0b1229;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: #233164;
+            --accent: #60a5fa;
+            --button: #1e293b;
+            --shadow: rgba(0,0,0,.35);
+            --a4-bg: #0a0f1f;
+            --page-bg: #ffffff;
+            --code-bg: #1e293b;
+            --code-text: #f1f5f9;
+            --inline-code-bg: #e2e8f0;
+            --inline-code-text: #0f172a;
+            --latex-border: #3b82f6;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --text-align: left;
+            --page-margins: 25mm;
+            --line-height: 1.6;
+            --letter-spacing: 0px;
+            --word-spacing: 0px;
+            --font-size-base: 14px;
+            --font-size-h1: 2em;
+            --font-size-h2: 1.6em;
+            --font-size-h3: 1.3em;
+            --font-size-h4: 1.15em;
+            --font-size-h5: 1em;
+            --font-size-h6: 0.9em;
+            --zoom-level: 100%;
+            
+            /* Cores dos títulos com fundo */
+            --h1-color: #1a1a1a;
+            --h1-bg: #ffffff;
+            --h2-color: #2563eb;
+            --h2-bg: #ffffff;
+            --h3-color: #059669;
+            --h3-bg: #ffffff;
+            --h4-color: #7c3aed;
+            --h4-bg: #ffffff;
+            --h5-color: #dc2626;
+            --h5-bg: #ffffff;
+            --h6-color: #ea580c;
+            --h6-bg: #ffffff;
+        }
+
+        .light {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #0f172a;
+            --muted: #475569;
+            --border: #e2e8f0;
+            --accent: #2563eb;
+            --button: #f1f5f9;
+            --shadow: rgba(0,0,0,.08);
+            --a4-bg: #eef2ff;
+            --page-bg: #ffffff;
+            --code-bg: #1e293b;
+            --code-text: #f1f5f9;
+            --inline-code-bg: #e2e8f0;
+            --inline-code-text: #0f172a;
+            --latex-border: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* ====== CABEÇALHO E BOTÕES ====== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: var(--button);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        button:hover {
+            outline: 2px solid var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .primary-btn {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .secondary-btn {
+            background-color: var(--button);
+            color: var(--text);
+        }
+
+        .settings-btn {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        /* ====== LAYOUT PRINCIPAL ====== */
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .editor-container, .preview-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--panel);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .panel-header {
+            padding: 15px;
+            background-color: var(--button);
+            border-bottom: 1px solid var(--border);
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ====== EDITOR ====== */
+        .editor {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            resize: none;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            outline: none;
+            background: transparent;
+            color: var(--text);
+        }
+
+        /* ====== PREVIEW E SISTEMA DE PÁGINAS ====== */
+        .preview {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: var(--a4-bg);
+        }
+
+        .pages-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            padding: 20px 0;
+            transform: scale(var(--zoom-level));
+            transform-origin: top center;
+            transition: transform 0.3s ease;
+        }
+
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            background-color: var(--page-bg);
+            box-shadow: 0 5px 25px var(--shadow);
+            position: relative;
+            color: #111827;
+            page-break-after: always;
+            border-radius: 2px;
+        }
+
+        .page-content {
+            padding: var(--page-margins);
+            height: 100%;
+            overflow: visible;
+            position: relative;
+            text-align: var(--text-align);
+            line-height: var(--line-height);
+            letter-spacing: var(--letter-spacing);
+            word-spacing: var(--word-spacing);
+            font-size: var(--font-size-base);
+        }
+
+        /* ====== CONFIGURAÇÕES ====== */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 500px;
+            height: 100vh;
+            background-color: var(--panel);
+            box-shadow: -2px 0 10px var(--shadow);
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 1000;
+            border-left: 1px solid var(--border);
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: var(--button);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .settings-group h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .setting-item input, .setting-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--panel);
+            color: var(--text);
+            transition: all 0.3s;
+        }
+
+        .setting-item input:focus, .setting-item select:focus {
+            outline: 2px solid var(--accent);
+            border-color: var(--accent);
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-picker input {
+            width: 50px;
+            height: 35px;
+            padding: 0;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .range-value {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .range-container input[type="range"] {
+            flex: 1;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* ====== ESTILOS PARA ELEMENTOS RENDERIZADOS ====== */
+        .page-content h1, .page-content h2, .page-content h3, 
+        .page-content h4, .page-content h5, .page-content h6 {
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+            line-height: 1.3;
+            break-after: avoid;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        /* Cores dos títulos com fundo - SEM BORDAS LATERAIS */
+        .page-content h1 {
+            font-size: var(--font-size-h1);
+            color: var(--h1-color);
+            background-color: var(--h1-bg);
+        }
+
+        .page-content h2 {
+            font-size: var(--font-size-h2);
+            color: var(--h2-color);
+            background-color: var(--h2-bg);
+        }
+
+        .page-content h3 {
+            font-size: var(--font-size-h3);
+            color: var(--h3-color);
+            background-color: var(--h3-bg);
+        }
+
+        .page-content h4 {
+            font-size: var(--font-size-h4);
+            color: var(--h4-color);
+            background-color: var(--h4-bg);
+        }
+
+        .page-content h5 {
+            font-size: var(--font-size-h5);
+            color: var(--h5-color);
+            background-color: var(--h5-bg);
+        }
+
+        .page-content h6 {
+            font-size: var(--font-size-h6);
+            color: var(--h6-color);
+            background-color: var(--h6-bg);
+            font-style: italic;
+        }
+
+        .page-content p {
+            margin-bottom: 1em;
+            line-height: var(--line-height);
+            text-align: var(--text-align);
+        }
+
+        /* Blocos com borda lateral grossa */
+        .page-content blockquote {
+            border-left: 6px solid var(--latex-border);
+            padding: 1em 1.5em;
+            margin: 1.5em 0;
+            color: #666;
+            background: rgba(96,165,250,.08);
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Cores do bloco de código - FUNDOS DIFERENCIADOS */
+        .page-content code {
+            background: var(--inline-code-bg);
+            color: var(--inline-code-text);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .page-content pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.2em;
+            border-radius: 8px;
+            white-space: pre-wrap;   /* quebra linhas longas para impressão */
+            word-break: break-word;  /* quebra palavras enormes */
+            overflow-x: hidden;      /* sem barra horizontal */
+            margin: 1.2em 0;
+            border-left: 6px solid var(--latex-border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .page-content pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+            border: none;
+            font-size: 0.95em;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .page-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1.2em 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .page-content th, .page-content td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .page-content th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .page-content tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .page-content ul, .page-content ol {
+            margin: 1.2em 0;
+            padding-left: 2em;
+        }
+
+        .page-content li {
+            margin-bottom: 0.4em;
+            line-height: var(--line-height);
+        }
+
+        .page-content a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .page-content a:hover {
+            text-decoration: underline;
+        }
+
+        .page-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .page-content hr {
+            border: none;
+            border-top: 2px solid #ddd;
+            margin: 2em 0;
+        }
+
+        /* LaTeX - FUNDO ÚNICO E CONSISTENTE */
+        .katex-display {
+            margin: 1.5em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            text-align: center;
+            padding: 1em;
+            background: rgba(96,165,250,.08); /* AZUL BEM CLARO CONSISTENTE */
+            border-radius: 8px;
+            border-left: 6px solid var(--latex-border);
+        }
+
+        .katex {
+            background: transparent; /* REMOVE O FUNDO DUPLICADO */
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 1.1em;
+        }
+
+        /* ====== IMPRESSÃO ====== */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .preview, .preview * {
+                visibility: visible;
+            }
+            .preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+                overflow: visible;
+                background: white;
+                padding: 0;
+            }
+            .pages-container {
+                box-shadow: none;
+                gap: 0;
+                padding: 0;
+                transform: none !important;
+            }
+            .a4-page {
+                box-shadow: none;
+                margin: 0;
+                page-break-after: always;
+                border-radius: 0;
+            }
+            .a4-page:last-child {
+                page-break-after: auto;
+            }
+            
+            /* Forçar cores na impressão */
+            .page-content h1 { 
+                color: var(--h1-color) !important; 
+                background-color: var(--h1-bg) !important;
+            }
+            .page-content h2 { 
+                color: var(--h2-color) !important; 
+                background-color: var(--h2-bg) !important;
+            }
+            .page-content h3 { 
+                color: var(--h3-color) !important; 
+                background-color: var(--h3-bg) !important;
+            }
+            .page-content h4 { 
+                color: var(--h4-color) !important; 
+                background-color: var(--h4-bg) !important;
+            }
+            .page-content h5 { 
+                color: var(--h5-color) !important; 
+                background-color: var(--h5-bg) !important;
+            }
+            .page-content h6 { 
+                color: var(--h6-color) !important; 
+                background-color: var(--h6-bg) !important;
+            }
+            .page-content pre, .page-content code { 
+                background-color: var(--code-bg) !important; 
+                color: var(--code-text) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .page-content pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.2em;
+            border-radius: 8px;
+            white-space: pre-wrap;   /* quebra linhas longas para impressão */
+            word-break: break-word;  /* quebra palavras enormes */
+            overflow-x: hidden;      /* sem barra horizontal */
+            margin: 1.2em 0;
+            border-left: 6px solid var(--latex-border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+            .page-content blockquote {
+                border-left-color: var(--latex-border) !important;
+                background: rgba(37, 99, 235, 0.08) !important;
+            }
+            .katex-display {
+                border-left-color: var(--latex-border) !important;
+            }
+            .katex {
+                background: rgba(96,165,250,.1) !important;
+                color: #111827 !important;
+            }
+            
+            /* Regras de quebra de página para impressão */
+            .page-content h1 {
+                page-break-before: always;
+            }
+            .page-content h2 {
+                page-break-before: always;
+            }
+            .page-content h1 + h2 {
+                page-break-before: avoid;
+            }
+            pre, blockquote, table, img {
+                page-break-inside: avoid;
+            }
+            ul, ol {
+                page-break-inside: auto;
+            }
+            li {
+                page-break-inside: avoid;
+            }
+        }
+
+        /* ====== UTILITÁRIOS ====== */
+        .status-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85em;
+        }
+
+        .page-counter {
+            position: absolute;
+            bottom: 15mm;
+            right: var(--page-margins);
+            color: #666;
+            font-size: 0.8em;
+            font-family: 'Courier New', monospace;
+        }
+
+        .page-header {
+            position: absolute;
+            top: 15mm;
+            left: var(--page-margins);
+            right: var(--page-margins);
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        /* Indicadores visuais */
+        .keep-together {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .content-group {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body class="light">
+<!-- Esta linha define: <div class="header"> -->
+    <div class="header">
+        <div class="title">📄 Visualizador de Markdown com Paginação</div>
+        <div class="buttons">
+            <button class="secondary-btn" id="openFileBtn">
+                <i class="fas fa-folder-open"></i> Abrir
+            </button>
+            <button class="secondary-btn" id="saveFileBtn">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+            <button class="primary-btn" id="printBtn">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+            <button class="settings-btn" id="settingsBtn">
+                <i class="fas fa-cog"></i> Configurações
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="editor-container">
+            <div class="panel-header">
+                <span>✏️ Editor Markdown</span>
+                <span id="wordCount">0 palavras</span>
+            </div>
+            <textarea class="editor" id="editor" placeholder="Digite seu Markdown aqui..."># 📘 **Guia de Bolso: LaTeX para Programadores e Estudantes**
+
+### 🟢 **Fundamentos do LaTeX (1–3 meses)**
+
+**Vocabulário Básico com Tradução**
+| Termo | Tradução |
+|-------|----------|
+| `documentclass` | classe do documento |
+| `\begin{}` / `\end{}` | início / fim de ambiente |
+| `\section{}` | seção |
+| `\textbf{}` | negrito |
+| `\emph{}` | ênfase (itálico) |
+| `\item` | item de lista |
+
+**Exemplos Práticos**
+```latex
+\documentclass{article} % classe do documento
+\begin{document}        % início do conteúdo
+\section{Introdução}    % título de seção
+Este é um texto em \textbf{negrito}. % texto em negrito
+\end{document}          % fim do conteúdo
+```
+
+**Mini Desafios**
+- Traduza: "Este é um item de lista." → _This is a list item._  
+- Escreva uma seção chamada "Resumo" com um parágrafo simples.</textarea>
+            <div class="status-info">
+                <span id="cursorInfo">Lin 1, Col 1</span>
+                <span id="charCount">0 caracteres</span>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <div class="panel-header">
+                <span>👁️ Visualização A4 com Paginação</span>
+                <span id="zoomLevel">100%</span>
+            </div>
+            <div class="preview" id="preview">
+                <div class="pages-container" id="pagesContainer">
+                </div>
+            </div>
+            <div class="status-info">
+                <span id="pageCount">0 páginas</span>
+                <span>🎯 LaTeX + Código + Paginação</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2>⚙️ Configurações de Visualização</h2>
+            <button id="closeSettingsBtn"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="settings-group">
+            <h3>🎨 Tema</h3>
+            <div class="setting-item">
+                <label for="themeSelect">Modo de Cor</label>
+                <select id="themeSelect">
+                    <option value="light">🌞 Tema Claro</option>
+                    <option value="dark">🌙 Tema Escuro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>🔤 Fontes</h3>
+            <div class="setting-item">
+                <label for="fontFamily">Fonte Principal</label>
+                <select id="fontFamily">
+                    <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="Calibri, sans-serif">Calibri</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Monotype Corsiva', cursive">Monotype</option>
+                    <option value="'Cambria Math', serif">Cambria Math</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>📐 Alinhamento</h3>
+            <div class="setting-item">
+                <label for="textAlign">Alinhamento do Texto</label>
+                <select id="textAlign">
+                    <option value="left">⬅️ Esquerda</option>
+                    <option value="center">🔘 Centralizado</option>
+                    <option value="right">➡️ Direita</option>
+                    <option value="justify">📏 Justificado</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>📏 Layout</h3>
+            <div class="setting-item">
+                <label for="pageMargins">Margens da Página: <span class="range-value" id="marginsValue">25mm</span></label>
+                <div class="range-container">
+                    <input type="range" id="pageMargins" min="10" max="40" step="1" value="25">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="zoomLevel">Zoom da Página: <span class="range-value" id="zoomValue">100%</span></label>
+                <div class="range-container">
+                    <input type="range" id="zoomLevel" min="50" max="150" step="5" value="100">
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>📝 Espaçamentos</h3>
+            <div class="setting-item">
+                <label for="lineHeight">Entre Linhas: <span class="range-value" id="lineHeightValue">1.6</span></label>
+                <div class="range-container">
+                    <input type="range" id="lineHeight" min="1" max="3" step="0.1" value="1.6">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="letterSpacing">Entre Caracteres: <span class="range-value" id="letterSpacingValue">0px</span></label>
+                <div class="range-container">
+                    <input type="range" id="letterSpacing" min="0" max="5" step="0.1" value="0">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="wordSpacing">Entre Palavras: <span class="range-value" id="wordSpacingValue">0px</span></label>
+                <div class="range-container">
+                    <input type="range" id="wordSpacing" min="0" max="10" step="0.1" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>🔠 Tamanhos de Fonte</h3>
+            <div class="setting-item">
+                <label for="fontSizeBase">Texto Base: <span class="range-value" id="fontSizeBaseValue">14px</span></label>
+                <div class="range-container">
+                    <input type="range" id="fontSizeBase" min="10" max="20" step="1" value="14">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="fontSizeH1">Título H1: <span class="range-value" id="fontSizeH1Value">2.0em</span></label>
+                <div class="range-container">
+                    <input type="range" id="fontSizeH1" min="1.5" max="3" step="0.1" value="2.0">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="fontSizeH2">Título H2: <span class="range-value" id="fontSizeH2Value">1.6em</span></label>
+                <div class="range-container">
+                    <input type="range" id="fontSizeH2" min="1.2" max="2.5" step="0.1" value="1.6">
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>🎨 Cores dos Títulos</h3>
+            
+            <div class="setting-item">
+                <label>H1</label>
+                <div class="color-picker">
+                    <input type="color" id="h1Color" value="#1a1a1a">
+                    <span>Fonte</span>
+                    <input type="color" id="h1BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H2</label>
+                <div class="color-picker">
+                    <input type="color" id="h2Color" value="#2563eb">
+                    <span>Fonte</span>
+                    <input type="color" id="h2BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H3</label>
+                <div class="color-picker">
+                    <input type="color" id="h3Color" value="#059669">
+                    <span>Fonte</span>
+                    <input type="color" id="h3BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H4</label>
+                <div class="color-picker">
+                    <input type="color" id="h4Color" value="#7c3aed">
+                    <span>Fonte</span>
+                    <input type="color" id="h4BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H5</label>
+                <div class="color-picker">
+                    <input type="color" id="h5Color" value="#dc2626">
+                    <span>Fonte</span>
+                    <input type="color" id="h5BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H6</label>
+                <div class="color-picker">
+                    <input type="color" id="h6Color" value="#ea580c">
+                    <span>Fonte</span>
+                    <input type="color" id="h6BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>💻 Cores do Código</h3>
+            <div class="setting-item">
+                <label for="codeBlockBg">Fundo do Bloco de Código</label>
+                <input type="color" id="codeBlockBg" value="#1e293b">
+            </div>
+            <div class="setting-item">
+                <label for="codeBlockText">Texto do Bloco de Código</label>
+                <input type="color" id="codeBlockText" value="#f1f5f9">
+            </div>
+            <div class="setting-item">
+                <label for="inlineCodeBg">Fundo do Código Inline</label>
+                <input type="color" id="inlineCodeBg" value="#e2e8f0">
+            </div>
+            <div class="setting-item">
+                <label for="inlineCodeText">Texto do Código Inline</label>
+                <input type="color" id="inlineCodeText" value="#0f172a">
+            </div>
+        </div>
+
+        <div class="buttons" style="padding: 20px 0; justify-content: center; gap: 15px;">
+            <button class="primary-btn" id="applySettingsBtn">
+                <i class="fas fa-check"></i> Aplicar Tudo
+            </button>
+            <button class="secondary-btn" id="resetSettingsBtn">
+                <i class="fas fa-undo"></i> Restaurar Padrões
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ====== SISTEMA DE CONFIGURAÇÕES COMPLETO ======
+        const settings = {
+            // Tema
+            theme: 'light',
+            
+            // Fontes e alinhamento
+            fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            textAlign: "left",
+            
+            // Layout
+            pageMargins: "25mm",
+            zoomLevel: "100%",
+            
+            // Espaçamentos
+            lineHeight: 1.6,
+            letterSpacing: "0px",
+            wordSpacing: "0px",
+            
+            // Tamanhos de fonte
+            fontSizeBase: "14px",
+            fontSizeH1: "2em",
+            fontSizeH2: "1.6em",
+            fontSizeH3: "1.3em",
+            fontSizeH4: "1.15em",
+            fontSizeH5: "1em",
+            fontSizeH6: "0.9em",
+            
+            // Cores dos títulos H1-H6 com fundo
+            h1Color: "#1a1a1a",
+            h1Bg: "#ffffff",
+            h2Color: "#2563eb",
+            h2Bg: "#ffffff",
+            h3Color: "#059669",
+            h3Bg: "#ffffff",
+            h4Color: "#7c3aed",
+            h4Bg: "#ffffff",
+            h5Color: "#dc2626",
+            h5Bg: "#ffffff",
+            h6Color: "#ea580c",
+            h6Bg: "#ffffff",
+            
+            // Cores de código - FUNDOS DIFERENCIADOS
+            codeBlockBg: "#1e293b",
+            codeBlockText: "#f1f5f9",
+            inlineCodeBg: "#e2e8f0",
+            inlineCodeText: "#0f172a",
+            latexBorder: "#3b82f6"
+        };
+
+        // ====== SISTEMA DE PAGINAÇÃO CORRIGIDO ======
+        class PaginationSystem {
+            constructor() {
+                this.pages = [];
+                this.currentPage = null;
+                this.pageCounter = 0;
+                this.pageHeight = 297; // mm
+                this.margins = 25; // mm
+                this.contentHeight = this.pageHeight - (this.margins * 2);
+            }
+
+            createNewPage() {
+                this.pageCounter++;
+                const page = document.createElement('div');
+                page.className = 'a4-page';
+                
+                const content = document.createElement('div');
+                content.className = 'page-content';
+                
+                const header = document.createElement('div');
+                header.className = 'page-header';
+                header.textContent = `Documento - Página ${this.pageCounter}`;
+                content.appendChild(header);
+                
+                page.appendChild(content);
+                this.pages.push({ 
+                    element: page, 
+                    content: content, 
+                    height: 40, // Altura do cabeçalho
+                    elements: []
+                });
+                this.currentPage = this.pages[this.pages.length - 1];
+                
+                return this.currentPage;
+            }
+
+            addElementToPage(element, isHeading = false) {
+                if (!this.currentPage) {
+                    this.createNewPage();
+                }
+
+                const elementHeight = this.calculateElementHeight(element);
+                
+                // VERIFICA SE PRECISA CRIAR NOVA PÁGINA PARA HEADINGS
+                if (isHeading && this.shouldBreakPageForHeading(element)) {
+                    this.createNewPage();
+                }
+                
+                // VERIFICA SE O ELEMENTO CABE NA PÁGINA ATUAL
+                if (this.currentPage.height + elementHeight > this.contentHeight && this.currentPage.height > 50) {
+                    this.createNewPage();
+                }
+
+                // ADICIONA O ELEMENTO À PÁGINA ATUAL
+                this.currentPage.content.appendChild(element);
+                this.currentPage.elements.push(element);
+                this.currentPage.height += elementHeight;
+            }
+
+            calculateElementHeight(element) {
+                const tempDiv = document.createElement('div');
+                tempDiv.style.cssText = `
+                    position: absolute; 
+                    visibility: hidden; 
+                    width: 160mm; 
+                    font-family: inherit; 
+                    font-size: inherit; 
+                    line-height: inherit;
+                    padding: 0;
+                    margin: 0;
+                `;
+                
+                const clone = element.cloneNode(true);
+                tempDiv.appendChild(clone);
+                document.body.appendChild(tempDiv);
+                
+                const height = (tempDiv.offsetHeight / 3.78) + 10; // Convert pixels to mm + margem
+                document.body.removeChild(tempDiv);
+                
+                return height;
+            }
+
+            shouldBreakPageForHeading(element) {
+                const tagName = element.tagName;
+                
+                // H1 SEMPRE QUEBRA PÁGINA (exceto se for o primeiro elemento)
+                if (tagName === 'H1') {
+                    return this.currentPage.elements.length > 0;
+                } 
+                // H2 QUEBRA PÁGINA APENAS SE NÃO VIER LOGO APÓS H1
+                else if (tagName === 'H2') {
+                    const lastElement = this.currentPage.elements[this.currentPage.elements.length - 1];
+                    return lastElement && lastElement.tagName !== 'H1' && this.currentPage.elements.length > 0;
+                }
+                
+                return false;
+            }
+
+            renderPages(container) {
+                container.innerHTML = '';
+                this.pages.forEach((page, index) => {
+                    const counter = document.createElement('div');
+                    counter.className = 'page-counter';
+                    counter.textContent = `${index + 1}`;
+                    page.element.appendChild(counter);
+                    
+                    container.appendChild(page.element);
+                });
+                document.getElementById('pageCount').textContent = `${this.pages.length} página${this.pages.length !== 1 ? 's' : ''}`;
+            }
+
+            clear() {
+                this.pages = [];
+                this.currentPage = null;
+                this.pageCounter = 0;
+            }
+        }
+
+        const pagination = new PaginationSystem();
+
+        // ====== APLICAÇÃO DE CONFIGURAÇÕES ======
+        function applyAllSettings() {
+            // Aplica as variáveis CSS
+            document.documentElement.style.setProperty('--font-family', settings.fontFamily);
+            document.documentElement.style.setProperty('--text-align', settings.textAlign);
+            document.documentElement.style.setProperty('--page-margins', settings.pageMargins);
+            document.documentElement.style.setProperty('--zoom-level', settings.zoomLevel);
+            document.documentElement.style.setProperty('--line-height', settings.lineHeight);
+            document.documentElement.style.setProperty('--letter-spacing', settings.letterSpacing);
+            document.documentElement.style.setProperty('--word-spacing', settings.wordSpacing);
+            document.documentElement.style.setProperty('--font-size-base', settings.fontSizeBase);
+            document.documentElement.style.setProperty('--font-size-h1', settings.fontSizeH1);
+            document.documentElement.style.setProperty('--font-size-h2', settings.fontSizeH2);
+            document.documentElement.style.setProperty('--font-size-h3', settings.fontSizeH3);
+            document.documentElement.style.setProperty('--font-size-h4', settings.fontSizeH4);
+            document.documentElement.style.setProperty('--font-size-h5', settings.fontSizeH5);
+            document.documentElement.style.setProperty('--font-size-h6', settings.fontSizeH6);
+            
+            // Aplica cores dos títulos
+            document.documentElement.style.setProperty('--h1-color', settings.h1Color);
+            document.documentElement.style.setProperty('--h1-bg', settings.h1Bg);
+            document.documentElement.style.setProperty('--h2-color', settings.h2Color);
+            document.documentElement.style.setProperty('--h2-bg', settings.h2Bg);
+            document.documentElement.style.setProperty('--h3-color', settings.h3Color);
+            document.documentElement.style.setProperty('--h3-bg', settings.h3Bg);
+            document.documentElement.style.setProperty('--h4-color', settings.h4Color);
+            document.documentElement.style.setProperty('--h4-bg', settings.h4Bg);
+            document.documentElement.style.setProperty('--h5-color', settings.h5Color);
+            document.documentElement.style.setProperty('--h5-bg', settings.h5Bg);
+            document.documentElement.style.setProperty('--h6-color', settings.h6Color);
+            document.documentElement.style.setProperty('--h6-bg', settings.h6Bg);
+            
+            // Aplica cores de código
+            document.documentElement.style.setProperty('--code-bg', settings.codeBlockBg);
+            document.documentElement.style.setProperty('--code-text', settings.codeBlockText);
+            document.documentElement.style.setProperty('--inline-code-bg', settings.inlineCodeBg);
+            document.documentElement.style.setProperty('--inline-code-text', settings.inlineCodeText);
+            document.documentElement.style.setProperty('--latex-border', settings.latexBorder);
+            
+            // Aplica tema
+            document.body.className = settings.theme;
+            
+            // Atualiza zoom no display
+            document.getElementById('zoomLevel').textContent = settings.zoomLevel;
+            
+            // Re-renderiza o conteúdo
+            renderMarkdown();
+        }
+
+        // ====== CONFIGURAÇÃO DO PAINEL ======
+        function setupSettingsPanel() {
+            // Tema
+            document.getElementById('themeSelect').value = settings.theme;
+            
+            // Fontes e alinhamento
+            document.getElementById('fontFamily').value = settings.fontFamily;
+            document.getElementById('textAlign').value = settings.textAlign;
+            
+            // Layout
+            document.getElementById('pageMargins').value = parseInt(settings.pageMargins);
+            document.getElementById('zoomLevel').value = parseInt(settings.zoomLevel);
+            document.getElementById('marginsValue').textContent = settings.pageMargins;
+            document.getElementById('zoomValue').textContent = settings.zoomLevel;
+            
+            // Espaçamentos
+            document.getElementById('lineHeight').value = settings.lineHeight;
+            document.getElementById('letterSpacing').value = parseFloat(settings.letterSpacing);
+            document.getElementById('wordSpacing').value = parseFloat(settings.wordSpacing);
+            document.getElementById('lineHeightValue').textContent = settings.lineHeight;
+            document.getElementById('letterSpacingValue').textContent = settings.letterSpacing;
+            document.getElementById('wordSpacingValue').textContent = settings.wordSpacing;
+            
+            // Tamanhos de fonte
+            document.getElementById('fontSizeBase').value = parseInt(settings.fontSizeBase);
+            document.getElementById('fontSizeH1').value = parseFloat(settings.fontSizeH1);
+            document.getElementById('fontSizeH2').value = parseFloat(settings.fontSizeH2);
+            document.getElementById('fontSizeBaseValue').textContent = settings.fontSizeBase;
+            document.getElementById('fontSizeH1Value').textContent = settings.fontSizeH1;
+            document.getElementById('fontSizeH2Value').textContent = settings.fontSizeH2;
+            
+            // Cores dos títulos H1-H6
+            document.getElementById('h1Color').value = settings.h1Color;
+            document.getElementById('h1BgColor').value = settings.h1Bg;
+            document.getElementById('h2Color').value = settings.h2Color;
+            document.getElementById('h2BgColor').value = settings.h2Bg;
+            document.getElementById('h3Color').value = settings.h3Color;
+            document.getElementById('h3BgColor').value = settings.h3Bg;
+            document.getElementById('h4Color').value = settings.h4Color;
+            document.getElementById('h4BgColor').value = settings.h4Bg;
+            document.getElementById('h5Color').value = settings.h5Color;
+            document.getElementById('h5BgColor').value = settings.h5Bg;
+            document.getElementById('h6Color').value = settings.h6Color;
+            document.getElementById('h6BgColor').value = settings.h6Bg;
+            
+            // Cores de código
+            document.getElementById('codeBlockBg').value = settings.codeBlockBg;
+            document.getElementById('codeBlockText').value = settings.codeBlockText;
+            document.getElementById('inlineCodeBg').value = settings.inlineCodeBg;
+            document.getElementById('inlineCodeText').value = settings.inlineCodeText;
+        }
+
+        // ====== FUNÇÕES PRINCIPAIS ======
+        
+function distributeContentToPages(html) {
+    pagination.clear();
+
+    const tempContainer = document.createElement('div');
+    tempContainer.innerHTML = html;
+
+    // Varremos manualmente com índice para evitar duplicação
+    const nodes = Array.from(tempContainer.childNodes).filter(n => n.nodeType === 1); // só elementos
+    let i = 0;
+
+    while (i < nodes.length) {
+        const el = nodes[i];
+        const tag = el.tagName || "";
+        const next = nodes[i + 1];
+        const nextTag = next ? (next.tagName || "") : "";
+
+        // Helper: clonar seguro
+        const cloneEl = (n) => n ? n.cloneNode(true) : null;
+
+        // 1) Título (H1..H6) + bloco seguinte (TABLE | PRE | UL | OL)
+        if (/^H[1-6]$/.test(tag) && next && /^(TABLE|PRE|UL|OL)$/.test(nextTag)) {
+            // Caso lista: agrupar apenas o título + primeiro item da lista
+            if (/^(UL|OL)$/.test(nextTag)) {
+                const list = next;
+                const firstItem = list.children[0];
+
+                const group = document.createElement('div');
+                group.className = 'keep-together';
+                group.appendChild(cloneEl(el));
+                if (firstItem) {
+                    const newListForFirst = document.createElement(nextTag.toLowerCase());
+                    newListForFirst.appendChild(firstItem.cloneNode(true));
+                    group.appendChild(newListForFirst);
+                }
+                pagination.addElementToPage(group, true);
+
+                // Criar lista residual com os demais itens (pode quebrar entre páginas)
+                if (list.children.length > 1) {
+                    const residual = document.createElement(nextTag.toLowerCase());
+                    for (let k = 1; k < list.children.length; k++) {
+                        residual.appendChild(list.children[k].cloneNode(true));
+                    }
+                    pagination.addElementToPage(residual, false);
+                }
+
+                i += 2; // consumiu Hx e UL/OL
+                continue;
+            }
+            // Caso tabela/código: agrupa título + bloco inteiro
+            if (/^(TABLE|PRE)$/.test(nextTag)) {
+                const group = document.createElement('div');
+                group.className = 'keep-together';
+                group.appendChild(cloneEl(el));
+                group.appendChild(cloneEl(next));
+                pagination.addElementToPage(group, true);
+                i += 2;
+                continue;
+            }
+        }
+
+        // 2) Parágrafo com "título" + lista logo abaixo
+        if (tag === "P" && next && /^(UL|OL)$/.test(nextTag)) {
+            // Se o parágrafo não for vazio, considera como título antecedente
+            const text = el.textContent.trim();
+            if (text.length > 0) {
+                const list = next;
+                const firstItem = list.children[0];
+
+                const group = document.createElement('div');
+                group.className = 'keep-together';
+                group.appendChild(cloneEl(el));
+                if (firstItem) {
+                    const newListForFirst = document.createElement(nextTag.toLowerCase());
+                    newListForFirst.appendChild(firstItem.cloneNode(true));
+                    group.appendChild(newListForFirst);
+                }
+                pagination.addElementToPage(group, false);
+
+                if (list.children.length > 1) {
+                    const residual = document.createElement(nextTag.toLowerCase());
+                    for (let k = 1; k < list.children.length; k++) {
+                        residual.appendChild(list.children[k].cloneNode(true));
+                    }
+                    pagination.addElementToPage(residual, false);
+                }
+
+                i += 2;
+                continue;
+            }
+        }
+
+        // 3) Parágrafo com "título" + tabela/código abaixo -> manter juntos
+        if (tag === "P" && next && /^(TABLE|PRE)$/.test(nextTag)) {
+            const text = el.textContent.trim();
+            if (text.length > 0) {
+                const group = document.createElement('div');
+                group.className = 'keep-together';
+                group.appendChild(cloneEl(el));
+                group.appendChild(cloneEl(next));
+                pagination.addElementToPage(group, false);
+                i += 2;
+                continue;
+            }
+        }
+
+        // Padrão: adiciona elemento atual (sem duplicar)
+        const isHeading = /^H[1-6]$/.test(tag);
+        pagination.addElementToPage(cloneEl(el), isHeading);
+        i += 1;
+    }
+
+    pagination.renderPages(document.getElementById('pagesContainer'));
+
+    // Renderiza LaTeX nas páginas
+    if (window.renderMathInElement) {
+        setTimeout(() => {
+            document.querySelectorAll('.page-content').forEach(content => {
+                renderMathInElement(content, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\[', right: '\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            });
+        }, 100);
+    }
+}
+
+        function renderMarkdown() {
+            const markdownText = document.getElementById('editor').value;
+            updateCounters(markdownText);
+            
+            const processedText = preprocessMarkdown(markdownText);
+            
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    const langClass = lang ? `language-${lang}` : '';
+                    return `<pre class="keep-together"><code class="${langClass}">${escapeHtml(code)}</code></pre>`;
+                },
+                breaks: true,
+                gfm: true
+            });
+            
+            try {
+                let htmlContent = marked.parse(processedText);
+                htmlContent = postprocessHTML(htmlContent);
+                
+                distributeContentToPages(htmlContent);
+            } catch (error) {
+                console.error('Erro ao renderizar Markdown:', error);
+                document.getElementById('pagesContainer').innerHTML = '<div class="a4-page"><div class="page-content"><p>Erro ao renderizar o conteúdo. Verifique o formato do Markdown.</p></div></div>';
+            }
+        }
+
+        // ====== FUNÇÕES AUXILIARES ======
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function preprocessMarkdown(text) {
+            const codeBlockRegex = /```[\s\S]*?```/g;
+            text = text.replace(codeBlockRegex, function(match) {
+                return match.replace(/\|/g, 'PIPE_PROTECTED');
+            });
+            
+            const inlineCodeRegex = /`[^`\n]+?`/g;
+            text = text.replace(inlineCodeRegex, function(match) {
+                return match.replace(/\|/g, 'PIPE_PROTECTED');
+            });
+            
+            return text;
+        }
+
+        function postprocessHTML(html) {
+            return html.replace(/PIPE_PROTECTED/g, '|');
+        }
+
+        function updateCounters(text) {
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            document.getElementById('wordCount').textContent = `${words.length} palavra${words.length !== 1 ? 's' : ''}`;
+            document.getElementById('charCount').textContent = `${text.length} caractere${text.length !== 1 ? 's' : ''}`;
+        }
+
+        // ====== EVENT LISTENERS ======
+        function setupEventListeners() {
+            const editor = document.getElementById('editor');
+            
+            // Debounce para renderização
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            const debouncedRender = debounce(renderMarkdown, 400);
+
+            editor.addEventListener('input', debouncedRender);
+            
+            // Botões principais
+            document.getElementById('openFileBtn').addEventListener('click', openFile);
+            document.getElementById('saveFileBtn').addEventListener('click', saveFile);
+            document.getElementById('printBtn').addEventListener('click', printDocument);
+            document.getElementById('settingsBtn').addEventListener('click', () => {
+                setupSettingsPanel();
+                document.getElementById('settingsPanel').classList.add('open');
+                document.getElementById('overlay').classList.add('active');
+            });
+            
+            // Fechar settings
+            document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+            document.getElementById('overlay').addEventListener('click', closeSettings);
+
+            // Aplicar configurações
+            document.getElementById('applySettingsBtn').addEventListener('click', applySettings);
+            document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
+
+            // Atualizar valores dos ranges em tempo real
+            document.querySelectorAll('input[type="range"]').forEach(range => {
+                range.addEventListener('input', updateRangeValue);
+            });
+        }
+
+        function updateRangeValue(e) {
+            const target = e.target;
+            const valueDisplay = document.getElementById(target.id + 'Value');
+            
+            if (valueDisplay) {
+                if (target.id === 'pageMargins') {
+                    valueDisplay.textContent = target.value + 'mm';
+                } else if (target.id === 'zoomLevel') {
+                    valueDisplay.textContent = target.value + '%';
+                } else if (target.id === 'lineHeight') {
+                    valueDisplay.textContent = target.value;
+                } else if (target.id === 'letterSpacing' || target.id === 'wordSpacing') {
+                    valueDisplay.textContent = target.value + 'px';
+                } else if (target.id === 'fontSizeBase') {
+                    valueDisplay.textContent = target.value + 'px';
+                } else if (target.id.startsWith('fontSizeH')) {
+                    valueDisplay.textContent = target.value + 'em';
+                }
+            }
+        }
+
+        function applySettings() {
+            // Tema
+            settings.theme = document.getElementById('themeSelect').value;
+            
+            // Fontes e alinhamento
+            settings.fontFamily = document.getElementById('fontFamily').value;
+            settings.textAlign = document.getElementById('textAlign').value;
+            
+            // Layout
+            settings.pageMargins = document.getElementById('pageMargins').value + 'mm';
+            settings.zoomLevel = document.getElementById('zoomLevel').value + '%';
+            
+            // Espaçamentos
+            settings.lineHeight = parseFloat(document.getElementById('lineHeight').value);
+            settings.letterSpacing = document.getElementById('letterSpacing').value + 'px';
+            settings.wordSpacing = document.getElementById('wordSpacing').value + 'px';
+            
+            // Tamanhos de fonte
+            settings.fontSizeBase = document.getElementById('fontSizeBase').value + 'px';
+            settings.fontSizeH1 = document.getElementById('fontSizeH1').value + 'em';
+            settings.fontSizeH2 = document.getElementById('fontSizeH2').value + 'em';
+            settings.fontSizeH3 = (parseFloat(document.getElementById('fontSizeH2').value) * 0.8).toFixed(1) + 'em';
+            settings.fontSizeH4 = (parseFloat(document.getElementById('fontSizeH2').value) * 0.7).toFixed(1) + 'em';
+            settings.fontSizeH5 = (parseFloat(document.getElementById('fontSizeH2').value) * 0.6).toFixed(1) + 'em';
+            settings.fontSizeH6 = (parseFloat(document.getElementById('fontSizeH2').value) * 0.5).toFixed(1) + 'em';
+            
+            // Cores dos títulos H1-H6
+            settings.h1Color = document.getElementById('h1Color').value;
+            settings.h1Bg = document.getElementById('h1BgColor').value;
+            settings.h2Color = document.getElementById('h2Color').value;
+            settings.h2Bg = document.getElementById('h2BgColor').value;
+            settings.h3Color = document.getElementById('h3Color').value;
+            settings.h3Bg = document.getElementById('h3BgColor').value;
+            settings.h4Color = document.getElementById('h4Color').value;
+            settings.h4Bg = document.getElementById('h4BgColor').value;
+            settings.h5Color = document.getElementById('h5Color').value;
+            settings.h5Bg = document.getElementById('h5BgColor').value;
+            settings.h6Color = document.getElementById('h6Color').value;
+            settings.h6Bg = document.getElementById('h6BgColor').value;
+            
+            // Cores de código
+            settings.codeBlockBg = document.getElementById('codeBlockBg').value;
+            settings.codeBlockText = document.getElementById('codeBlockText').value;
+            settings.inlineCodeBg = document.getElementById('inlineCodeBg').value;
+            settings.inlineCodeText = document.getElementById('inlineCodeText').value;
+            
+            applyAllSettings();
+            closeSettings();
+        }
+
+        function resetSettings() {
+            // Restaura configurações padrão
+            Object.assign(settings, {
+                theme: 'light',
+                fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                textAlign: "left",
+                pageMargins: "25mm",
+                zoomLevel: "100%",
+                lineHeight: 1.6,
+                letterSpacing: "0px",
+                wordSpacing: "0px",
+                fontSizeBase: "14px",
+                fontSizeH1: "2em",
+                fontSizeH2: "1.6em",
+                fontSizeH3: "1.3em",
+                fontSizeH4: "1.15em",
+                fontSizeH5: "1em",
+                fontSizeH6: "0.9em",
+                h1Color: "#1a1a1a",
+                h1Bg: "#ffffff",
+                h2Color: "#2563eb",
+                h2Bg: "#ffffff",
+                h3Color: "#059669",
+                h3Bg: "#ffffff",
+                h4Color: "#7c3aed",
+                h4Bg: "#ffffff",
+                h5Color: "#dc2626",
+                h5Bg: "#ffffff",
+                h6Color: "#ea580c",
+                h6Bg: "#ffffff",
+                codeBlockBg: "#1e293b",
+                codeBlockText: "#f1f5f9",
+                inlineCodeBg: "#e2e8f0",
+                inlineCodeText: "#0f172a",
+                latexBorder: "#3b82f6"
+            });
+            
+            setupSettingsPanel();
+            applyAllSettings();
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsPanel').classList.remove('open');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        // ====== FUNÇÕES DE ARQUIVO ======
+        function openFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.md,.markdown,text/markdown';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = event => {
+                    document.getElementById('editor').value = event.target.result;
+                    renderMarkdown();
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function saveFile() {
+            const content = document.getElementById('editor').value;
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'documento.md';
+            a.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        function printDocument() {
+            window.print();
+        }
+
+        // ====== INICIALIZAÇÃO ======
+        function init() {
+            setupSettingsPanel();
+            setupEventListeners();
+            applyAllSettings();
+            }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

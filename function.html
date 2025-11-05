@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora de Funções</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root{
+      --bg:#0b0c10; --panel:#111319; --ink:#e5e7eb; --muted:#97a3b6;
+      --brand:#7c3aed; --accent:#10b981; --danger:#ef4444; --sheet:#ffffff;
+      --border:#1f2540; --hover:#303a63;
+    }
+    *{box-sizing:border-box; margin:0; padding:0}
+    body{
+      margin:0; background:var(--bg); color:var(--ink); 
+      font:14px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Header */
+    .header{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:14px 20px; background:#0f1220; border-bottom:1px solid var(--border);
+      box-shadow:0 2px 8px rgba(0,0,0,.3);
+    }
+    .header .logo{
+      font-weight:700; font-size:18px; color:var(--brand);
+      display:flex; align-items:center; gap:8px;
+    }
+    .header .logo::before{content:'⚡'; font-size:22px}
+
+    /* Layout */
+    .layout{
+      display:grid; grid-template-columns:320px 1fr; 
+      min-height:calc(100vh - 60px); gap:0;
+    }
+
+    /* Sidebar */
+    aside{
+      background:#0f1220; border-right:1px solid var(--border); 
+      padding:16px; overflow-y:auto; max-height:calc(100vh - 60px);
+    }
+    .section-title{
+      margin:12px 0 12px; color:#cbd5e1; font-weight:600; 
+      font-size:13px; text-transform:uppercase; letter-spacing:0.5px;
+    }
+    .search{
+      width:100%; padding:10px 12px; border:1px solid var(--border); 
+      border-radius:10px; background:#0e1222; color:#e2e8f0; 
+      outline:none; transition:border .2s;
+    }
+    .search:focus{border-color:var(--brand)}
+
+    /* Cards */
+    .cards{display:grid; grid-template-columns:1fr; gap:10px; margin-top:12px}
+    .card{
+      border:1px solid var(--border); border-radius:10px; 
+      background:#0e1222; padding:12px; cursor:pointer;
+      transition:all .2s; position:relative;
+    }
+    .card:hover{
+      outline:2px solid var(--hover); transform:translateY(-2px);
+      box-shadow:0 4px 12px rgba(124,58,237,.2);
+    }
+    .card.active{
+      outline:2px solid var(--brand); background:#171a2b;
+    }
+    .card .name{
+      font-weight:600; margin-bottom:6px; color:#e5e7eb;
+      display:flex; align-items:center; gap:6px;
+    }
+    .card .category{
+      font-size:11px; color:var(--muted); text-transform:uppercase;
+      margin-bottom:4px; letter-spacing:0.5px;
+    }
+    .card .preview{
+      background:#0d1226; border-radius:8px; padding:8px; 
+      color:#cbd5e1; font-size:13px; overflow:hidden;
+    }
+
+    /* Main Area */
+    main{
+      padding:20px; display:flex; flex-direction:column; gap:16px;
+      overflow-y:auto; max-height:calc(100vh - 60px);
+    }
+    .toolbar{
+      display:flex; gap:10px; flex-wrap:wrap; padding:12px;
+      background:#0f1220; border-radius:12px; border:1px solid var(--border);
+    }
+    .btn{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+      background:#171a2b; color:#e5e7eb; cursor:pointer;
+      font-weight:500; transition:all .2s; font-size:13px;
+    }
+    .btn:hover{background:#1f2540; transform:translateY(-1px)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:var(--brand); border-color:var(--brand)}
+    .btn.primary:hover{background:#6d28d9}
+    .btn.success{background:var(--accent); border-color:var(--accent)}
+    .btn.success:hover{background:#059669}
+
+    /* Calculator Panel */
+    .calculator{
+      background:#0f1220; border:1px solid var(--border);
+      border-radius:12px; padding:20px;
+    }
+    .calc-header{
+      font-size:20px; font-weight:700; margin-bottom:16px;
+      color:var(--brand); display:flex; align-items:center; gap:8px;
+    }
+    .formula-display{
+      background:#0e1222; border-radius:10px; padding:16px;
+      margin:12px 0; min-height:80px; display:flex;
+      align-items:center; justify-content:center;
+    }
+    .inputs-grid{
+      display:grid; gap:12px; margin:16px 0;
+    }
+    .input-group{
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .input-group label{
+      font-weight:600; color:#cbd5e1; font-size:13px;
+    }
+    .input-group input{
+      padding:10px 12px; border:1px solid var(--border);
+      border-radius:8px; background:#0e1222; color:#e5e7eb;
+      outline:none; transition:border .2s; font-size:14px;
+    }
+    .input-group input:focus{border-color:var(--brand)}
+
+    .result-box{
+      background:linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+      border-radius:12px; padding:20px; margin:16px 0;
+      color:white; text-align:center; display:none;
+    }
+    .result-box.show{display:block; animation:slideIn .3s ease}
+    .result-label{font-size:13px; opacity:0.9; margin-bottom:6px}
+    .result-value{font-size:28px; font-weight:700}
+    .result-unit{font-size:16px; opacity:0.9; margin-top:4px}
+
+    .steps-box{
+      background:#0f1220; border:1px solid var(--border);
+      border-radius:10px; padding:16px; margin:12px 0; display:none;
+    }
+    .steps-box.show{display:block; animation:slideIn .3s ease}
+    .steps-title{
+      font-weight:600; margin-bottom:12px; color:#cbd5e1;
+      display:flex; align-items:center; gap:6px;
+    }
+    .step{
+      padding:10px 12px; background:#0e1222; border-radius:8px;
+      margin:8px 0; border-left:3px solid var(--brand);
+    }
+
+    /* Animations */
+    @keyframes slideIn{
+      from{opacity:0; transform:translateY(-10px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+
+    /* KaTeX styling */
+    .katex{font-size:1.1em}
+    .katex-display{
+      margin:12px 0; overflow-x:auto; overflow-y:hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:8px; height:8px}
+    ::-webkit-scrollbar-track{background:#0b0c10}
+    ::-webkit-scrollbar-thumb{background:#1f2540; border-radius:4px}
+    ::-webkit-scrollbar-thumb:hover{background:#303a63}
+
+    /* Responsive */
+    @media (max-width: 768px){
+      .layout{grid-template-columns:1fr}
+      aside{max-height:40vh; border-right:none; border-bottom:1px solid var(--border)}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">Calculadora de Funções</div>
+  </div>
+
+  <div class="layout">
+    <aside>
+      <div class="section-title">📚 Banco de Fórmulas</div>
+      <input type="text" class="search" placeholder="Buscar fórmula..." id="searchInput">
+      <div class="cards" id="formulaCards"></div>
+    </aside>
+
+    <main>
+      <div class="toolbar">
+        <button class="btn primary" onclick="calculate()">▶️ Calcular</button>
+        <button class="btn" onclick="clearInputs()">🔄 Limpar</button>
+        <button class="btn success" onclick="exportResult()">📥 Exportar</button>
+      </div>
+
+      <div class="calculator">
+        <div class="calc-header">
+          <span id="formulaTitle">Selecione uma fórmula</span>
+        </div>
+
+        <div class="formula-display" id="formulaDisplay">
+          <div style="color:var(--muted)">Escolha uma fórmula da lista ao lado</div>
+        </div>
+
+        <div class="inputs-grid" id="inputsGrid"></div>
+
+        <div class="result-box" id="resultBox">
+          <div class="result-label">Resultado</div>
+          <div class="result-value" id="resultValue">0</div>
+          <div class="result-unit" id="resultUnit"></div>
+        </div>
+
+        <div class="steps-box" id="stepsBox">
+          <div class="steps-title">📝 Passos da Resolução</div>
+          <div id="stepsContent"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const formulas = [
+      {
+        id: 'velocidade',
+        name: 'Velocidade Média',
+        category: 'Cinemática',
+        latex: 'v = \\frac{\\Delta s}{\\Delta t}',
+        vars: [
+          {symbol: 's', name: 'Deslocamento', unit: 'm'},
+          {symbol: 't', name: 'Tempo', unit: 's'}
+        ],
+        result: {symbol: 'v', unit: 'm/s'},
+        calc: (s, t) => s / t,
+        steps: (s, t) => [
+          `Dados: Δs = ${s} m, Δt = ${t} s`,
+          `Aplicando v = Δs / Δt`,
+          `v = ${s} / ${t}`,
+          `v = ${(s/t).toFixed(2)} m/s`
+        ]
+      },
+      {
+        id: 'energia_cinetica',
+        name: 'Energia Cinética',
+        category: 'Mecânica',
+        latex: 'E_c = \\frac{1}{2}mv^2',
+        vars: [
+          {symbol: 'm', name: 'Massa', unit: 'kg'},
+          {symbol: 'v', name: 'Velocidade', unit: 'm/s'}
+        ],
+        result: {symbol: 'E_c', unit: 'J'},
+        calc: (m, v) => 0.5 * m * v * v,
+        steps: (m, v) => [
+          `Dados: m = ${m} kg, v = ${v} m/s`,
+          `Aplicando E_c = ½mv²`,
+          `E_c = ½ × ${m} × ${v}²`,
+          `E_c = ${(0.5 * m * v * v).toFixed(2)} J`
+        ]
+      },
+      {
+        id: 'forca',
+        name: 'Segunda Lei de Newton',
+        category: 'Mecânica',
+        latex: 'F = ma',
+        vars: [
+          {symbol: 'm', name: 'Massa', unit: 'kg'},
+          {symbol: 'a', name: 'Aceleração', unit: 'm/s²'}
+        ],
+        result: {symbol: 'F', unit: 'N'},
+        calc: (m, a) => m * a,
+        steps: (m, a) => [
+          `Dados: m = ${m} kg, a = ${a} m/s²`,
+          `Aplicando F = ma`,
+          `F = ${m} × ${a}`,
+          `F = ${(m * a).toFixed(2)} N`
+        ]
+      },
+      {
+        id: 'peso',
+        name: 'Força Peso',
+        category: 'Mecânica',
+        latex: 'P = mg',
+        vars: [
+          {symbol: 'm', name: 'Massa', unit: 'kg'},
+          {symbol: 'g', name: 'Gravidade', unit: 'm/s²', default: 9.8}
+        ],
+        result: {symbol: 'P', unit: 'N'},
+        calc: (m, g) => m * g,
+        steps: (m, g) => [
+          `Dados: m = ${m} kg, g = ${g} m/s²`,
+          `Aplicando P = mg`,
+          `P = ${m} × ${g}`,
+          `P = ${(m * g).toFixed(2)} N`
+        ]
+      },
+      {
+        id: 'trabalho',
+        name: 'Trabalho',
+        category: 'Mecânica',
+        latex: 'W = F \\cdot d \\cdot \\cos(\\theta)',
+        vars: [
+          {symbol: 'F', name: 'Força', unit: 'N'},
+          {symbol: 'd', name: 'Deslocamento', unit: 'm'},
+          {symbol: 'theta', name: 'Ângulo', unit: '°', default: 0}
+        ],
+        result: {symbol: 'W', unit: 'J'},
+        calc: (F, d, theta) => F * d * Math.cos(theta * Math.PI / 180),
+        steps: (F, d, theta) => [
+          `Dados: F = ${F} N, d = ${d} m, θ = ${theta}°`,
+          `Convertendo θ para radianos: ${(theta * Math.PI / 180).toFixed(4)} rad`,
+          `Aplicando W = F·d·cos(θ)`,
+          `W = ${F} × ${d} × cos(${theta}°)`,
+          `W = ${(F * d * Math.cos(theta * Math.PI / 180)).toFixed(2)} J`
+        ]
+      },
+      {
+        id: 'potencia',
+        name: 'Potência',
+        category: 'Mecânica',
+        latex: 'P = \\frac{W}{\\Delta t}',
+        vars: [
+          {symbol: 'W', name: 'Trabalho', unit: 'J'},
+          {symbol: 't', name: 'Tempo', unit: 's'}
+        ],
+        result: {symbol: 'P', unit: 'W'},
+        calc: (W, t) => W / t,
+        steps: (W, t) => [
+          `Dados: W = ${W} J, Δt = ${t} s`,
+          `Aplicando P = W / Δt`,
+          `P = ${W} / ${t}`,
+          `P = ${(W / t).toFixed(2)} W`
+        ]
+      },
+      {
+        id: 'lei_ohm',
+        name: 'Lei de Ohm',
+        category: 'Eletricidade',
+        latex: 'V = RI',
+        vars: [
+          {symbol: 'R', name: 'Resistência', unit: 'Ω'},
+          {symbol: 'I', name: 'Corrente', unit: 'A'}
+        ],
+        result: {symbol: 'V', unit: 'V'},
+        calc: (R, I) => R * I,
+        steps: (R, I) => [
+          `Dados: R = ${R} Ω, I = ${I} A`,
+          `Aplicando V = RI`,
+          `V = ${R} × ${I}`,
+          `V = ${(R * I).toFixed(2)} V`
+        ]
+      },
+      {
+        id: 'potencia_eletrica',
+        name: 'Potência Elétrica',
+        category: 'Eletricidade',
+        latex: 'P = VI',
+        vars: [
+          {symbol: 'V', name: 'Tensão', unit: 'V'},
+          {symbol: 'I', name: 'Corrente', unit: 'A'}
+        ],
+        result: {symbol: 'P', unit: 'W'},
+        calc: (V, I) => V * I,
+        steps: (V, I) => [
+          `Dados: V = ${V} V, I = ${I} A`,
+          `Aplicando P = VI`,
+          `P = ${V} × ${I}`,
+          `P = ${(V * I).toFixed(2)} W`
+        ]
+      },
+      {
+        id: 'area_circulo',
+        name: 'Área do Círculo',
+        category: 'Geometria',
+        latex: 'A = \\pi r^2',
+        vars: [
+          {symbol: 'r', name: 'Raio', unit: 'm'}
+        ],
+        result: {symbol: 'A', unit: 'm²'},
+        calc: (r) => Math.PI * r * r,
+        steps: (r) => [
+          `Dados: r = ${r} m`,
+          `Aplicando A = πr²`,
+          `A = π × ${r}²`,
+          `A = ${Math.PI.toFixed(4)} × ${(r*r).toFixed(2)}`,
+          `A = ${(Math.PI * r * r).toFixed(2)} m²`
+        ]
+      },
+      {
+        id: 'volume_esfera',
+        name: 'Volume da Esfera',
+        category: 'Geometria',
+        latex: 'V = \\frac{4}{3}\\pi r^3',
+        vars: [
+          {symbol: 'r', name: 'Raio', unit: 'm'}
+        ],
+        result: {symbol: 'V', unit: 'm³'},
+        calc: (r) => (4/3) * Math.PI * r * r * r,
+        steps: (r) => [
+          `Dados: r = ${r} m`,
+          `Aplicando V = (4/3)πr³`,
+          `V = (4/3) × π × ${r}³`,
+          `V = ${((4/3) * Math.PI * r * r * r).toFixed(2)} m³`
+        ]
+      },
+      {
+        id: 'bhaskara',
+        name: 'Fórmula de Bhaskara',
+        category: 'Matemática',
+        latex: 'x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}',
+        vars: [
+          {symbol: 'a', name: 'Coeficiente a', unit: ''},
+          {symbol: 'b', name: 'Coeficiente b', unit: ''},
+          {symbol: 'c', name: 'Coeficiente c', unit: ''}
+        ],
+        result: {symbol: 'x', unit: ''},
+        calc: (a, b, c) => {
+          const delta = b*b - 4*a*c;
+          if(delta < 0) return 'Sem raízes reais';
+          const x1 = (-b + Math.sqrt(delta)) / (2*a);
+          const x2 = (-b - Math.sqrt(delta)) / (2*a);
+          return delta === 0 ? x1.toFixed(4) : `x₁=${x1.toFixed(4)}, x₂=${x2.toFixed(4)}`;
+        },
+        steps: (a, b, c) => {
+          const delta = b*b - 4*a*c;
+          if(delta < 0) return [`Δ = ${delta.toFixed(2)} < 0`, 'Não há raízes reais'];
+          const x1 = (-b + Math.sqrt(delta)) / (2*a);
+          const x2 = (-b - Math.sqrt(delta)) / (2*a);
+          return [
+            `Dados: a = ${a}, b = ${b}, c = ${c}`,
+            `Calculando Δ = b² - 4ac`,
+            `Δ = ${b}² - 4×${a}×${c} = ${delta.toFixed(2)}`,
+            `x = (-b ± √Δ) / 2a`,
+            `x₁ = (${-b} + ${Math.sqrt(delta).toFixed(2)}) / ${2*a} = ${x1.toFixed(4)}`,
+            `x₂ = (${-b} - ${Math.sqrt(delta).toFixed(2)}) / ${2*a} = ${x2.toFixed(4)}`
+          ];
+        }
+      }
+    ];
+
+    let currentFormula = null;
+
+    function renderCards() {
+      const container = document.getElementById('formulaCards');
+      container.innerHTML = formulas.map(f => `
+        <div class="card" onclick="selectFormula('${f.id}')">
+          <div class="category">${f.category}</div>
+          <div class="name">${f.name}</div>
+          <div class="preview" id="preview-${f.id}"></div>
+        </div>
+      `).join('');
+
+      formulas.forEach(f => {
+        katex.render(f.latex, document.getElementById(`preview-${f.id}`), {
+          throwOnError: false, displayMode: false
+        });
+      });
+    }
+
+    function selectFormula(id) {
+      currentFormula = formulas.find(f => f.id === id);
+      if(!currentFormula) return;
+
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      document.getElementById('formulaTitle').textContent = currentFormula.name;
+
+      katex.render(currentFormula.latex, document.getElementById('formulaDisplay'), {
+        throwOnError: false, displayMode: true
+      });
+
+      const inputsGrid = document.getElementById('inputsGrid');
+      inputsGrid.innerHTML = currentFormula.vars.map(v => `
+        <div class="input-group">
+          <label>${v.name} (${v.symbol}) ${v.unit ? `[${v.unit}]` : ''}</label>
+          <input type="number" step="any" id="input-${v.symbol}" 
+                 value="${v.default || ''}" placeholder="Digite o valor">
+        </div>
+      `).join('');
+
+      document.getElementById('resultBox').classList.remove('show');
+      document.getElementById('stepsBox').classList.remove('show');
+    }
+
+    function calculate() {
+      if(!currentFormula) {
+        alert('Selecione uma fórmula primeiro!');
+        return;
+      }
+
+      const values = currentFormula.vars.map(v => {
+        const input = document.getElementById(`input-${v.symbol}`);
+        return parseFloat(input.value) || 0;
+      });
+
+      if(values.some(v => v === 0)) {
+        alert('Preencha todos os valores!');
+        return;
+      }
+
+      const result = currentFormula.calc(...values);
+      const steps = currentFormula.steps(...values);
+
+      document.getElementById('resultValue').textContent = 
+        typeof result === 'string' ? result : result.toFixed(4);
+      document.getElementById('resultUnit').textContent = currentFormula.result.unit;
+      document.getElementById('resultBox').classList.add('show');
+
+      document.getElementById('stepsContent').innerHTML = 
+        steps.map(s => `<div class="step">${s}</div>`).join('');
+      document.getElementById('stepsBox').classList.add('show');
+    }
+
+    function clearInputs() {
+      document.querySelectorAll('#inputsGrid input').forEach(input => {
+        const symbol = input.id.replace('input-', '');
+        const variable = currentFormula?.vars.find(v => v.symbol === symbol);
+        input.value = variable?.default || '';
+      });
+      document.getElementById('resultBox').classList.remove('show');
+      document.getElementById('stepsBox').classList.remove('show');
+    }
+
+    function exportResult() {
+      if(!currentFormula) return;
+      const result = document.getElementById('resultValue').textContent;
+      const unit = document.getElementById('resultUnit').textContent;
+      const text = `${currentFormula.name}\nResultado: ${result} ${unit}`;
+
+      const blob = new Blob([text], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'resultado.txt';
+      a.click();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.card').forEach(card => {
+        const name = card.querySelector('.name').textContent.toLowerCase();
+        const category = card.querySelector('.category').textContent.toLowerCase();
+        card.style.display = (name.includes(term) || category.includes(term)) ? 'block' : 'none';
+      });
+    });
+
+    renderCards();
+  </script>
+</body>
+</html>

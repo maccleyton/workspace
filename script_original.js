@@ -1,369 +1,171 @@
 // ====== SISTEMA DE CONFIGURAÇÕES COMPLETO ======
 const settings = {
-  // Tema
-  theme: 'default',
-
-  // Fontes e alinhamento
-  fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  textAlign: "left",
-
-  // Layout
-  pageMargins: "25mm",
-  zoomLevel: "100%",
-
-  // Espaçamentos
-  lineHeight: 1.6,
-  letterSpacing: "0px",
-  wordSpacing: "0px",
-
-  // Tamanhos de fonte
-  fontSizeBase: "14px",
-  fontSizeH1: "2em",
-  fontSizeH2: "1.6em",
-  fontSizeH3: "1.3em",
-  fontSizeH4: "1.15em",
-  fontSizeH5: "1em",
-  fontSizeH6: "0.9em",
-
-  // Cores dos títulos H1-H6 com fundo
-  h1Color: "#1a1a1a", h1Bg: "#ffffff",
-  h2Color: "#2563eb", h2Bg: "#ffffff",
-  h3Color: "#059669", h3Bg: "#ffffff",
-  h4Color: "#7c3aed", h4Bg: "#ffffff",
-  h5Color: "#dc2626", h5Bg: "#ffffff",
-  h6Color: "#ea580c", h6Bg: "#ffffff",
-
-  // Cores de código - FUNDOS DIFERENCIADOS
-  codeBlockBg: "#1e293b",
-  codeBlockText: "#f1f5f9",
-  inlineCodeBg: "#e2e8f0",
-  inlineCodeText: "#0f172a",
-  latexBorder: "#3b82f6"
+	// Tema
+	theme: 'light',
+	
+	// Fontes e alinhamento
+	fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+	textAlign: "left",
+	
+	// Layout
+	pageMargins: "25mm",
+	zoomLevel: "100%",
+	
+	// Espaçamentos
+	lineHeight: 1.6,
+	letterSpacing: "0px",
+	wordSpacing: "0px",
+	
+	// Tamanhos de fonte
+	fontSizeBase: "14px",
+	fontSizeH1: "2em",
+	fontSizeH2: "1.6em",
+	fontSizeH3: "1.3em",
+	fontSizeH4: "1.15em",
+	fontSizeH5: "1em",
+	fontSizeH6: "0.9em",
+	
+	// Cores dos títulos H1-H6 com fundo
+	h1Color: "#1a1a1a",
+	h1Bg: "#ffffff",
+	h2Color: "#2563eb",
+	h2Bg: "#ffffff",
+	h3Color: "#059669",
+	h3Bg: "#ffffff",
+	h4Color: "#7c3aed",
+	h4Bg: "#ffffff",
+	h5Color: "#dc2626",
+	h5Bg: "#ffffff",
+	h6Color: "#ea580c",
+	h6Bg: "#ffffff",
+	
+	// Cores de código - FUNDOS DIFERENCIADOS
+	codeBlockBg: "#1e293b",
+	codeBlockText: "#f1f5f9",
+	inlineCodeBg: "#e2e8f0",
+	inlineCodeText: "#0f172a",
+	latexBorder: "#3b82f6"
 };
 
-// ====== SISTEMA DE PAGINAÇÃO ALTERNÁVEL ======
-let isPaginatedMode = true; // começa no modo paginado
-
-function togglePaginationMode() {
-  isPaginatedMode = !isPaginatedMode;
-  const toggle = document.getElementById('paginationToggle');
-  const container = document.getElementById('pagesContainer');
-  const title = document.getElementById('previewTitle');
-  const pageCount = document.getElementById('pageCount');
-
-  if (isPaginatedMode) {
-    // Modo Paginado (A4)
-    toggle.classList.add('active');
-    container.classList.remove('continuous-mode');
-    title.textContent = '👁️ Visualização Paginada (A4)';
-    pageCount.style.display = 'inline';
-    renderMarkdown(); // Re-renderiza com paginação
-  } else {
-    // Modo Contínuo
-    toggle.classList.remove('active');
-    container.classList.add('continuous-mode');
-    title.textContent = '👁️ Visualização Contínua';
-    pageCount.style.display = 'none';
-    renderContinuousMode(); // Renderiza contínuo
-  }
-}
-
-// ====== RENDER CONTÍNUO ======
-function renderContinuousMode() {
-  const markdownText = document.getElementById('editor').value;
-  updateCounters(markdownText);
-
-  const processedText = preprocessMarkdown(markdownText);
-  marked.setOptions({ breaks: true, gfm: true });
-
-  try {
-    let htmlContent = marked.parse(processedText);
-
-    // Correções do markup (remove <p> soltos em volta de listas e títulos)
-    htmlContent = htmlContent
-      .replace(/<\/h\d>\s*\n\n\s*<(ul|ol)>/g, '$1>\n<$2>')
-      .replace(/<\/(ul|ol)>\s*<\/p>/g, '$1>')
-      .replace(/\n\n\s*<(ul|ol)>/g, '<$1>')
-      .replace(/<\/(ul|ol)>\s*\n\n/g, '$1>\n\n')
-      .replace(/\n\n\s*<\/p>/g, '');
-
-    const container = document.getElementById('pagesContainer');
-    container.innerHTML = '';
-
-    // Cria uma única página contínua
-    const page = document.createElement('div');
-    page.className = 'a4-page';
-
-    const content = document.createElement('div');
-    content.className = 'page-content';
-    content.innerHTML = htmlContent;
-
-    page.appendChild(content);
-    container.appendChild(page);
-
-    // Renderiza LaTeX
-    if (window.renderMathInElement) {
-      setTimeout(() => {
-        // Protege cifrões monetários antes do KaTeX
-        content.innerHTML = content.innerHTML.replace(
-          /(\bR|\bUS)\$(\s?\d[\d\.,]*)/g,
-          (m) => m.replace('$', '__CURRENCY__')
-        );
-
-        renderMathInElement(content, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false },
-            { left: '\\[', right: '\\]', display: true }
-          ],
-          throwOnError: false
-        });
-
-        // Restaura cifrões monetários
-        content.innerHTML = content.innerHTML.replace(/__CURRENCY__/g, '$');
-      }, 100);
-    }
-  } catch (error) {
-    console.error('Erro ao renderizar:', error);
-    document.getElementById('pagesContainer').innerHTML =
-      '\n\nErro ao renderizar o conteúdo. Verifique o formato do Markdown.\n\n';
-  }
-}
-
-// ====== PRÉ-PROCESSAMENTO DO MARKDOWN ======
-function preprocessMarkdown(md) {
-  // Ajustes simples (pode expandir conforme necessidade)
-  return md
-    .replace(/\r\n/g, '\n')
-    .replace(/\t/g, '  ');
-}
-
-// ====== RENDER PAGINADO ======
-function renderMarkdown() {
-  const markdownText = document.getElementById('editor').value;
-  updateCounters(markdownText);
-
-  const processedText = preprocessMarkdown(markdownText);
-  marked.setOptions({ breaks: true, gfm: true });
-
-  let html = marked.parse(processedText);
-
-  // Pós-processamento para reduzir vãos artificiais
-  html = html
-    .replace(/<\/h\d>\s*\n\n\s*<(ul|ol)>/g, '$1>\n<$2>')
-    .replace(/<\/(ul|ol)>\s*<\/p>/g, '$1>')
-    .replace(/\n\n\s*<(ul|ol)>/g, '<$1>')
-    .replace(/<\/(ul|ol)>\s*\n\n/g, '$1>\n\n')
-    .replace(/\n\n\s*<\/p>/g, '');
-
-  distributeContentToPages(html);
-}
-
-// ====== SISTEMA DE PAGINAÇÃO (ALTURA PELO CONTEÚDO) ======
+// ====== SISTEMA DE PAGINAÇÃO CORRIGIDO ======
 class PaginationSystem {
-  constructor(options = {}) {
-    // Dimensões aproximadas A4 em mm (297 x 210), com margens
-    //this.pageHeight = 297;
-    this.pageWidth = 210;
-    this.margins = parseFloat((settings.pageMargins || '25mm').replace('mm','')) || 25;
-    this.contentHeight = this.pageHeight - 2 * this.margins;
+	constructor() {
+		this.pages = [];
+		this.currentPage = null;
+		this.pageCounter = 0;
+		this.pageHeight = 297; // mm
+		this.margins = 25; // mm
+		this.contentHeight = this.pageHeight - (this.margins * 2);
+	}
 
-    // Estados
-    this.pages = [];
-    this.currentPage = null;
+	createNewPage() {
+		this.pageCounter++;
+		const page = document.createElement('div');
+		page.className = 'a4-page';
+		
+		const content = document.createElement('div');
+		content.className = 'page-content';
+		
+		const header = document.createElement('div');
+		header.className = 'page-header';
+		header.textContent = `Documento - Página ${this.pageCounter}`;
+		content.appendChild(header);
+		
+		page.appendChild(content);
+		this.pages.push({ 
+			element: page, 
+			content: content, 
+			height: 40, // Altura do cabeçalho
+			elements: []
+		});
+		this.currentPage = this.pages[this.pages.length - 1];
+		
+		return this.currentPage;
+	}
 
-    // Parâmetros
-    this.THRESHOLD = 2; // mm de folga para evitar estouro
-    this.HEADING_NEXT_RATIO = 0.0; // reserva 90% do próximo bloco p/ “anti-órfão”
-    this.MEASURE_DPI_MM = 3.78; // px -> mm (aprox 96dpi)
+	addElementToPage(element, isHeading = false) {
+		if (!this.currentPage) {
+			this.createNewPage();
+		}
 
-    // Medidor
-    this.measureContainer = this.createMeasureContainer();
-  }
+		const elementHeight = this.calculateElementHeight(element);
+		
+		// VERIFICA SE PRECISA CRIAR NOVA PÁGINA PARA HEADINGS
+		if (isHeading && this.shouldBreakPageForHeading(element)) {
+			this.createNewPage();
+		}
+		
+		// VERIFICA SE O ELEMENTO CABE NA PÁGINA ATUAL
+		if (this.currentPage.height + elementHeight > this.contentHeight && this.currentPage.height > 50) {
+			this.createNewPage();
+		}
 
-  createMeasureContainer() {
-    const mc = document.createElement('div');
-    mc.style.position = 'absolute';
-    mc.style.visibility = 'hidden';
-    mc.style.left = '-10000px';
-    mc.style.top = '0';
-    mc.style.width = `${this.pageWidth - 2 * this.margins}mm`; // largura interna
-    mc.style.boxSizing = 'border-box';
-    document.body.appendChild(mc);
-    return mc;
-  }
+		// ADICIONA O ELEMENTO À PÁGINA ATUAL
+		this.currentPage.content.appendChild(element);
+		this.currentPage.elements.push(element);
+		this.currentPage.height += elementHeight;
+	}
 
-  clear() {
-    this.pages = [];
-    this.currentPage = null;
-  }
+	calculateElementHeight(element) {
+		const tempDiv = document.createElement('div');
+		tempDiv.style.cssText = `
+			position: absolute; 
+			visibility: hidden; 
+			width: 160mm; 
+			font-family: inherit; 
+			font-size: inherit; 
+			line-height: inherit;
+			padding: 0;
+			margin: 0;
+		`;
+		
+		const clone = element.cloneNode(true);
+		tempDiv.appendChild(clone);
+		document.body.appendChild(tempDiv);
+		
+		const height = (tempDiv.offsetHeight / 3.78) + 10; // Convert pixels to mm + margem
+		document.body.removeChild(tempDiv);
+		
+		return height;
+	}
 
-  createNewPage() {
-    const pageEl = document.createElement('div');
-    pageEl.className = 'a4-page';
+	shouldBreakPageForHeading(element) {
+		const tagName = element.tagName;
+		
+		// H1 SEMPRE QUEBRA PÁGINA (exceto se for o primeiro elemento)
+		if (tagName === 'H1') {
+			return this.currentPage.elements.length > 0;
+		} 
+		// H2 QUEBRA PÁGINA APENAS SE NÃO VIER LOGO APÓS H1
+		else if (tagName === 'H2') {
+			const lastElement = this.currentPage.elements[this.currentPage.elements.length - 1];
+			return lastElement && lastElement.tagName !== 'H1' && this.currentPage.elements.length > 0;
+		}
+		
+		return false;
+	}
 
-    const contentEl = document.createElement('div');
-    contentEl.className = 'page-content';
-    pageEl.appendChild(contentEl);
+	renderPages(container) {
+		container.innerHTML = '';
+		this.pages.forEach((page, index) => {
+			const counter = document.createElement('div');
+			counter.className = 'page-counter';
+			counter.textContent = `${index + 1}`;
+			page.element.appendChild(counter);
+			
+			container.appendChild(page.element);
+		});
+		document.getElementById('pageCount').textContent = `${this.pages.length} página${this.pages.length !== 1 ? 's' : ''}`;
+	}
 
-    const pageObj = {
-      el: pageEl,
-      contentEl,
-      usedHeight: 0 // em mm
-    };
-
-    this.pages.push(pageObj);
-    this.currentPage = pageObj;
-  }
-
-  ensurePage() {
-    if (!this.currentPage) this.createNewPage();
-  }
-
-  pxToMm(px) {
-    return px / this.MEASURE_DPI_MM;
-  }
-
-  calculateElementHeight(element) {
-    // Clona para medir no container invisível com mesma largura da página
-    const clone = element.cloneNode(true);
-    // Normaliza largura
-    clone.style.width = '100%';
-    clone.style.boxSizing = 'border-box';
-    clone.style.position = 'static';
-    clone.style.maxWidth = 'none';
-    this.measureContainer.innerHTML = '';
-    this.measureContainer.appendChild(clone);
-    const h = clone.offsetHeight;
-    return this.pxToMm(h);
-  }
-
-  shouldBreakPageForHeading(el, isFirstOnPage) {
-    return false;
-  }
-
-  addElementToPage(element, opts = {}) {
-    const { isHeading = false, headingContext = {} } = opts;
-    this.ensurePage();
-
-    const elHeight = this.calculateElementHeight(element);
-    let required = elHeight;
-
-    const page = this.currentPage;
-    const remaining = this.contentHeight - page.usedHeight;
-
-    if (required + this.THRESHOLD > remaining) {
-      // Nova página antes de inserir
-      this.createNewPage();
-    }
-
-    // Inserção efetiva
-    const target = this.currentPage.contentEl;
-    target.appendChild(element);
-    this.currentPage.usedHeight += elHeight;
-  }
-
-  renderPagesInto(container) {
-    container.innerHTML = '';
-    this.pages.forEach((p, idx) => {
-      container.appendChild(p.el);
-    });
-  }
+	clear() {
+		this.pages = [];
+		this.currentPage = null;
+		this.pageCounter = 0;
+	}
 }
 
 const pagination = new PaginationSystem();
-
-// ====== DISTRIBUIÇÃO PARA PÁGINAS ======
-function distributeContentToPages(html) {
-  const tmp = document.createElement('div');
-  tmp.innerHTML = html;
-
-  pagination.clear();
-
-  const elements = Array.from(tmp.childNodes).filter(n =>
-    n.nodeType === Node.ELEMENT_NODE || (n.nodeType === Node.TEXT_NODE && n.textContent.trim() !== '')
-  );
-
-  const container = document.getElementById('pagesContainer');
-  container.innerHTML = '';
-
-  let lastWasH1OnSamePage = false;
-
-  for (let i = 0; i < elements.length; i++) {
-    const node = elements[i];
-
-    // Converte TEXT_NODE simples em <p>
-    let el = node.nodeType === Node.TEXT_NODE ? wrapTextInParagraph(node.textContent) : node;
-
-    // Identificadores
-    const tag = el.tagName ? el.tagName.toLowerCase() : '';
-    const isHeading = /^h[1-6]$/.test(tag);
-
-    // Agrupamentos sensíveis (keep-together) após H1/H2 com blocos
-    let nextElCandidate = null;
-    if (isHeading && i + 1 < elements.length) {
-      // próximo bloco relevante
-      nextElCandidate = normalizeNode(elements[i + 1]);
-      const nextTag = nextElCandidate?.tagName ? nextElCandidate.tagName.toLowerCase() : '';
-    }
-
-    pagination.addElementToPage(el, {
-      isHeading,
-      headingContext: { nextElement: null }
-    });
-
-    // Atualiza contexto "H2 após H1"
-    if (tag === 'h1') {
-      lastWasH1OnSamePage = true;
-    } else if (tag === 'h2') {
-      // depois de um H2 consideramos que a sequência especial acabou
-      lastWasH1OnSamePage = false;
-    } else if (pagination.currentPage && pagination.currentPage.usedHeight === 0) {
-      // nova página, zera flag
-      lastWasH1OnSamePage = false;
-    }
-  }
-
-  pagination.renderPagesInto(container);
-
-  // Render LaTeX em modo paginado
-  if (window.renderMathInElement) {
-    setTimeout(() => {
-      const scope = container;
-      scope.innerHTML = scope.innerHTML.replace(
-        /(\bR|\bUS)\$(\s?\d[\d\.,]*)/g,
-        (m) => m.replace('$', '__CURRENCY__')
-      );
-
-      renderMathInElement(scope, {
-        delimiters: [
-          { left: '$$', right: '$$', display: true },
-          { left: '$', right: '$', display: false },
-          { left: '\\[', right: '\\]', display: true }
-        ],
-        throwOnError: false
-      });
-
-      scope.innerHTML = scope.innerHTML.replace(/__CURRENCY__/g, '$');
-    }, 50);
-  }
-}
-
-function normalizeNode(n) {
-  if (!n) return null;
-  if (n.nodeType === Node.TEXT_NODE) {
-    const txt = n.textContent.trim();
-    if (!txt) return null;
-    return wrapTextInParagraph(txt);
-  }
-  return n;
-}
-
-function wrapTextInParagraph(text) {
-  const p = document.createElement('p');
-  p.textContent = text;
-  return p;
-}
 
 // ====== APLICAÇÃO DE CONFIGURAÇÕES ======
 function applyAllSettings() {
@@ -414,7 +216,7 @@ function applyAllSettings() {
 	renderMarkdown();
 }
 
-// Painel de configurações (exemplo de binding)
+// ====== CONFIGURAÇÃO DO PAINEL ======
 function setupSettingsPanel() {
 	// Tema
 	document.getElementById('themeSelect').value = settings.theme;
@@ -466,43 +268,163 @@ function setupSettingsPanel() {
 	document.getElementById('inlineCodeText').value = settings.inlineCodeText;
 }
 
-// ====== CONTADORES, STATUS E AUXILIARES ======
-function updateCounters(text) {
-  const charCount = document.getElementById('charCount');
-  const wordCount = document.getElementById('wordCount');
-  const pageCount = document.getElementById('pageCountNumber');
+// ====== FUNÇÕES PRINCIPAIS ======
 
-  const words = (text.match(/\S+/g) || []).length;
-  const chars = text.length;
+function distributeContentToPages(html) {
+pagination.clear();
 
-  if (charCount) charCount.textContent = chars.toString();
-  if (wordCount) wordCount.textContent = words.toString();
+const tempContainer = document.createElement('div');
+tempContainer.innerHTML = html;
 
-  // pageCount é atualizado ao final do render paginado
-  setTimeout(() => {
-    const pages = document.querySelectorAll('#pagesContainer .a4-page').length;
-    if (pageCount) pageCount.textContent = pages.toString();
-  }, 50);
+// Varremos manualmente com índice para evitar duplicação
+const nodes = Array.from(tempContainer.childNodes).filter(n => n.nodeType === 1); // só elementos
+let i = 0;
+
+while (i < nodes.length) {
+const el = nodes[i];
+const tag = el.tagName || "";
+const next = nodes[i + 1];
+const nextTag = next ? (next.tagName || "") : "";
+
+// Helper: clonar seguro
+const cloneEl = (n) => n ? n.cloneNode(true) : null;
+
+// 1) Título (H1..H6) + bloco seguinte (TABLE | PRE | UL | OL)
+if (/^H[1-6]$/.test(tag) && next && /^(TABLE|PRE|UL|OL)$/.test(nextTag)) {
+	// Caso lista: agrupar apenas o título + primeiro item da lista
+	if (/^(UL|OL)$/.test(nextTag)) {
+		const list = next;
+		const firstItem = list.children[0];
+
+		const group = document.createElement('div');
+		group.className = 'keep-together';
+		group.appendChild(cloneEl(el));
+		if (firstItem) {
+			const newListForFirst = document.createElement(nextTag.toLowerCase());
+			newListForFirst.appendChild(firstItem.cloneNode(true));
+			group.appendChild(newListForFirst);
+		}
+		pagination.addElementToPage(group, true);
+
+		// Criar lista residual com os demais itens (pode quebrar entre páginas)
+		if (list.children.length > 1) {
+			const residual = document.createElement(nextTag.toLowerCase());
+			for (let k = 1; k < list.children.length; k++) {
+				residual.appendChild(list.children[k].cloneNode(true));
+			}
+			pagination.addElementToPage(residual, false);
+		}
+
+		i += 2; // consumiu Hx e UL/OL
+		continue;
+	}
+	// Caso tabela/código: agrupa título + bloco inteiro
+	if (/^(TABLE|PRE)$/.test(nextTag)) {
+		const group = document.createElement('div');
+		group.className = 'keep-together';
+		group.appendChild(cloneEl(el));
+		group.appendChild(cloneEl(next));
+		pagination.addElementToPage(group, true);
+		i += 2;
+		continue;
+	}
 }
 
-// ====== INITIALIZAÇÃO ======
-window.addEventListener('DOMContentLoaded', () => {
-  applyAllSettings();
-  setupSettingsPanel();
-  if (isPaginatedMode) renderMarkdown();
-  else renderContinuousMode();
+// 2) Parágrafo com "título" + lista logo abaixo
+if (tag === "P" && next && /^(UL|OL)$/.test(nextTag)) {
+	// Se o parágrafo não for vazio, considera como título antecedente
+	const text = el.textContent.trim();
+	if (text.length > 0) {
+		const list = next;
+		const firstItem = list.children[0];
 
-  const toggleBtn = document.getElementById('paginationToggle');
-  if (toggleBtn) toggleBtn.addEventListener('click', togglePaginationMode);
+		const group = document.createElement('div');
+		group.className = 'keep-together';
+		group.appendChild(cloneEl(el));
+		if (firstItem) {
+			const newListForFirst = document.createElement(nextTag.toLowerCase());
+			newListForFirst.appendChild(firstItem.cloneNode(true));
+			group.appendChild(newListForFirst);
+		}
+		pagination.addElementToPage(group, false);
 
-  const editor = document.getElementById('editor');
-  if (editor) {
-    editor.addEventListener('input', () => {
-      if (isPaginatedMode) renderMarkdown();
-      else renderContinuousMode();
-    });
-  }
-});
+		if (list.children.length > 1) {
+			const residual = document.createElement(nextTag.toLowerCase());
+			for (let k = 1; k < list.children.length; k++) {
+				residual.appendChild(list.children[k].cloneNode(true));
+			}
+			pagination.addElementToPage(residual, false);
+		}
+
+		i += 2;
+		continue;
+	}
+}
+
+// 3) Parágrafo com "título" + tabela/código abaixo -> manter juntos
+if (tag === "P" && next && /^(TABLE|PRE)$/.test(nextTag)) {
+	const text = el.textContent.trim();
+	if (text.length > 0) {
+		const group = document.createElement('div');
+		group.className = 'keep-together';
+		group.appendChild(cloneEl(el));
+		group.appendChild(cloneEl(next));
+		pagination.addElementToPage(group, false);
+		i += 2;
+		continue;
+	}
+}
+
+// Padrão: adiciona elemento atual (sem duplicar)
+const isHeading = /^H[1-6]$/.test(tag);
+pagination.addElementToPage(cloneEl(el), isHeading);
+i += 1;
+}
+
+pagination.renderPages(document.getElementById('pagesContainer'));
+
+// Renderiza LaTeX nas páginas
+if (window.renderMathInElement) {
+setTimeout(() => {
+	document.querySelectorAll('.page-content').forEach(content => {
+		renderMathInElement(content, {
+			delimiters: [
+				{left: '$$', right: '$$', display: true},
+				{left: '$', right: '$', display: false},
+				{left: '\[', right: '\]', display: true}
+			],
+			throwOnError: false
+		});
+	});
+}, 100);
+}
+}
+
+function renderMarkdown() {
+	const markdownText = document.getElementById('editor').value;
+	updateCounters(markdownText);
+	
+	const processedText = preprocessMarkdown(markdownText);
+	
+	marked.setOptions({
+		highlight: function(code, lang) {
+			const langClass = lang ? `language-${lang}` : '';
+			return `<pre class="keep-together"><code class="${langClass}">${escapeHtml(code)}</code></pre>`;
+		},
+		breaks: true,
+		gfm: true
+	});
+	
+	try {
+		let htmlContent = marked.parse(processedText);
+		htmlContent = postprocessHTML(htmlContent);
+		
+		distributeContentToPages(htmlContent);
+	} catch (error) {
+		console.error('Erro ao renderizar Markdown:', error);
+		document.getElementById('pagesContainer').innerHTML = '<div class="a4-page"><div class="page-content"><p>Erro ao renderizar o conteúdo. Verifique o formato do Markdown.</p></div></div>';
+	}
+}
 
 // ====== FUNÇÕES AUXILIARES ======
 function escapeHtml(unsafe) {
@@ -537,6 +459,7 @@ function updateCounters(text) {
 	document.getElementById('wordCount').textContent = `${words.length} palavra${words.length !== 1 ? 's' : ''}`;
 	document.getElementById('charCount').textContent = `${text.length} caractere${text.length !== 1 ? 's' : ''}`;
 }
+
 
 // ====== EVENT LISTENERS ======
 function setupEventListeners() {
