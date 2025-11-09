@@ -1,0 +1,23 @@
+{
+  "name": "calculadora-formulas",
+  "version": "1.0.0",
+  "description": "Calculadora interativa com fórmulas matemáticas renderizadas em LaTeX",
+  "private": true,
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "start": "python -m http.server 3000",
+    "build": "echo 'Static files - no build needed'"
+  },
+  "keywords": [
+    "calculadora",
+    "formulas",
+    "matematica",
+    "latex",
+    "katex",
+    "interativa",
+    "educacao",
+    "ciencia"
+  ],
+  "author": "MiniMax Agent",
+  "license": "MIT"
+}

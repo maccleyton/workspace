@@ -1,872 +1,2225 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fórmulas Interativas - Workspace</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root{
-      --bg: #212121;           /* Fundo principal */
-      --panel: #121212;        /* Painéis */
-      --text: #ffffff;         /* Texto principal */
-      --muted: #cfcfcf;        /* Texto secundário */
-      --border: #545454;       /* Bordas */
-      --accent: #019875;       /* Destaque principal */
-      --accent-hover: #02b48a; /* Destaque hover */
-      --danger: #dc2626;       /* Perigo */
-      --sheet: #ffffff;        /* Folha branca */
-      --hover: #1a1a1a;        /* Hover */
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fórmulas Interativas</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-page: #0A0A0A;
+            --bg-surface: #141414;
+            --bg-surface-hover: #1A1A1A;
+            --text-primary: #E4E4E7;
+            --text-secondary: #A1A1AA;
+            --text-tertiary: #52525B;
+            --border-default: #27272A;
+            --border-interactive: #3F3F46;
+            --primary: #019875;
+            --primary-hover: #02b48a;
+            --accent: #3B82F6;
+            
+            /* Configurações customizáveis */
+            --h1-color: #019875;
+            --h1-bg: transparent;
+            --h2-color: #019875;
+            --h2-bg: transparent;
+            --h3-color: #019875;
+            --h3-bg: transparent;
+            --h4-color: #019875;
+            --h4-bg: transparent;
+            --h5-color: #019875;
+            --h5-bg: transparent;
+            --h6-color: #019875;
+            --h6-bg: transparent;
+            
+            --p-size: 16px;
+            --font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            --spacing-vertical: 1.6;
+            --spacing-horizontal: 0.5;
+            --word-spacing: 0.5;
+            --margins: 20px;
+            --text-align: left;
+            
+            --code-inline-color: #00ff88;
+            --code-inline-bg: rgba(0, 255, 136, 0.1);
+            --code-block-color: #ffffff;
+            --code-block-bg: #1a1a1a;
+            --code-block-border: var(--primary);
+            
+            --latex-block-color: #1a1a2e;
+            --latex-block-bg: #e3f2fd;
+            --latex-block-border: var(--primary);
+            --latex-inline-color: #1a1a2e;
+            --latex-inline-bg: rgba(227, 242, 253, 0.3);
+            
+            --table-header-bg: #019875;
+            --border-quote: var(--primary);
+            --quote-color: var(--text-primary);
+            --quote-bg: rgba(1, 152, 117, 0.05);
+            --quote-size: 16px;
+            
+            --hr-color: #00ff88;
+            --hr-thickness: 2px;
+            --hr-style: solid;
+        }
 
-    * {
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0;
-      font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      margin: 0; 
-      background: var(--bg); 
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-page);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-    /* Header */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 20px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,.5);
-    }
+        /* Top Menu Bar */
+        .top-menu {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-default);
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
 
-    .header .logo {
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+        .menu-title {
+            font-weight: 600;
+            font-size: 18px;
+            background: linear-gradient(to right, var(--primary), var(--primary-hover));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .header .logo::before {
-      content: '⚡';
-      font-size: 22px;
-    }
+        .menu-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    /* Layout */
-    .layout {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      min-height: calc(100vh - 60px);
-      gap: 0;
-    }
+        .menu-item:hover {
+            background: var(--bg-surface-hover);
+            color: var(--text-primary);
+        }
 
-    /* Sidebar */
-    aside {
-      background: var(--panel);
-      border-right: 1px solid var(--border);
-      padding: 16px;
-      overflow-y: auto;
-      max-height: calc(100vh - 60px);
-    }
+        .menu-item.active {
+            background: var(--bg-surface-hover);
+            color: var(--primary);
+        }
 
-    .section-title {
-      margin: 12px 0 12px;
-      color: var(--muted);
-      font-weight: 600;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+        .menu-item.primary {
+            background: var(--primary);
+            color: white;
+        }
 
-    .search {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--panel);
-      color: var(--text);
-      outline: none;
-      transition: border .2s;
-    }
+        .menu-item.primary:hover {
+            background: var(--primary-hover);
+        }
 
-    .search:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
-    }
+        .menu-item.success {
+            background: #28a745;
+            color: white;
+        }
 
-    /* Cards */
-    .cards {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
+        .menu-item.success:hover {
+            background: #218838;
+        }
 
-    .card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--panel);
-      padding: 12px;
-      cursor: pointer;
-      transition: all .2s;
-      position: relative;
-      overflow: hidden;
-    }
+        .menu-item.danger {
+            background: #dc3545;
+            color: white;
+        }
 
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--accent);
-      transform: scaleX(0);
-      transition: transform 0.3s ease;
-    }
+        .menu-item.danger:hover {
+            background: #c82333;
+        }
 
-    .card:hover::before {
-      transform: scaleX(1);
-    }
+        .menu-item.info {
+            background: #17a2b8;
+            color: white;
+        }
 
-    .card:hover {
-      transform: translateY(-2px);
-      background: var(--hover);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      border-color: var(--accent);
-    }
+        .menu-item.info:hover {
+            background: #138496;
+        }
 
-    .card.active {
-      outline: 2px solid var(--accent);
-      background: var(--hover);
-    }
+        /* Main Container with Sidebar */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
 
-    .card.active::before {
-      transform: scaleX(1);
-    }
+        /* Navigation Sidebar */
+        .nav-sidebar {
+            width: 300px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-default);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
 
-    .card .name {
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+        .nav-sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            border-right: none;
+        }
 
-    .card .category {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      letter-spacing: 0.5px;
-    }
+        .nav-sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-default);
+            background: var(--bg-surface-hover);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .card .preview {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 6px;
-      padding: 8px;
-      color: var(--muted);
-      font-size: 13px;
-      overflow: hidden;
-    }
+        .nav-sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    /* Main Area */
-    main {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      overflow-y: auto;
-      max-height: calc(100vh - 60px);
-    }
+        .nav-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
 
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      padding: 12px;
-      background: var(--panel);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
+        .nav-toggle-btn:hover {
+            background: var(--bg-surface);
+            color: var(--primary);
+        }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 14px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: var(--panel);
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 500;
-      transition: all .2s;
-      font-size: 13px;
-      text-decoration: none;
-    }
+        .nav-sidebar.collapsed .nav-sidebar-header,
+        .nav-sidebar.collapsed .nav-sidebar-content {
+            display: none;
+        }
 
-    .btn:hover {
-      background: var(--hover);
-      transform: translateY(-1px);
-      border-color: var(--accent);
-    }
+        /* Toggle button when sidebar is collapsed */
+        .nav-toggle-external {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-left: none;
+            border-radius: 0 6px 6px 0;
+            padding: 12px 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: none;
+        }
 
-    .btn:active {
-      transform: translateY(1px);
-    }
+        .main-container:has(.nav-sidebar.collapsed) .nav-toggle-external {
+            display: block;
+        }
 
-    .btn.primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
-    }
+        .nav-toggle-external:hover {
+            background: var(--bg-surface-hover);
+            color: var(--primary);
+        }
 
-    .btn.primary:hover {
-      background: var(--accent-hover);
-    }
+        .nav-sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
 
-    .btn.success {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
-    }
+        .category-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 10px 0;
+            padding: 0 10px;
+        }
 
-    .btn.success:hover {
-      background: var(--accent-hover);
-    }
+        .category-btn {
+            background: var(--bg-page);
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
 
-    /* Calculator Panel */
-    .calculator {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-    }
+        .category-btn:hover {
+            background: var(--bg-surface-hover);
+            color: var(--text-primary);
+            border-color: var(--primary);
+        }
 
-    .calc-header {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
 
-    .formula-display {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-      padding: 16px;
-      margin: 12px 0;
-      min-height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border);
-    }
+        .category-btn.all {
+            background: var(--bg-page);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
 
-    .inputs-grid {
-      display: grid;
-      gap: 12px;
-      margin: 16px 0;
-    }
+        .nav-heading {
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: var(--bg-page);
+            border: 1px solid var(--border-default);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: block;
+            text-align: left;
+            width: 100%;
+        }
 
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+        .nav-heading:hover {
+            background: var(--bg-surface-hover);
+            color: var(--text-primary);
+            border-color: var(--primary);
+        }
 
-    .input-group label {
-      font-weight: 600;
-      color: var(--muted);
-      font-size: 13px;
-    }
+        .nav-heading.level-1 { 
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .nav-heading.level-2 { 
+            padding-left: 20px;
+            font-size: 13px;
+        }
+        .nav-heading.level-3 { 
+            padding-left: 30px;
+            font-size: 12px;
+        }
 
-    .input-group input {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--panel);
-      color: var(--text);
-      outline: none;
-      transition: border .2s;
-      font-size: 14px;
-    }
+        .nav-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 12px;
+        }
 
-    .input-group input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
-    }
+        /* Search Bar */
+        .search-container {
+            padding: 15px 15px 0 15px;
+        }
 
-    .result-box {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-      border-radius: 8px;
-      padding: 20px;
-      margin: 16px 0;
-      color: white;
-      text-align: center;
-      display: none;
-    }
+        .search {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            outline: none;
+            transition: border .2s;
+            font-size: 14px;
+        }
 
-    .result-box.show {
-      display: block;
-      animation: slideIn .3s ease;
-    }
+        .search:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
+        }
 
-    .result-label {
-      font-size: 13px;
-      opacity: 0.9;
-      margin-bottom: 6px;
-    }
+        /* Formula Cards */
+        .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 0 10px 10px 10px;
+        }
 
-    .result-value {
-      font-size: 28px;
-      font-weight: 700;
-    }
+        .card {
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            background: var(--bg-page);
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .result-unit {
-      font-size: 16px;
-      opacity: 0.9;
-      margin-top: 4px;
-    }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--primary-hover));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
 
-    .steps-box {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      margin: 12px 0;
-      display: none;
-    }
+        .card:hover::before {
+            transform: scaleX(1);
+        }
 
-    .steps-box.show {
-      display: block;
-      animation: slideIn .3s ease;
-    }
+        .card:hover {
+            background: var(--bg-surface-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
 
-    .steps-title {
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+        .card.active {
+            outline: 2px solid var(--primary);
+            background: var(--bg-surface-hover);
+        }
 
-    .step {
-      padding: 10px 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 6px;
-      margin: 8px 0;
-      border-left: 3px solid var(--accent);
-    }
+        .card.active::before {
+            transform: scaleX(1);
+        }
 
-    /* Animations */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+        .card .name {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
 
-    /* KaTeX styling */
-    .katex {
-      font-size: 1.1em;
-    }
+        .card .category {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
 
-    .katex-display {
-      margin: 12px 0;
-      overflow-x: auto;
-      overflow-y: hidden;
-    }
+        .card .preview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            overflow: hidden;
+            font-family: 'Fira Code', monospace;
+        }
 
-    /* Efeito de textura sutil */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image:
-        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.03) 1px, transparent 2px),
-        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.02) 1.5px, transparent 2.5px),
-        radial-gradient(circle at 75% 50%, rgba(255,255,255,0.01) 1px, transparent 2px);
-      background-repeat: repeat;
-      background-size: 100px 100px;
-      pointer-events: none;
-      z-index: -1;
-    }
+        /* Main Content */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 20px;
+        }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
 
-    ::-webkit-scrollbar-track {
-      background: var(--bg);
-    }
 
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px;
-    }
+        /* Calculator Panel */
+        .calculator {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--accent);
-    }
+        .calc-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-default);
+        }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-      
-      aside {
-        max-height: 40vh;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-      
-      .toolbar {
-        justify-content: center;
-      }
-      
-      .btn {
-        flex: 1;
-        min-width: 120px;
-        justify-content: center;
-      }
-    }
+        .formula-display {
+            background: var(--bg-page);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
-    @media (max-width: 480px) {
-      .header {
-        padding: 12px 15px;
-      }
-      
-      .header .logo {
-        font-size: 16px;
-      }
-      
-      main {
-        padding: 15px;
-      }
-      
-      .calculator {
-        padding: 15px;
-      }
-      
-      .calc-header {
-        font-size: 18px;
-      }
-    }
-  </style>
+        .formula-display.empty {
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+
+        .inputs-grid {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .input-group input {
+            padding: 10px 12px;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            outline: none;
+            transition: border .2s;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: white;
+            text-align: center;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideIn .3s ease;
+        }
+
+        .result-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 6px;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .result-unit {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .steps-box {
+            background: var(--bg-page);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .steps-box.show {
+            display: block;
+        }
+
+        .steps-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .steps-content {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .step {
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--bg-surface);
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-default);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-interactive);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-sidebar {
+                display: none;
+            }
+            
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .content-area {
+                padding: 10px;
+            }
+        }
+
+        /* KaTeX customization */
+        .katex {
+            color: var(--text-primary) !important;
+            font-size: 1.1em !important;
+        }
+
+        .katex-display {
+            text-align: center !important;
+            margin: 1em 0 !important;
+        }
+
+        .formula-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            overflow: hidden;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .formula-preview .katex {
+            color: var(--text-secondary) !important;
+            font-size: 0.9em !important;
+        }
+
+        /* Graph Modal Styles */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .graph-overlay {
+            backdrop-filter: blur(5px);
+        }
+
+        .graph-modal {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
 </head>
 <body>
+    <!-- Top Menu -->
+    <div class="top-menu">
+        <div class="menu-title">
+            <i class="fas fa-calculator"></i>
+            Fórmulas Interativas
+        </div>
+        <div class="menu-item" onclick="loadFormulaBank()">
+            <i class="fas fa-database"></i> Banco de Fórmulas
+        </div>
+        <div class="menu-item danger" onclick="clearCalculator()">
+            <i class="fas fa-trash"></i> Limpar
+        </div>
+        <div class="menu-item primary" onclick="calculate()">
+            <i class="fas fa-play"></i> Calcular
+        </div>
+        <div class="menu-item success" onclick="exportResult()">
+            <i class="fas fa-download"></i> Exportar
+        </div>
+        <div class="menu-item info" onclick="generateGraph()">
+            <i class="fas fa-chart-line"></i> Gerar Gráficos
+        </div>
+    </div>
 
-  <div class="header">
-    <div class="logo">Fórmulas Interativas</div>
-    <a href="../index.html" class="btn">
-      <i class="fas fa-arrow-left"></i> Voltar ao Workspace
-    </a>
-  </div>
+    <div class="main-container">
+        <!-- Navigation Sidebar -->
+        <div class="nav-sidebar" id="navSidebar">
+            <div class="nav-sidebar-header">
+                <div class="nav-sidebar-title">
+                    <i class="fas fa-list"></i> Fórmulas
+                </div>
+                <button class="nav-toggle-btn" onclick="toggleNavSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="nav-sidebar-content">
+                <div class="search-container">
+                    <input type="text" class="search" placeholder="Buscar fórmula..." id="searchInput" oninput="filterFormulas()">
+                </div>
+                <div class="category-filters" id="categoryFilters">
+                    <!-- Category filters will be populated here -->
+                </div>
+                <div class="cards" id="formulaCards">
+                    <!-- Formula cards will be populated here -->
+                </div>
+            </div>
+        </div>
 
-  <div class="layout">
-    <aside>
-      <div class="section-title">📚 Banco de Fórmulas</div>
-      <input type="text" class="search" placeholder="Buscar fórmula..." id="searchInput">
-      <div class="cards" id="formulaCards"></div>
-    </aside>
-
-    <main>
-      <div class="toolbar">
-        <button class="btn primary" onclick="calculate()">
-          <i class="fas fa-play"></i> Calcular
+        <!-- Toggle button when sidebar is collapsed -->
+        <button class="nav-toggle-external" onclick="toggleNavSidebar()">
+            <i class="fas fa-chevron-right"></i>
         </button>
-        <button class="btn" onclick="clearInputs()">
-          <i class="fas fa-redo"></i> Limpar
-        </button>
-        <button class="btn success" onclick="exportResult()">
-          <i class="fas fa-download"></i> Exportar
-        </button>
-      </div>
 
-      <div class="calculator">
-        <div class="calc-header">
-          <i class="fas fa-calculator"></i>
-          <span id="formulaTitle">Selecione uma fórmula</span>
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Calculator Panel -->
+            <div class="calculator">
+                <div class="calc-header">
+                    <i class="fas fa-calculator"></i>
+                    <span id="formulaTitle">Selecione uma fórmula</span>
+                </div>
+
+                <div class="formula-display empty" id="formulaDisplay">
+                    <div style="color: var(--text-tertiary); text-align: center;">
+                        <i class="fas fa-hand-point-left"></i> Escolha uma fórmula da lista ao lado
+                    </div>
+                </div>
+
+                <div class="inputs-grid" id="inputsGrid"></div>
+
+                <div class="result-box" id="resultBox">
+                    <div class="result-label">Resultado</div>
+                    <div class="result-value" id="resultValue">0</div>
+                    <div class="result-unit" id="resultUnit"></div>
+                </div>
+
+                <div class="steps-box" id="stepsBox">
+                    <div class="steps-title">
+                        <i class="fas fa-list-ol"></i> Passos da Resolução
+                    </div>
+                    <div class="steps-content" id="stepsContent"></div>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <div class="formula-display" id="formulaDisplay">
-          <div style="color:var(--muted)">
-            <i class="fas fa-hand-point-left"></i> Escolha uma fórmula da lista ao lado
-          </div>
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-info">
+            <span id="formulaCount">0 fórmulas</span>
+            <span id="selectedFormula">Nenhuma fórmula selecionada</span>
         </div>
-
-        <div class="inputs-grid" id="inputsGrid"></div>
-
-        <div class="result-box" id="resultBox">
-          <div class="result-label">Resultado</div>
-          <div class="result-value" id="resultValue">0</div>
-          <div class="result-unit" id="resultUnit"></div>
+        <div class="status-info">
+            <span>Fórmulas Interativas v1.0</span>
         </div>
+    </div>
 
-        <div class="steps-box" id="stepsBox">
-          <div class="steps-title">
-            <i class="fas fa-list-ol"></i> Passos da Resolução
-          </div>
-          <div id="stepsContent"></div>
-        </div>
-      </div>
-    </main>
-  </div>
+    <script>
+        // Formula data
+        const formulas = [
+            // MATEMÁTICA
+            {
+                id: 'bhaskara',
+                name: 'Fórmula de Bhaskara',
+                category: 'Matemática',
+                latex: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+                vars: [
+                    {symbol: 'a', name: 'Coeficiente a', unit: ''},
+                    {symbol: 'b', name: 'Coeficiente b', unit: ''},
+                    {symbol: 'c', name: 'Coeficiente c', unit: ''}
+                ],
+                result: {symbol: 'x', unit: ''},
+                calc: (a, b, c) => {
+                    const discriminante = b*b - 4*a*c;
+                    if (discriminante < 0) return 'Sem raízes reais';
+                    return `x₁ = ${formatarNumeroBrasil((-b + Math.sqrt(discriminante)) / (2*a))}, x₂ = ${formatarNumeroBrasil((-b - Math.sqrt(discriminante)) / (2*a))}`;
+                },
+                steps: (a, b, c) => [
+                    `Dados: a = ${a}, b = ${b}, c = ${c}`,
+                    `Calculando Δ = b² - 4ac`,
+                    `Δ = ${b}² - 4×${a}×${c} = ${b*b - 4*a*c}`,
+                    `Aplicando x = (-b ± √Δ)/(2a)`,
+                    `x = (${-b} ± √${b*b - 4*a*c})/(2×${a})`,
+                    `x₁ = ${formatarNumeroBrasil((-b + Math.sqrt(discriminante)) / (2*a))}, x₂ = ${formatarNumeroBrasil((-b - Math.sqrt(discriminante)) / (2*a))}`
+                ]
+            },
+            {
+                id: 'area_triangulo',
+                name: 'Área do Triângulo',
+                category: 'Matemática',
+                latex: 'A = \\frac{b \\cdot h}{2}',
+                vars: [
+                    {symbol: 'b', name: 'Base', unit: 'm'},
+                    {symbol: 'h', name: 'Altura', unit: 'm'}
+                ],
+                result: {symbol: 'A', unit: 'm²'},
+                calc: (b, h) => (b * h) / 2,
+                steps: (b, h) => [
+                    `Dados: b = ${b} m, h = ${h} m`,
+                    `Aplicando A = (b × h) / 2`,
+                    `A = (${b} × ${h}) / 2`,
+                    `A = ${formatarNumeroBrasil((b * h) / 2)} m²`
+                ]
+            },
+            {
+                id: 'area_circulo',
+                name: 'Área do Círculo',
+                category: 'Matemática',
+                latex: 'A = \\pi r^2',
+                vars: [
+                    {symbol: 'r', name: 'Raio', unit: 'm'}
+                ],
+                result: {symbol: 'A', unit: 'm²'},
+                calc: (r) => Math.PI * r * r,
+                steps: (r) => [
+                    `Dados: r = ${r} m`,
+                    `Aplicando A = πr²`,
+                    `A = π × ${r}²`,
+                    `A = ${formatarNumeroBrasil(Math.PI * r * r)} m²`
+                ]
+            },
+            {
+                id: 'teorema_pitagoras',
+                name: 'Teorema de Pitágoras',
+                category: 'Matemática',
+                latex: 'a^2 = b^2 + c^2',
+                vars: [
+                    {symbol: 'b', name: 'Cateto 1', unit: 'm'},
+                    {symbol: 'c', name: 'Cateto 2', unit: 'm'}
+                ],
+                result: {symbol: 'a', unit: 'm'},
+                calc: (b, c) => Math.sqrt(b*b + c*c),
+                steps: (b, c) => [
+                    `Dados: b = ${b} m, c = ${c} m`,
+                    `Aplicando a² = b² + c²`,
+                    `a² = ${b}² + ${c}² = ${b*b} + ${c*c}`,
+                    `a² = ${b*b + c*c}`,
+                    `a = √${b*b + c*c} = ${formatarNumeroBrasil(Math.sqrt(b*b + c*c))} m`
+                ]
+            },
+            {
+                id: 'progressao_aritmetica',
+                name: 'Termo Geral da PA',
+                category: 'Matemática',
+                latex: 'a_n = a_1 + (n-1)r',
+                vars: [
+                    {symbol: 'a1', name: 'Primeiro termo', unit: ''},
+                    {symbol: 'n', name: 'Posição', unit: ''},
+                    {symbol: 'r', name: 'Razão', unit: ''}
+                ],
+                result: {symbol: 'a_n', unit: ''},
+                calc: (a1, n, r) => a1 + (n-1)*r,
+                steps: (a1, n, r) => [
+                    `Dados: a₁ = ${a1}, n = ${n}, r = ${r}`,
+                    `Aplicando aₙ = a₁ + (n-1)r`,
+                    `aₙ = ${a1} + (${n}-1)×${r}`,
+                    `aₙ = ${a1} + ${(n-1)*r}`,
+                    `aₙ = ${a1 + (n-1)*r}`
+                ]
+            },
+            {
+                id: 'progressao_geometrica',
+                name: 'Termo Geral da PG',
+                category: 'Matemática',
+                latex: 'a_n = a_1 \\cdot q^{n-1}',
+                vars: [
+                    {symbol: 'a1', name: 'Primeiro termo', unit: ''},
+                    {symbol: 'n', name: 'Posição', unit: ''},
+                    {symbol: 'q', name: 'Razão', unit: ''}
+                ],
+                result: {symbol: 'a_n', unit: ''},
+                calc: (a1, n, q) => a1 * Math.pow(q, n-1),
+                steps: (a1, n, q) => [
+                    `Dados: a₁ = ${a1}, n = ${n}, q = ${q}`,
+                    `Aplicando aₙ = a₁ × q^(n-1)`,
+                    `aₙ = ${a1} × ${q}^(${n}-1)`,
+                    `aₙ = ${a1} × ${q}^${n-1}`,
+                    `aₙ = ${(a1 * Math.pow(q, n-1)).toFixed(2)}`
+                ]
+            },
+            {
+                id: 'media_aritmetica',
+                name: 'Média Aritmética',
+                category: 'Matemática',
+                latex: '\\bar{x} = \\frac{\\sum x}{n}',
+                vars: [
+                    {symbol: 'soma', name: 'Soma dos valores', unit: ''},
+                    {symbol: 'n', name: 'Quantidade', unit: ''}
+                ],
+                result: {symbol: 'x̄', unit: ''},
+                calc: (soma, n) => soma / n,
+                steps: (soma, n) => [
+                    `Dados: Σx = ${soma}, n = ${n}`,
+                    `Aplicando x̄ = Σx/n`,
+                    `x̄ = ${soma}/${n}`,
+                    `x̄ = ${(soma/n).toFixed(2)}`
+                ]
+            },
 
-  <script>
-    // ... (o JavaScript permanece EXATAMENTE o mesmo que você forneceu)
-    const formulas = [
-      {
-        id: 'velocidade',
-        name: 'Velocidade Média',
-        category: 'Cinemática',
-        latex: 'v = \\frac{\\Delta s}{\\Delta t}',
-        vars: [
-          {symbol: 's', name: 'Deslocamento', unit: 'm'},
-          {symbol: 't', name: 'Tempo', unit: 's'}
-        ],
-        result: {symbol: 'v', unit: 'm/s'},
-        calc: (s, t) => s / t,
-        steps: (s, t) => [
-          `Dados: Δs = ${s} m, Δt = ${t} s`,
-          `Aplicando v = Δs / Δt`,
-          `v = ${s} / ${t}`,
-          `v = ${(s/t).toFixed(2)} m/s`
-        ]
-      },
-      {
-        id: 'energia_cinetica',
-        name: 'Energia Cinética',
-        category: 'Mecânica',
-        latex: 'E_c = \\frac{1}{2}mv^2',
-        vars: [
-          {symbol: 'm', name: 'Massa', unit: 'kg'},
-          {symbol: 'v', name: 'Velocidade', unit: 'm/s'}
-        ],
-        result: {symbol: 'E_c', unit: 'J'},
-        calc: (m, v) => 0.5 * m * v * v,
-        steps: (m, v) => [
-          `Dados: m = ${m} kg, v = ${v} m/s`,
-          `Aplicando E_c = ½mv²`,
-          `E_c = ½ × ${m} × ${v}²`,
-          `E_c = ${(0.5 * m * v * v).toFixed(2)} J`
-        ]
-      },
-      {
-        id: 'forca',
-        name: 'Segunda Lei de Newton',
-        category: 'Mecânica',
-        latex: 'F = ma',
-        vars: [
-          {symbol: 'm', name: 'Massa', unit: 'kg'},
-          {symbol: 'a', name: 'Aceleração', unit: 'm/s²'}
-        ],
-        result: {symbol: 'F', unit: 'N'},
-        calc: (m, a) => m * a,
-        steps: (m, a) => [
-          `Dados: m = ${m} kg, a = ${a} m/s²`,
-          `Aplicando F = ma`,
-          `F = ${m} × ${a}`,
-          `F = ${(m * a).toFixed(2)} N`
-        ]
-      },
-      {
-        id: 'peso',
-        name: 'Força Peso',
-        category: 'Mecânica',
-        latex: 'P = mg',
-        vars: [
-          {symbol: 'm', name: 'Massa', unit: 'kg'},
-          {symbol: 'g', name: 'Gravidade', unit: 'm/s²', default: 9.8}
-        ],
-        result: {symbol: 'P', unit: 'N'},
-        calc: (m, g) => m * g,
-        steps: (m, g) => [
-          `Dados: m = ${m} kg, g = ${g} m/s²`,
-          `Aplicando P = mg`,
-          `P = ${m} × ${g}`,
-          `P = ${(m * g).toFixed(2)} N`
-        ]
-      },
-      {
-        id: 'trabalho',
-        name: 'Trabalho',
-        category: 'Mecânica',
-        latex: 'W = F \\cdot d \\cdot \\cos(\\theta)',
-        vars: [
-          {symbol: 'F', name: 'Força', unit: 'N'},
-          {symbol: 'd', name: 'Deslocamento', unit: 'm'},
-          {symbol: 'theta', name: 'Ângulo', unit: '°', default: 0}
-        ],
-        result: {symbol: 'W', unit: 'J'},
-        calc: (F, d, theta) => F * d * Math.cos(theta * Math.PI / 180),
-        steps: (F, d, theta) => [
-          `Dados: F = ${F} N, d = ${d} m, θ = ${theta}°`,
-          `Convertendo θ para radianos: ${(theta * Math.PI / 180).toFixed(4)} rad`,
-          `Aplicando W = F·d·cos(θ)`,
-          `W = ${F} × ${d} × cos(${theta}°)`,
-          `W = ${(F * d * Math.cos(theta * Math.PI / 180)).toFixed(2)} J`
-        ]
-      },
-      {
-        id: 'potencia',
-        name: 'Potência',
-        category: 'Mecânica',
-        latex: 'P = \\frac{W}{\\Delta t}',
-        vars: [
-          {symbol: 'W', name: 'Trabalho', unit: 'J'},
-          {symbol: 't', name: 'Tempo', unit: 's'}
-        ],
-        result: {symbol: 'P', unit: 'W'},
-        calc: (W, t) => W / t,
-        steps: (W, t) => [
-          `Dados: W = ${W} J, Δt = ${t} s`,
-          `Aplicando P = W / Δt`,
-          `P = ${W} / ${t}`,
-          `P = ${(W / t).toFixed(2)} W`
-        ]
-      },
-      {
-        id: 'lei_ohm',
-        name: 'Lei de Ohm',
-        category: 'Eletricidade',
-        latex: 'V = RI',
-        vars: [
-          {symbol: 'R', name: 'Resistência', unit: 'Ω'},
-          {symbol: 'I', name: 'Corrente', unit: 'A'}
-        ],
-        result: {symbol: 'V', unit: 'V'},
-        calc: (R, I) => R * I,
-        steps: (R, I) => [
-          `Dados: R = ${R} Ω, I = ${I} A`,
-          `Aplicando V = RI`,
-          `V = ${R} × ${I}`,
-          `V = ${(R * I).toFixed(2)} V`
-        ]
-      },
-      {
-        id: 'potencia_eletrica',
-        name: 'Potência Elétrica',
-        category: 'Eletricidade',
-        latex: 'P = VI',
-        vars: [
-          {symbol: 'V', name: 'Tensão', unit: 'V'},
-          {symbol: 'I', name: 'Corrente', unit: 'A'}
-        ],
-        result: {symbol: 'P', unit: 'W'},
-        calc: (V, I) => V * I,
-        steps: (V, I) => [
-          `Dados: V = ${V} V, I = ${I} A`,
-          `Aplicando P = VI`,
-          `P = ${V} × ${I}`,
-          `P = ${(V * I).toFixed(2)} W`
-        ]
-      },
-      {
-        id: 'area_circulo',
-        name: 'Área do Círculo',
-        category: 'Geometria',
-        latex: 'A = \\pi r^2',
-        vars: [
-          {symbol: 'r', name: 'Raio', unit: 'm'}
-        ],
-        result: {symbol: 'A', unit: 'm²'},
-        calc: (r) => Math.PI * r * r,
-        steps: (r) => [
-          `Dados: r = ${r} m`,
-          `Aplicando A = πr²`,
-          `A = π × ${r}²`,
-          `A = ${Math.PI.toFixed(4)} × ${(r*r).toFixed(2)}`,
-          `A = ${(Math.PI * r * r).toFixed(2)} m²`
-        ]
-      },
-      {
-        id: 'volume_esfera',
-        name: 'Volume da Esfera',
-        category: 'Geometria',
-        latex: 'V = \\frac{4}{3}\\pi r^3',
-        vars: [
-          {symbol: 'r', name: 'Raio', unit: 'm'}
-        ],
-        result: {symbol: 'V', unit: 'm³'},
-        calc: (r) => (4/3) * Math.PI * r * r * r,
-        steps: (r) => [
-          `Dados: r = ${r} m`,
-          `Aplicando V = (4/3)πr³`,
-          `V = (4/3) × π × ${r}³`,
-          `V = ${((4/3) * Math.PI * r * r * r).toFixed(2)} m³`
-        ]
-      },
-      {
-        id: 'bhaskara',
-        name: 'Fórmula de Bhaskara',
-        category: 'Matemática',
-        latex: 'x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}',
-        vars: [
-          {symbol: 'a', name: 'Coeficiente a', unit: ''},
-          {symbol: 'b', name: 'Coeficiente b', unit: ''},
-          {symbol: 'c', name: 'Coeficiente c', unit: ''}
-        ],
-        result: {symbol: 'x', unit: ''},
-        calc: (a, b, c) => {
-          const delta = b*b - 4*a*c;
-          if(delta < 0) return 'Sem raízes reais';
-          const x1 = (-b + Math.sqrt(delta)) / (2*a);
-          const x2 = (-b - Math.sqrt(delta)) / (2*a);
-          return delta === 0 ? x1.toFixed(4) : `x₁=${x1.toFixed(4)}, x₂=${x2.toFixed(4)}`;
-        },
-        steps: (a, b, c) => {
-          const delta = b*b - 4*a*c;
-          if(delta < 0) return [`Δ = ${delta.toFixed(2)} < 0`, 'Não há raízes reais'];
-          const x1 = (-b + Math.sqrt(delta)) / (2*a);
-          const x2 = (-b - Math.sqrt(delta)) / (2*a);
-          return [
-            `Dados: a = ${a}, b = ${b}, c = ${c}`,
-            `Calculando Δ = b² - 4ac`,
-            `Δ = ${b}² - 4×${a}×${c} = ${delta.toFixed(2)}`,
-            `x = (-b ± √Δ) / 2a`,
-            `x₁ = (${-b} + ${Math.sqrt(delta).toFixed(2)}) / ${2*a} = ${x1.toFixed(4)}`,
-            `x₂ = (${-b} - ${Math.sqrt(delta).toFixed(2)}) / ${2*a} = ${x2.toFixed(4)}`
-          ];
+            // FÍSICA - Cinemática
+            {
+                id: 'velocidade_media',
+                name: 'Velocidade Média',
+                category: 'Física',
+                latex: 'v = \\frac{\\Delta s}{\\Delta t}',
+                vars: [
+                    {symbol: 's', name: 'Deslocamento', unit: 'm'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 'v', unit: 'm/s'},
+                calc: (s, t) => s / t,
+                steps: (s, t) => [
+                    `Dados: Δs = ${s} m, Δt = ${t} s`,
+                    `Aplicando v = Δs / Δt`,
+                    `v = ${s} / ${t}`,
+                    `v = ${formatarNumeroBrasil(s/t)} m/s`
+                ]
+            },
+            {
+                id: 'aceleracao',
+                name: 'Aceleração',
+                category: 'Física',
+                latex: 'a = \\frac{\\Delta v}{\\Delta t}',
+                vars: [
+                    {symbol: 'v', name: 'Variação da velocidade', unit: 'm/s'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 'a', unit: 'm/s²'},
+                calc: (v, t) => v / t,
+                steps: (v, t) => [
+                    `Dados: Δv = ${v} m/s, Δt = ${t} s`,
+                    `Aplicando a = Δv / Δt`,
+                    `a = ${v} / ${t}`,
+                    `a = ${(v/t).toFixed(2)} m/s²`
+                ]
+            },
+            {
+                id: 'mruv_posicao',
+                name: 'Posição no MRUV',
+                category: 'Física',
+                latex: 's = s_0 + v_0t + \\frac{1}{2}at^2',
+                vars: [
+                    {symbol: 's0', name: 'Posição inicial', unit: 'm'},
+                    {symbol: 'v0', name: 'Velocidade inicial', unit: 'm/s'},
+                    {symbol: 'a', name: 'Aceleração', unit: 'm/s²'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 's', unit: 'm'},
+                calc: (s0, v0, a, t) => s0 + v0*t + 0.5*a*t*t,
+                steps: (s0, v0, a, t) => [
+                    `Dados: s₀ = ${s0} m, v₀ = ${v0} m/s, a = ${a} m/s², t = ${t} s`,
+                    `Aplicando s = s₀ + v₀t + ½at²`,
+                    `s = ${s0} + ${v0}×${t} + ½×${a}×${t}²`,
+                    `s = ${s0} + ${v0*t} + ${0.5*a*t*t}`,
+                    `s = ${(s0 + v0*t + 0.5*a*t*t).toFixed(2)} m`
+                ]
+            },
+            {
+                id: 'torricelli',
+                name: 'Equação de Torricelli',
+                category: 'Física',
+                latex: 'v^2 = v_0^2 + 2a\\Delta s',
+                vars: [
+                    {symbol: 'v0', name: 'Velocidade inicial', unit: 'm/s'},
+                    {symbol: 'a', name: 'Aceleração', unit: 'm/s²'},
+                    {symbol: 's', name: 'Deslocamento', unit: 'm'}
+                ],
+                result: {symbol: 'v', unit: 'm/s'},
+                calc: (v0, a, s) => Math.sqrt(v0*v0 + 2*a*s),
+                steps: (v0, a, s) => [
+                    `Dados: v₀ = ${v0} m/s, a = ${a} m/s², Δs = ${s} m`,
+                    `Aplicando v² = v₀² + 2aΔs`,
+                    `v² = ${v0}² + 2×${a}×${s}`,
+                    `v² = ${v0*v0} + ${2*a*s}`,
+                    `v² = ${v0*v0 + 2*a*s}`,
+                    `v = √${v0*v0 + 2*a*s} = ${formatarNumeroBrasil(Math.sqrt(v0*v0 + 2*a*s))} m/s`
+                ]
+            },
+            {
+                id: 'queda_livre',
+                name: 'Queda Livre (altura)',
+                category: 'Física',
+                latex: 'h = \\frac{1}{2}gt^2',
+                vars: [
+                    {symbol: 'g', name: 'Gravidade', unit: 'm/s²'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 'h', unit: 'm'},
+                calc: (g, t) => 0.5 * g * t * t,
+                steps: (g, t) => [
+                    `Dados: g = ${g} m/s², t = ${t} s`,
+                    `Aplicando h = ½gt²`,
+                    `h = ½×${g}×${t}²`,
+                    `h = ${0.5*g*t*t} m`
+                ]
+            },
+
+            // FÍSICA - Dinâmica
+            {
+                id: 'segunda_lei_newton',
+                name: '2ª Lei de Newton',
+                category: 'Física',
+                latex: 'F = ma',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'kg'},
+                    {symbol: 'a', name: 'Aceleração', unit: 'm/s²'}
+                ],
+                result: {symbol: 'F', unit: 'N'},
+                calc: (m, a) => m * a,
+                steps: (m, a) => [
+                    `Dados: m = ${m} kg, a = ${a} m/s²`,
+                    `Aplicando F = ma`,
+                    `F = ${m} × ${a}`,
+                    `F = ${(m * a).toFixed(2)} N`
+                ]
+            },
+            {
+                id: 'peso',
+                name: 'Peso',
+                category: 'Física',
+                latex: 'P = mg',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'kg'},
+                    {symbol: 'g', name: 'Gravidade', unit: 'm/s²'}
+                ],
+                result: {symbol: 'P', unit: 'N'},
+                calc: (m, g) => m * g,
+                steps: (m, g) => [
+                    `Dados: m = ${m} kg, g = ${g} m/s²`,
+                    `Aplicando P = mg`,
+                    `P = ${m} × ${g}`,
+                    `P = ${(m * g).toFixed(2)} N`
+                ]
+            },
+            {
+                id: 'energia_cinetica',
+                name: 'Energia Cinética',
+                category: 'Física',
+                latex: 'E_c = \\frac{1}{2}mv^2',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'kg'},
+                    {symbol: 'v', name: 'Velocidade', unit: 'm/s'}
+                ],
+                result: {symbol: 'E_c', unit: 'J'},
+                calc: (m, v) => 0.5 * m * v * v,
+                steps: (m, v) => [
+                    `Dados: m = ${m} kg, v = ${v} m/s`,
+                    `Aplicando E_c = ½mv²`,
+                    `E_c = ½ × ${m} × ${v}²`,
+                    `E_c = ${formatarNumeroBrasil(0.5 * m * v * v)} J`
+                ]
+            },
+            {
+                id: 'trabalho',
+                name: 'Trabalho',
+                category: 'Física',
+                latex: 'W = F \\cdot d \\cdot \\cos \\theta',
+                vars: [
+                    {symbol: 'F', name: 'Força', unit: 'N'},
+                    {symbol: 'd', name: 'Distância', unit: 'm'},
+                    {symbol: 'theta', name: 'Ângulo', unit: '°'}
+                ],
+                result: {symbol: 'W', unit: 'J'},
+                calc: (F, d, theta) => F * d * Math.cos(theta * Math.PI / 180),
+                steps: (F, d, theta) => [
+                    `Dados: F = ${F} N, d = ${d} m, θ = ${theta}°`,
+                    `Aplicando W = F×d×cos(θ)`,
+                    `W = ${F} × ${d} × cos(${theta}°)`,
+                    `W = ${F*d} × ${Math.cos(theta * Math.PI / 180).toFixed(3)}`,
+                    `W = ${(F * d * Math.cos(theta * Math.PI / 180)).toFixed(2)} J`
+                ]
+            },
+            {
+                id: 'potencia',
+                name: 'Potência',
+                category: 'Física',
+                latex: 'P = \\frac{W}{t}',
+                vars: [
+                    {symbol: 'W', name: 'Trabalho', unit: 'J'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 'P', unit: 'W'},
+                calc: (W, t) => W / t,
+                steps: (W, t) => [
+                    `Dados: W = ${W} J, t = ${t} s`,
+                    `Aplicando P = W/t`,
+                    `P = ${W}/${t}`,
+                    `P = ${(W/t).toFixed(2)} W`
+                ]
+            },
+
+            // FÍSICA - Hidrostática e Gases
+            {
+                id: 'pressao',
+                name: 'Pressão',
+                category: 'Física',
+                latex: 'P = \\frac{F}{A}',
+                vars: [
+                    {symbol: 'F', name: 'Força', unit: 'N'},
+                    {symbol: 'A', name: 'Área', unit: 'm²'}
+                ],
+                result: {symbol: 'P', unit: 'Pa'},
+                calc: (F, A) => F / A,
+                steps: (F, A) => [
+                    `Dados: F = ${F} N, A = ${A} m²`,
+                    `Aplicando P = F/A`,
+                    `P = ${F}/${A}`,
+                    `P = ${(F/A).toFixed(2)} Pa`
+                ]
+            },
+            {
+                id: 'pressao_hidrostatica',
+                name: 'Pressão Hidrostática',
+                category: 'Física',
+                latex: 'P = \\rho g h',
+                vars: [
+                    {symbol: 'rho', name: 'Densidade', unit: 'kg/m³'},
+                    {symbol: 'g', name: 'Gravidade', unit: 'm/s²'},
+                    {symbol: 'h', name: 'Profundidade', unit: 'm'}
+                ],
+                result: {symbol: 'P', unit: 'Pa'},
+                calc: (rho, g, h) => rho * g * h,
+                steps: (rho, g, h) => [
+                    `Dados: ρ = ${rho} kg/m³, g = ${g} m/s², h = ${h} m`,
+                    `Aplicando P = ρgh`,
+                    `P = ${rho} × ${g} × ${h}`,
+                    `P = ${(rho * g * h).toFixed(2)} Pa`
+                ]
+            },
+            {
+                id: 'clapeyron',
+                name: 'Equação de Clapeyron',
+                category: 'Física',
+                latex: 'PV = nRT',
+                vars: [
+                    {symbol: 'P', name: 'Pressão', unit: 'Pa'},
+                    {symbol: 'V', name: 'Volume', unit: 'm³'},
+                    {symbol: 'n', name: 'Mols', unit: 'mol'},
+                    {symbol: 'T', name: 'Temperatura', unit: 'K'}
+                ],
+                result: {symbol: 'R', unit: 'J/(mol·K)'},
+                calc: (P, V, n, T) => (P * V) / (n * T),
+                steps: (P, V, n, T) => [
+                    `Dados: P = ${P} Pa, V = ${V} m³, n = ${n} mol, T = ${T} K`,
+                    `Aplicando PV = nRT → R = PV/(nT)`,
+                    `R = (${P} × ${V}) / (${n} × ${T})`,
+                    `R = ${(P * V)} / ${(n * T)}`,
+                    `R = ${((P * V) / (n * T)).toFixed(2)} J/(mol·K)`
+                ]
+            },
+            {
+                id: 'densidade',
+                name: 'Densidade',
+                category: 'Física',
+                latex: '\\rho = \\frac{m}{V}',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'kg'},
+                    {symbol: 'V', name: 'Volume', unit: 'm³'}
+                ],
+                result: {symbol: 'ρ', unit: 'kg/m³'},
+                calc: (m, V) => m / V,
+                steps: (m, V) => [
+                    `Dados: m = ${m} kg, V = ${V} m³`,
+                    `Aplicando ρ = m / V`,
+                    `ρ = ${m} / ${V}`,
+                    `ρ = ${(m/V).toFixed(2)} kg/m³`
+                ]
+            },
+
+            // FÍSICA - Eletricidade
+            {
+                id: 'lei_ohm',
+                name: 'Lei de Ohm',
+                category: 'Física',
+                latex: 'V = Ri',
+                vars: [
+                    {symbol: 'R', name: 'Resistência', unit: 'Ω'},
+                    {symbol: 'i', name: 'Corrente', unit: 'A'}
+                ],
+                result: {symbol: 'V', unit: 'V'},
+                calc: (R, i) => R * i,
+                steps: (R, i) => [
+                    `Dados: R = ${R} Ω, i = ${i} A`,
+                    `Aplicando V = Ri`,
+                    `V = ${R} × ${i}`,
+                    `V = ${(R * i).toFixed(2)} V`
+                ]
+            },
+            {
+                id: 'potencia_eletrica',
+                name: 'Potência Elétrica',
+                category: 'Física',
+                latex: 'P = Vi',
+                vars: [
+                    {symbol: 'V', name: 'Tensão', unit: 'V'},
+                    {symbol: 'i', name: 'Corrente', unit: 'A'}
+                ],
+                result: {symbol: 'P', unit: 'W'},
+                calc: (V, i) => V * i,
+                steps: (V, i) => [
+                    `Dados: V = ${V} V, i = ${i} A`,
+                    `Aplicando P = Vi`,
+                    `P = ${V} × ${i}`,
+                    `P = ${(V * i).toFixed(2)} W`
+                ]
+            },
+            {
+                id: 'coulomb',
+                name: 'Lei de Coulomb',
+                category: 'Física',
+                latex: 'F = k\\frac{q_1q_2}{r^2}',
+                vars: [
+                    {symbol: 'q1', name: 'Carga 1', unit: 'C'},
+                    {symbol: 'q2', name: 'Carga 2', unit: 'C'},
+                    {symbol: 'r', name: 'Distância', unit: 'm'}
+                ],
+                result: {symbol: 'F', unit: 'N'},
+                calc: (q1, q2, r) => (9e9 * q1 * q2) / (r * r),
+                steps: (q1, q2, r) => [
+                    `Dados: q₁ = ${q1} C, q₂ = ${q2} C, r = ${r} m`,
+                    `Aplicando F = kq₁q₂/r² (k = 9×10⁹)`,
+                    `F = 9×10⁹ × ${q1} × ${q2} / ${r}²`,
+                    `F = ${(9e9 * q1 * q2).toExponential(2)} / ${r*r}`,
+                    `F = ${((9e9 * q1 * q2) / (r * r)).toFixed(2)} N`
+                ]
+            },
+
+            // FÍSICA - Ondas e Óptica
+            {
+                id: 'onda_fundamental',
+                name: 'Equação da Onda',
+                category: 'Física',
+                latex: 'v = \\lambda f',
+                vars: [
+                    {symbol: 'lambda', name: 'Comprimento de onda', unit: 'm'},
+                    {symbol: 'f', name: 'Frequência', unit: 'Hz'}
+                ],
+                result: {symbol: 'v', unit: 'm/s'},
+                calc: (lambda, f) => lambda * f,
+                steps: (lambda, f) => [
+                    `Dados: λ = ${lambda} m, f = ${f} Hz`,
+                    `Aplicando v = λf`,
+                    `v = ${lambda} × ${f}`,
+                    `v = ${(lambda * f).toFixed(2)} m/s`
+                ]
+            },
+            {
+                id: 'lei_snell',
+                name: 'Lei de Snell',
+                category: 'Física',
+                latex: 'n_1\\sin \\theta_1 = n_2\\sin \\theta_2',
+                vars: [
+                    {symbol: 'n1', name: 'Índice 1', unit: ''},
+                    {symbol: 'theta1', name: 'Ângulo 1', unit: '°'},
+                    {symbol: 'n2', name: 'Índice 2', unit: ''}
+                ],
+                result: {symbol: 'θ₂', unit: '°'},
+                calc: (n1, theta1, n2) => {
+                    const rad = Math.asin((n1 * Math.sin(theta1 * Math.PI / 180)) / n2);
+                    return (rad * 180 / Math.PI).toFixed(2);
+                },
+                steps: (n1, theta1, n2) => [
+                    `Dados: n₁ = ${n1}, θ₁ = ${theta1}°, n₂ = ${n2}`,
+                    `Aplicando n₁sen(θ₁) = n₂sen(θ₂)`,
+                    `${n1}×sen(${theta1}°) = ${n2}×sen(θ₂)`,
+                    `sen(θ₂) = ${(n1 * Math.sin(theta1 * Math.PI / 180)).toFixed(3)}/${n2}`,
+                    `sen(θ₂) = ${(n1 * Math.sin(theta1 * Math.PI / 180) / n2).toFixed(3)}`,
+                    `θ₂ = ${Math.asin((n1 * Math.sin(theta1 * Math.PI / 180)) / n2) * 180 / Math.PI}.toFixed(2)}°`
+                ]
+            },
+
+            // QUÍMICA
+            {
+                id: 'mols',
+                name: 'Número de Mols',
+                category: 'Química',
+                latex: 'n = \\frac{m}{M}',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'g'},
+                    {symbol: 'M', name: 'Massa molar', unit: 'g/mol'}
+                ],
+                result: {symbol: 'n', unit: 'mol'},
+                calc: (m, M) => m / M,
+                steps: (m, M) => [
+                    `Dados: m = ${m} g, M = ${M} g/mol`,
+                    `Aplicando n = m/M`,
+                    `n = ${m}/${M}`,
+                    `n = ${(m/M).toFixed(2)} mol`
+                ]
+            },
+            {
+                id: 'molaridade',
+                name: 'Molaridade',
+                category: 'Química',
+                latex: 'M = \\frac{n}{V}',
+                vars: [
+                    {symbol: 'n', name: 'Mols', unit: 'mol'},
+                    {symbol: 'V', name: 'Volume', unit: 'L'}
+                ],
+                result: {symbol: 'M', unit: 'mol/L'},
+                calc: (n, V) => n / V,
+                steps: (n, V) => [
+                    `Dados: n = ${n} mol, V = ${V} L`,
+                    `Aplicando M = n/V`,
+                    `M = ${n}/${V}`,
+                    `M = ${(n/V).toFixed(2)} mol/L`
+                ]
+            },
+            {
+                id: 'ph',
+                name: 'pH',
+                category: 'Química',
+                latex: 'pH = -\\log[H^+]',
+                vars: [
+                    {symbol: 'h', name: '[H⁺]', unit: 'mol/L'}
+                ],
+                result: {symbol: 'pH', unit: ''},
+                calc: (h) => -Math.log10(h),
+                steps: (h) => [
+                    `Dados: [H⁺] = ${h} mol/L`,
+                    `Aplicando pH = -log[H⁺]`,
+                    `pH = -log(${h})`,
+                    `pH = ${(-Math.log10(h)).toFixed(2)}`
+                ]
+            },
+            {
+                id: 'diluicao',
+                name: 'Diluição',
+                category: 'Química',
+                latex: 'C_1V_1 = C_2V_2',
+                vars: [
+                    {symbol: 'c1', name: 'Concentração inicial', unit: 'mol/L'},
+                    {symbol: 'v1', name: 'Volume inicial', unit: 'L'},
+                    {symbol: 'c2', name: 'Concentração final', unit: 'mol/L'}
+                ],
+                result: {symbol: 'V₂', unit: 'L'},
+                calc: (c1, v1, c2) => (c1 * v1) / c2,
+                steps: (c1, v1, c2) => [
+                    `Dados: C₁ = ${c1} mol/L, V₁ = ${v1} L, C₂ = ${c2} mol/L`,
+                    `Aplicando C₁V₁ = C₂V₂`,
+                    `${c1} × ${v1} = ${c2} × V₂`,
+                    `V₂ = (${c1} × ${v1}) / ${c2}`,
+                    `V₂ = ${(c1 * v1)} / ${c2}`,
+                    `V₂ = ${((c1 * v1) / c2).toFixed(2)} L`
+                ]
+            },
+
+            // ECONOMIA E FINANÇAS
+            {
+                id: 'juros_simples',
+                name: 'Juros Simples (Montante)',
+                category: 'Economia',
+                latex: 'M = C(1 + it)',
+                vars: [
+                    {symbol: 'C', name: 'Capital', unit: 'R$'},
+                    {symbol: 'i', name: 'Taxa', unit: ''},
+                    {symbol: 't', name: 'Tempo', unit: 'períodos'}
+                ],
+                result: {symbol: 'M', unit: 'R$'},
+                calc: (C, i, t) => C * (1 + i * t),
+                steps: (C, i, t) => [
+                    `Dados: C = R$ ${C}, i = ${i}, t = ${t}`,
+                    `Aplicando M = C(1 + it)`,
+                    `M = ${C}(1 + ${i} × ${t})`,
+                    `M = ${C}(1 + ${i*t})`,
+                    `M = ${C} × ${(1 + i*t)}`,
+                    `M = R$ ${formatarNumeroBrasil(C * (1 + i * t))}`
+                ]
+            },
+            {
+                id: 'juros_compostos',
+                name: 'Juros Compostos (Montante)',
+                category: 'Economia',
+                latex: 'M = C(1 + i)^n',
+                vars: [
+                    {symbol: 'C', name: 'Capital', unit: 'R$'},
+                    {symbol: 'i', name: 'Taxa', unit: ''},
+                    {symbol: 'n', name: 'Períodos', unit: ''}
+                ],
+                result: {symbol: 'M', unit: 'R$'},
+                calc: (C, i, n) => C * Math.pow(1 + i, n),
+                steps: (C, i, n) => [
+                    `Dados: C = R$ ${C}, i = ${i}, n = ${n}`,
+                    `Aplicando M = C(1 + i)^n`,
+                    `M = ${C}(1 + ${i})^${n}`,
+                    `M = ${C} × ${Math.pow(1 + i, n).toFixed(4)}`,
+                    `M = R$ ${formatarNumeroBrasil(C * Math.pow(1 + i, n))}`
+                ]
+            },
+            {
+                id: 'vpl',
+                name: 'VPL (Valor Presente Líquido)',
+                category: 'Economia',
+                latex: 'VPL = \\sum\\frac{FC_t}{(1+i)^t}',
+                vars: [
+                    {symbol: 'fc', name: 'Fluxo de caixa', unit: 'R$'},
+                    {symbol: 'i', name: 'Taxa de desconto', unit: ''},
+                    {symbol: 't', name: 'Período', unit: ''}
+                ],
+                result: {symbol: 'VPL', unit: 'R$'},
+                calc: (fc, i, t) => fc / Math.pow(1 + i, t),
+                steps: (fc, i, t) => [
+                    `Dados: FC = R$ ${fc}, i = ${i}, t = ${t}`,
+                    `Aplicando VPL = FC/(1+i)^t`,
+                    `VPL = ${fc}/(1 + ${i})^${t}`,
+                    `VPL = ${fc}/${Math.pow(1 + i, t).toFixed(4)}`,
+                    `VPL = R$ ${(fc / Math.pow(1 + i, t)).toFixed(2)}`
+                ]
+            },
+
+            // ESTATÍSTICA E CIÊNCIA DA COMPUTAÇÃO
+            {
+                id: 'correlacao_pearson',
+                name: 'Correlação de Pearson',
+                category: 'Estatística',
+                latex: 'r = \\frac{\\sum(x-\\bar{x})(y-\\bar{y})}{\\sqrt{\\sum(x-\\bar{x})^2\\sum(y-\\bar{y})^2}}',
+                vars: [
+                    {symbol: 'n', name: 'Número de dados', unit: ''},
+                    {symbol: 'soma_xy', name: 'Soma de x·y', unit: ''},
+                    {symbol: 'soma_x', name: 'Soma de x', unit: ''},
+                    {symbol: 'soma_y', name: 'Soma de y', unit: ''},
+                    {symbol: 'soma_x2', name: 'Soma de x²', unit: ''},
+                    {symbol: 'soma_y2', name: 'Soma de y²', unit: ''}
+                ],
+                result: {symbol: 'r', unit: ''},
+                calc: (n, soma_xy, soma_x, soma_y, soma_x2, soma_y2) => {
+                    const numerador = n * soma_xy - soma_x * soma_y;
+                    const denominador = Math.sqrt((n * soma_x2 - soma_x * soma_x) * (n * soma_y2 - soma_y * soma_y));
+                    return numerador / denominador;
+                },
+                steps: (n, soma_xy, soma_x, soma_y, soma_x2, soma_y2) => {
+                    const numerador = n * soma_xy - soma_x * soma_y;
+                    const denominador = Math.sqrt((n * soma_x2 - soma_x * soma_x) * (n * soma_y2 - soma_y * soma_y));
+                    return [
+                        `Dados: n = ${n}, Σxy = ${soma_xy}, Σx = ${soma_x}, Σy = ${soma_y}, Σx² = ${soma_x2}, Σy² = ${soma_y2}`,
+                        `Calculando r = (n·Σxy - Σx·Σy) / √[(n·Σx² - (Σx)²)(n·Σy² - (Σy)²)]`,
+                        `r = (${n}×${soma_xy} - ${soma_x}×${soma_y}) / √[(${n}×${soma_x2} - ${soma_x}²)×(${n}×${soma_y2} - ${soma_y}²)]`,
+                        `r = (${n*soma_xy} - ${soma_x*soma_y}) / √[${n*soma_x2 - soma_x*soma_x}×${n*soma_y2 - soma_y*soma_y}]`,
+                        `r = ${numerador} / √${(n*soma_x2 - soma_x*soma_x)*(n*soma_y2 - soma_y*soma_y)}`,
+                        `r = ${numerador} / ${formatarNumeroBrasil(denominador)}`,
+                        `r = ${(numerador/denominador).toFixed(3)}`
+                    ];
+                }
+            },
+            {
+                id: 'erro_padrao',
+                name: 'Erro Padrão da Média',
+                category: 'Estatística',
+                latex: 'SE = \\frac{\\sigma}{\\sqrt{n}}',
+                vars: [
+                    {symbol: 'sigma', name: 'Desvio padrão', unit: ''},
+                    {symbol: 'n', name: 'Tamanho da amostra', unit: ''}
+                ],
+                result: {symbol: 'SE', unit: ''},
+                calc: (sigma, n) => sigma / Math.sqrt(n),
+                steps: (sigma, n) => [
+                    `Dados: σ = ${sigma}, n = ${n}`,
+                    `Aplicando SE = σ/√n`,
+                    `SE = ${sigma}/√${n}`,
+                    `SE = ${sigma}/${Math.sqrt(n).toFixed(2)}`,
+                    `SE = ${formatarNumeroBrasil(sigma / Math.sqrt(n))}`
+                ]
+            }
+        ];
+
+        let currentFormula = null;
+        let filteredFormulas = [...formulas];
+        let currentCategory = 'all';
+
+        // Get unique categories
+        const categories = ['all', ...[...new Set(formulas.map(f => f.category))]];
+
+        // Initialize the application
+        function init() {
+            renderCategoryFilters();
+            renderFormulaCards();
+            updateStatus();
+            
+            // Setup search
+            document.getElementById('searchInput').addEventListener('input', filterFormulas);
         }
-      }
-    ];
 
-    let currentFormula = null;
+        function renderCategoryFilters() {
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = '';
 
-    function renderCards() {
-      const container = document.getElementById('formulaCards');
-      container.innerHTML = formulas.map(f => `
-        <div class="card" onclick="selectFormula('${f.id}')">
-          <div class="category">${f.category}</div>
-          <div class="name">${f.name}</div>
-          <div class="preview" id="preview-${f.id}"></div>
-        </div>
-      `).join('');
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = `category-btn ${category === 'all' ? 'active' : ''}`;
+                btn.textContent = category === 'all' ? '📚 Todas as Fórmulas' : `📖 ${category}`;
+                btn.onclick = () => filterByCategory(category);
+                container.appendChild(btn);
+            });
+        }
 
-      formulas.forEach(f => {
-        katex.render(f.latex, document.getElementById(`preview-${f.id}`), {
-          throwOnError: false, displayMode: false
-        });
-      });
-    }
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Apply category filter
+            if (category === 'all') {
+                filteredFormulas = [...formulas];
+            } else {
+                filteredFormulas = formulas.filter(f => f.category === category);
+            }
+            
+            // Re-apply search filter if any
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filteredFormulas = filteredFormulas.filter(formula => 
+                    formula.name.toLowerCase().includes(searchTerm) ||
+                    formula.category.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderFormulaCards();
+            updateStatus();
+        }
 
-    function selectFormula(id) {
-      currentFormula = formulas.find(f => f.id === id);
-      if(!currentFormula) return;
+        function renderFormulaCards() {
+            const container = document.getElementById('formulaCards');
+            container.innerHTML = '';
 
-      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-      event.currentTarget.classList.add('active');
+            filteredFormulas.forEach(formula => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => selectFormula(formula);
+                
+                card.innerHTML = `
+                    <div class="name">
+                        <i class="fas fa-calculator"></i>
+                        ${formula.name}
+                    </div>
+                    <div class="category">${formula.category}</div>
+                    <div class="formula-preview" id="preview-${formula.id}">
+                        ${formula.latex}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+                
+                // Render LaTeX for preview
+                katex.render(formula.latex, document.getElementById(`preview-${formula.id}`), {
+                    throwOnError: false,
+                    displayMode: false
+                });
+            });
+        }
 
-      document.getElementById('formulaTitle').textContent = currentFormula.name;
+        function selectFormula(formula) {
+            currentFormula = formula;
+            
+            // Update UI
+            document.getElementById('formulaTitle').textContent = formula.name;
+            document.getElementById('formulaDisplay').classList.remove('empty');
+            
+            // Render formula with KaTeX
+            const displayElement = document.getElementById('formulaDisplay');
+            displayElement.innerHTML = '';
+            katex.render(formula.latex, displayElement, {
+                throwOnError: false,
+                displayMode: true
+            });
+            
+            // Create input fields
+            const inputsGrid = document.getElementById('inputsGrid');
+            inputsGrid.innerHTML = '';
+            
+            formula.vars.forEach((variable, index) => {
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'input-group';
+                inputGroup.innerHTML = `
+                    <label>${variable.name} (${variable.symbol}) - ${variable.unit}</label>
+                    <input type="number" step="any" id="var-${variable.symbol}" placeholder="Digite o valor de ${variable.name}">
+                `;
+                inputsGrid.appendChild(inputGroup);
+                
+                // Focus on first input
+                if (index === 0) {
+                    setTimeout(() => document.getElementById(`var-${variable.symbol}`).focus(), 100);
+                }
+            });
+            
+            // Clear results
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('stepsBox').classList.remove('show');
+            
+            // Update cards
+            document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+            event.target.closest('.card').classList.add('active');
+            
+            updateStatus();
+        }
 
-      katex.render(currentFormula.latex, document.getElementById('formulaDisplay'), {
-        throwOnError: false, displayMode: true
-      });
+        function filterFormulas() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Start with category filter
+            let baseFormulas = currentCategory === 'all' ? 
+                [...formulas] : 
+                formulas.filter(f => f.category === currentCategory);
+            
+            // Apply search filter
+            if (searchTerm) {
+                filteredFormulas = baseFormulas.filter(formula => 
+                    formula.name.toLowerCase().includes(searchTerm) ||
+                    formula.category.toLowerCase().includes(searchTerm)
+                );
+            } else {
+                filteredFormulas = baseFormulas;
+            }
+            
+            renderFormulaCards();
+            updateStatus();
+        }
 
-      const inputsGrid = document.getElementById('inputsGrid');
-      inputsGrid.innerHTML = currentFormula.vars.map(v => `
-        <div class="input-group">
-          <label>${v.name} (${v.symbol}) ${v.unit ? `[${v.unit}]` : ''}</label>
-          <input type="number" step="any" id="input-${v.symbol}" 
-                 value="${v.default || ''}" placeholder="Digite o valor">
-        </div>
-      `).join('');
+        function calculate() {
+            if (!currentFormula) {
+                alert('Por favor, selecione uma fórmula primeiro!');
+                return;
+            }
+            
+            // Get input values
+            const values = {};
+            let missingFields = [];
+            
+            currentFormula.vars.forEach(variable => {
+                const input = document.getElementById(`var-${variable.symbol}`);
+                const value = parseFloat(input.value);
+                
+                if (isNaN(value)) {
+                    missingFields.push(variable.name);
+                } else {
+                    values[variable.symbol] = value;
+                }
+            });
+            
+            if (missingFields.length > 0) {
+                alert(`Por favor, preencha os seguintes campos: ${missingFields.join(', ')}`);
+                return;
+            }
+            
+            // Calculate result
+            try {
+                const args = currentFormula.vars.map(v => values[v.symbol]);
+                const result = currentFormula.calc(...args);
+                const steps = currentFormula.steps(...args);
+                
+                // Display result (handle different types)
+                let resultText, resultUnit = currentFormula.result.unit;
+                
+                if (typeof result === 'string') {
+                    resultText = result;
+                } else if (typeof result === 'number' && isFinite(result)) {
+                    resultText = formatarNumeroBrasil(result);
+                } else {
+                    resultText = String(result);
+                }
+                
+                document.getElementById('resultValue').textContent = resultText;
+                document.getElementById('resultUnit').textContent = resultUnit;
+                document.getElementById('resultBox').classList.add('show');
+                
+                // Display steps
+                const stepsContent = document.getElementById('stepsContent');
+                if (Array.isArray(steps)) {
+                    stepsContent.innerHTML = steps.map(step => 
+                        `<div class="step">${step}</div>`
+                    ).join('');
+                } else {
+                    stepsContent.innerHTML = `<div class="step">${steps}</div>`;
+                }
+                document.getElementById('stepsBox').classList.add('show');
+                
+            } catch (error) {
+                alert('Erro no cálculo. Verifique os valores inseridos.');
+                console.error('Calculation error:', error);
+            }
+        }
 
-      document.getElementById('resultBox').classList.remove('show');
-      document.getElementById('stepsBox').classList.remove('show');
-    }
+        function clearInputs() {
+            if (currentFormula) {
+                currentFormula.vars.forEach(variable => {
+                    const input = document.getElementById(`var-${variable.symbol}`);
+                    if (input) input.value = '';
+                });
+            }
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('stepsBox').classList.remove('show');
+        }
 
-    function calculate() {
-      if(!currentFormula) {
-        alert('Selecione uma fórmula primeiro!');
-        return;
-      }
+        function clearCalculator() {
+            currentFormula = null;
+            document.getElementById('formulaTitle').textContent = 'Selecione uma fórmula';
+            document.getElementById('formulaDisplay').innerHTML = `
+                <div style="color: var(--text-tertiary); text-align: center;">
+                    <i class="fas fa-hand-point-left"></i> Escolha uma fórmula da lista ao lado
+                </div>
+            `;
+            document.getElementById('formulaDisplay').classList.add('empty');
+            document.getElementById('inputsGrid').innerHTML = '';
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('stepsBox').classList.remove('show');
+            
+            document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+            updateStatus();
+        }
 
-      const values = currentFormula.vars.map(v => {
-        const input = document.getElementById(`input-${v.symbol}`);
-        return parseFloat(input.value) || 0;
-      });
+        // Função para formatar números no padrão brasileiro
+        function formatarNumeroBrasil(numero) {
+            if (typeof numero === 'number' && isFinite(numero)) {
+                // Formatar no padrão brasileiro: ponto para milhares, vírgula para decimais
+                return numero.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+            return String(numero);
+        }
 
-      if(values.some(v => v === 0)) {
-        alert('Preencha todos os valores!');
-        return;
-      }
+        function generateGraph() {
+            if (!currentFormula) {
+                alert('Por favor, selecione uma fórmula primeiro!');
+                return;
+            }
 
-      const result = currentFormula.calc(...values);
-      const steps = currentFormula.steps(...values);
+            // Verificar se a fórmula pode gerar gráfico
+            const graphableFormulas = ['bhaskara', 'area_triangulo', 'area_circulo', 'teorema_pitagoras', 
+                                     'velocidade_media', 'aceleracao', 'posicao_mru', 'posicao_mruv', 'energia_cinetica',
+                                     'juros_simples', 'juros_compostos'];
 
-      document.getElementById('resultValue').textContent = 
-        typeof result === 'string' ? result : result.toFixed(4);
-      document.getElementById('resultUnit').textContent = currentFormula.result.unit;
-      document.getElementById('resultBox').classList.add('show');
+            if (!graphableFormulas.includes(currentFormula.id)) {
+                alert('Esta fórmula não suporta visualização gráfica.');
+                return;
+            }
 
-      document.getElementById('stepsContent').innerHTML = 
-        steps.map(s => `<div class="step">${s}</div>`).join('');
-      document.getElementById('stepsBox').classList.add('show');
-    }
+            // Obter valores das variáveis
+            const values = {};
+            let missingFields = [];
+            
+            currentFormula.vars.forEach(variable => {
+                const input = document.getElementById(`var-${variable.symbol}`);
+                const value = parseFloat(input.value);
+                
+                if (isNaN(value)) {
+                    missingFields.push(variable.name);
+                } else {
+                    values[variable.symbol] = value;
+                }
+            });
 
-    function clearInputs() {
-      document.querySelectorAll('#inputsGrid input').forEach(input => {
-        const symbol = input.id.replace('input-', '');
-        const variable = currentFormula?.vars.find(v => v.symbol === symbol);
-        input.value = variable?.default || '';
-      });
-      document.getElementById('resultBox').classList.remove('show');
-      document.getElementById('stepsBox').classList.remove('show');
-    }
+            if (missingFields.length > 0) {
+                alert(`Por favor, preencha os seguintes campos para gerar o gráfico: ${missingFields.join(', ')}`);
+                return;
+            }
 
-    function exportResult() {
-      if(!currentFormula) return;
-      const result = document.getElementById('resultValue').textContent;
-      const unit = document.getElementById('resultUnit').textContent;
-      const text = `${currentFormula.name}\nResultado: ${result} ${unit}`;
+            // Abrir modal de gráfico
+            showGraphModal(currentFormula, values);
+        }
 
-      const blob = new Blob([text], {type: 'text/plain'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'resultado.txt';
-      a.click();
-    }
+        function showGraphModal(formula, values) {
+            // Criar overlay do modal
+            const overlay = document.createElement('div');
+            overlay.className = 'graph-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s ease;
+            `;
 
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('.card').forEach(card => {
-        const name = card.querySelector('.name').textContent.toLowerCase();
-        const category = card.querySelector('.category').textContent.toLowerCase();
-        card.style.display = (name.includes(term) || category.includes(term)) ? 'block' : 'none';
-      });
-    });
+            // Criar container do modal
+            const modal = document.createElement('div');
+            modal.className = 'graph-modal';
+            modal.style.cssText = `
+                background: var(--bg-surface);
+                border: 1px solid var(--border-default);
+                border-radius: 12px;
+                padding: 20px;
+                max-width: 90vw;
+                max-height: 90vh;
+                overflow: auto;
+                position: relative;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            `;
 
-    renderCards();
-  </script>
+            // Header do modal
+            const header = document.createElement('div');
+            header.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid var(--border-default);
+            `;
+
+            const title = document.createElement('h3');
+            title.textContent = `Gráfico: ${formula.name}`;
+            title.style.cssText = `
+                color: var(--primary);
+                margin: 0;
+                font-size: 18px;
+            `;
+
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '✕';
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                font-size: 20px;
+                cursor: pointer;
+                padding: 5px;
+                border-radius: 4px;
+                transition: all 0.3s ease;
+            `;
+            closeBtn.onmouseover = () => {
+                closeBtn.style.background = 'var(--bg-surface-hover)';
+                closeBtn.style.color = 'var(--primary)';
+            };
+            closeBtn.onmouseout = () => {
+                closeBtn.style.background = 'none';
+                closeBtn.style.color = 'var(--text-secondary)';
+            };
+            closeBtn.onclick = () => document.body.removeChild(overlay);
+
+            header.appendChild(title);
+            header.appendChild(closeBtn);
+
+            // Container do gráfico
+            const graphContainer = document.createElement('div');
+            graphContainer.id = 'graphCanvas';
+            graphContainer.style.cssText = `
+                width: 600px;
+                height: 400px;
+                border: 1px solid var(--border-default);
+                border-radius: 8px;
+                background: var(--bg-page);
+                position: relative;
+            `;
+
+            // Gerar o gráfico baseado na fórmula
+            generateFormulaGraph(formula, values, graphContainer);
+
+            modal.appendChild(header);
+            modal.appendChild(graphContainer);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            // Fechar ao clicar no overlay
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    document.body.removeChild(overlay);
+                }
+            };
+        }
+
+        function generateFormulaGraph(formula, values, container) {
+            const ctx = container.getContext('2d');
+            const width = container.width;
+            const height = container.height;
+
+            // Limpar canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Definir cores
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = '#333333';
+            ctx.strokeStyle = '#666666';
+
+            // Configurações do gráfico
+            const padding = 60;
+            const graphWidth = width - 2 * padding;
+            const graphHeight = height - 2 * padding;
+
+            // Função para converter coordenadas
+            function toCanvasX(x) {
+                return padding + (x + 10) * (graphWidth / 20); // range -10 a 10
+            }
+            function toCanvasY(y) {
+                return height - padding - (y + 10) * (graphHeight / 20); // range -10 a 10
+            }
+
+            // Desenhar eixos
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            // Eixo Y
+            ctx.moveTo(toCanvasX(0), toCanvasY(-10));
+            ctx.lineTo(toCanvasX(0), toCanvasY(10));
+            // Eixo X
+            ctx.moveTo(toCanvasX(-10), toCanvasY(0));
+            ctx.lineTo(toCanvasX(10), toCanvasY(0));
+            ctx.stroke();
+
+            // Desenhar grade
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#e0e0e0';
+            for (let i = -10; i <= 10; i += 2) {
+                // Linhas verticais
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(i), toCanvasY(-10));
+                ctx.lineTo(toCanvasX(i), toCanvasY(10));
+                ctx.stroke();
+                
+                // Linhas horizontais
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(-10), toCanvasY(i));
+                ctx.lineTo(toCanvasX(10), toCanvasY(i));
+                ctx.stroke();
+            }
+
+            // Desenhar etiqueta dos eixos
+            ctx.fillStyle = '#333333';
+            ctx.font = '12px Arial';
+            ctx.fillText('x', toCanvasX(9.5), toCanvasY(-0.5));
+            ctx.fillText('y', toCanvasX(-0.5), toCanvasY(9.5));
+
+            // Gerar gráfico específico da fórmula
+            switch (formula.id) {
+                case 'bhaskara':
+                    drawBhaskaraGraph(ctx, values, toCanvasX, toCanvasY);
+                    break;
+                case 'area_triangulo':
+                    drawAreaTriangleGraph(ctx, values, toCanvasX, toCanvasY);
+                    break;
+                case 'energia_cinetica':
+                    drawEnergyGraph(ctx, values, toCanvasX, toCanvasY);
+                    break;
+                default:
+                    // Gráfico genérico baseado nas variáveis
+                    drawGenericGraph(ctx, formula, values, toCanvasX, toCanvasY);
+            }
+        }
+
+        function drawBhaskaraGraph(ctx, values, toCanvasX, toCanvasY) {
+            const a = values.a || 1;
+            const b = values.b || 0;
+            const c = values.c || 0;
+
+            // Desenhar a parábola ax² + bx + c
+            ctx.strokeStyle = '#019875';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            const delta = b*b - 4*a*c;
+            let firstPoint = true;
+
+            for (let x = -8; x <= 8; x += 0.1) {
+                const y = a * x * x + b * x + c;
+                const canvasX = toCanvasX(x);
+                const canvasY = toCanvasY(y);
+
+                if (firstPoint) {
+                    ctx.moveTo(canvasX, canvasY);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            }
+            ctx.stroke();
+
+            // Marcar as raízes se existirem
+            if (delta >= 0) {
+                const x1 = (-b + Math.sqrt(delta)) / (2*a);
+                const x2 = (-b - Math.sqrt(delta)) / (2*a);
+
+                ctx.fillStyle = '#ff4757';
+                // Raiz 1
+                ctx.beginPath();
+                ctx.arc(toCanvasX(x1), toCanvasY(0), 6, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Raiz 2
+                if (x1 !== x2) {
+                    ctx.beginPath();
+                    ctx.arc(toCanvasX(x2), toCanvasY(0), 6, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+
+                // Vértice
+                const vertexX = -b / (2*a);
+                const vertexY = -delta / (4*a);
+                ctx.fillStyle = '#3742fa';
+                ctx.beginPath();
+                ctx.arc(toCanvasX(vertexX), toCanvasY(vertexY), 5, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Legenda
+                ctx.fillStyle = '#333333';
+                ctx.font = '11px Arial';
+                if (delta > 0) {
+                    ctx.fillText(`x₁ = ${formatarNumeroBrasil(x1)}`, toCanvasX(x1) + 10, toCanvasY(0) - 10);
+                    ctx.fillText(`x₂ = ${formatarNumeroBrasil(x2)}`, toCanvasX(x2) + 10, toCanvasY(0) + 20);
+                } else {
+                    ctx.fillText(`x = ${formatarNumeroBrasil(x1)}`, toCanvasX(x1) + 10, toCanvasY(0) - 10);
+                }
+            }
+        }
+
+        function drawAreaTriangleGraph(ctx, values, toCanvasX, toCanvasY) {
+            const b = values.b || 1;
+            const h = values.h || 1;
+
+            // Desenhar triângulo
+            ctx.strokeStyle = '#019875';
+            ctx.lineWidth = 3;
+            ctx.fillStyle = 'rgba(1, 152, 117, 0.2)';
+
+            ctx.beginPath();
+            ctx.moveTo(toCanvasX(-b/2), toCanvasY(0));
+            ctx.lineTo(toCanvasX(b/2), toCanvasY(0));
+            ctx.lineTo(toCanvasX(0), toCanvasY(h));
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Mostrar valores
+            ctx.fillStyle = '#333333';
+            ctx.font = '12px Arial';
+            ctx.fillText(`Base = ${b}`, toCanvasX(b/2 + 0.5), toCanvasY(-1));
+            ctx.fillText(`Altura = ${h}`, toCanvasX(0.5), toCanvasY(h/2));
+        }
+
+        function drawEnergyGraph(ctx, values, toCanvasX, toCanvasY) {
+            const m = values.m || 1;
+
+            // Desenhar gráfico de energia cinética vs velocidade
+            ctx.strokeStyle = '#019875';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            let firstPoint = true;
+            for (let v = 0; v <= 10; v += 0.1) {
+                const energy = 0.5 * m * v * v;
+                const canvasX = toCanvasX(v);
+                const canvasY = toCanvasY(energy / 10); // Escalonar para caber no gráfico
+
+                if (firstPoint) {
+                    ctx.moveTo(canvasX, canvasY);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            }
+            ctx.stroke();
+
+            // Marcar ponto atual se houver velocidade
+            const v = values.v || 0;
+            const energy = 0.5 * m * v * v;
+            if (v > 0) {
+                ctx.fillStyle = '#ff4757';
+                ctx.beginPath();
+                ctx.arc(toCanvasX(v), toCanvasY(energy / 10), 6, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.fillStyle = '#333333';
+                ctx.font = '11px Arial';
+                ctx.fillText(`E = ${formatarNumeroBrasil(energy)}J`, toCanvasX(v) + 10, toCanvasY(energy / 10));
+            }
+        }
+
+        function drawGenericGraph(ctx, formula, values, toCanvasX, toCanvasY) {
+            // Para fórmulas genéricas, desenhar baseado nas primeiras duas variáveis
+            if (formula.vars.length >= 2) {
+                const xVar = formula.vars[0];
+                const yVar = formula.vars[1];
+
+                ctx.strokeStyle = '#019875';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+
+                let firstPoint = true;
+                for (let x = 0.1; x <= 10; x += 0.1) {
+                    let y;
+                    try {
+                        // Substituir as variáveis na função
+                        const args = formula.vars.map((v, i) => {
+                            if (i === 0) return x;
+                            return values[v.symbol] || 1;
+                        });
+                        y = formula.calc(...args);
+                        
+                        if (typeof y === 'number' && isFinite(y) && y > -10 && y < 10) {
+                            const canvasX = toCanvasX(x);
+                            const canvasY = toCanvasY(y);
+
+                            if (firstPoint) {
+                                ctx.moveTo(canvasX, canvasY);
+                                firstPoint = false;
+                            } else {
+                                ctx.lineTo(canvasX, canvasY);
+                            }
+                        }
+                    } catch (e) {
+                        // Ignorar erros de cálculo
+                    }
+                }
+                ctx.stroke();
+            }
+        }
+
+        function exportResult() {
+            if (!currentFormula) {
+                alert('Nenhuma fórmula selecionada para exportar.');
+                return;
+            }
+            
+            const result = document.getElementById('resultValue').textContent;
+            const unit = document.getElementById('resultUnit').textContent;
+            const steps = document.getElementById('stepsContent').innerHTML;
+            
+            const content = `
+# Cálculo: ${currentFormula.name}
+
+## Fórmula
+$${currentFormula.latex}$$
+
+## Resultado
+**${result} ${unit}**
+
+## Passos da Resolução
+${steps.replace(/<div class="step">/g, '').replace(/<\/div>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')}
+            `;
+            
+            const blob = new Blob([content], {type: 'text/markdown'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `calculo-${currentFormula.id}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function loadFormulaBank() {
+            // Scroll to formulas sidebar
+            document.getElementById('navSidebar').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleNavSidebar() {
+            const navSidebar = document.querySelector('.nav-sidebar');
+            navSidebar.classList.toggle('collapsed');
+        }
+
+        function updateStatus() {
+            const formulaCount = document.getElementById('formulaCount');
+            const selectedFormula = document.getElementById('selectedFormula');
+            
+            const totalCount = currentCategory === 'all' ? formulas.length : 
+                formulas.filter(f => f.category === currentCategory).length;
+            
+            formulaCount.textContent = `${filteredFormulas.length}/${totalCount} fórmulas`;
+            selectedFormula.textContent = currentFormula ? 
+                `Selecionada: ${currentFormula.name}` : 
+                'Nenhuma fórmula selecionada';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>

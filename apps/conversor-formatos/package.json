@@ -1,0 +1,40 @@
+{
+  "name": "conversor-formatos",
+  "version": "1.0.0",
+  "description": "Conversor de formatos para texto e números - Workspace Hub",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "dev": "python3 -m http.server 8080",
+    "preview": "npx serve -s . -l 8080"
+  },
+  "keywords": [
+    "conversor",
+    "formatos",
+    "binario",
+    "hexadecimal",
+    "octal",
+    "texto",
+    "numeros",
+    "workspace",
+    "hub"
+  ],
+  "author": "MiniMax Agent",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/conversor-formatos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/conversor-formatos/issues"
+  },
+  "homepage": "https://github.com/username/conversor-formatos#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

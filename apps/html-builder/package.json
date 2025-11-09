@@ -1,0 +1,20 @@
+{
+  "name": "html-builder",
+  "version": "1.0.0",
+  "description": "Construtor de Páginas HTML - Interface visual para criação de páginas web",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 3003",
+    "dev": "python -m http.server 3003"
+  },
+  "keywords": [
+    "html",
+    "builder",
+    "visual",
+    "web",
+    "page",
+    "constructor"
+  ],
+  "author": "MiniMax Agent",
+  "license": "MIT"
+}

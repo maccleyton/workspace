@@ -1,0 +1,263 @@
+/**
+ * ESTILOS PARA NAVEGAÇÃO E PREVIEW
+ * Conecta navegação com preview em tempo real
+ */
+
+/* Navegação */
+.navigation-tree {
+    padding: 8px 0;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    margin: 1px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #94A3B8;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.nav-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #F8FAFC;
+}
+
+.nav-item.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: #F8FAFC;
+    border-left: 3px solid #3B82F6;
+}
+
+.nav-item i {
+    transition: transform 0.2s ease;
+    margin-right: 8px;
+    font-size: 12px;
+}
+
+.nav-item.expanded i {
+    transform: rotate(90deg);
+}
+
+.nav-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estados de loading e feedback */
+.editor-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.preview-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.preview-loading::before {
+    content: '🔄 Renderizando...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(15, 23, 42, 0.9);
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: #F8FAFC;
+    z-index: 11;
+    font-size: 14px;
+}
+
+/* Animações para elementos de destaque */
+@keyframes highlightElement {
+    0% { background: rgba(59, 130, 246, 0.2); }
+    50% { background: rgba(59, 130, 246, 0.4); }
+    100% { background: transparent; }
+}
+
+.highlight-animation {
+    animation: highlightElement 1s ease-in-out;
+}
+
+/* Scroll smooth para preview */
+.preview-content {
+    scroll-behavior: smooth;
+}
+
+/* Estados de foco */
+.editor-pane.focused,
+.preview-pane.focused {
+    box-shadow: 0 0 0 2px #3B82F6;
+    transition: box-shadow 0.3s ease;
+}
+
+/* Tooltip para botões de ação */
+.btn-icon[title] {
+    position: relative;
+}
+
+.btn-icon[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 4px;
+}
+
+/* Notificações */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid #3B82F6;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #F8FAFC;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    backdrop-filter: blur(10px);
+    max-width: 300px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    border-color: #10B981;
+}
+
+.notification.error {
+    border-color: #EF4444;
+}
+
+.notification.warning {
+    border-color: #F59E0B;
+}
+
+.notification.info {
+    border-color: #3B82F6;
+}
+
+/* Loading spinner para operações */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+    border-top-color: #3B82F6;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Estados de erro no preview */
+.preview-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #EF4444;
+    border-radius: 4px;
+    padding: 12px;
+    color: #F87171;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+}
+
+/* Indicadores de status */
+.status-indicator {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.saving {
+    background: #F59E0B;
+}
+
+.status-indicator.error {
+    background: #EF4444;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Adaptação para mobile */
+@media (max-width: 768px) {
+    .navigation-tree {
+        max-height: 150px;
+    }
+    
+    .nav-item {
+        padding: 6px 8px;
+        font-size: 13px;
+    }
+    
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        font-size: 13px;
+    }
+}
+
+/* Modo de impressão -隐藏 elementos interativos */
+@media print {
+    .navigation-tree,
+    .toolbar-container,
+    .tabs-container,
+    .app-header,
+    .btn-icon,
+    .notification {
+        display: none !important;
+    }
+    
+    .main-content {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .preview-content {
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
+    }
+}

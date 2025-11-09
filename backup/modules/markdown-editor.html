@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+	<link rel="stylesheet" href="https://unpkg.com/prismjs@1.29.0/themes/prism-twilight.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<!-- Prism core -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>  <!-- JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>  <!-- TS -->
+	<link rel="stylesheet" href="style.css">
+</head>
+<body class="default">
+    <!-- ====== CABEÇALHO COM BOTÕES ====== -->
+    <div class="header">
+        <div class="title">📄 Editor Markdown com Preview</div>
+        <div class="buttons">
+            <button class="secondary-btn" id="openFileBtn">
+                <i class="fas fa-folder-open"></i> Abrir
+            </button>
+            <button class="secondary-btn" id="saveFileBtn">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+            <button class="secondary-btn" id="toGoBackBtn">
+                <i class="fas fa-folder-toGoBack"></i> Voltar
+            </button>
+            <button class="primary-btn" id="printBtn">
+                <i class="fas fa-print"></i> Imprimir
+            </button>
+            <button class="settings-btn" id="settingsBtn">
+                <i class="fas fa-cog"></i> Configurações
+            </button>
+        </div>
+    </div>
+
+    <!-- ====== CONTAINER PRINCIPAL ====== -->
+    <div class="container">
+        <!-- EDITOR -->
+        <div class="editor-container">
+            <div class="panel-header">
+                <span>✏️ Editor Markdown</span>
+                <span id="wordCount">0 palavras</span>
+            </div>
+            <textarea class="editor" id="editor" placeholder="Digite seu Markdown aqui...">
+# Exemplos de texto em Markdown
+
+### Digite seu texto aqui
+
+---
+
+**Código inline:**
+
+`console.log("Hello Word!");`
+
+**Código em bloco:**
+
+```python
+print("Hello Word!)
+```
+
+**LaTeX inline:**
+
+$ E=mc^2 $
+
+**LaTeX em bloco:**
+
+$$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
+
+---
+			</textarea>
+            <div class="status-info">
+                <span id="cursorInfo">Lin 1, Col 1</span>
+                <span id="charCount">0 caracteres</span>
+            </div>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="preview-container">
+            <div class="panel-header">
+                <span>👁️ Visualização A4 com Paginação</span>
+                <span id="zoomLevel">100%</span>
+            </div>
+            <div class="preview" id="preview">
+                <div class="pages-container" id="pagesContainer">
+                    <!-- Páginas A4 serão geradas aqui dinamicamente -->
+                </div>
+            </div>
+            <div class="status-info">
+                <span id="pageCount">0 páginas</span>
+                <span>🎯 LaTeX + Código + Paginação</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY PARA MODAL -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ====== PAINEL DE CONFIGURAÇÕES COMPLETO ====== -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2>⚙️ Configurações de Visualização</h2>
+            <button id="closeSettingsBtn"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- TEMA -->
+        <div class="settings-group">
+            <h3>🎨 Tema</h3>
+            <div class="setting-item">
+                <label for="themeSelect">Modo de Cor</label>
+                <select id="themeSelect">
+					<option value="default">🧱 Tema Padrão</option>
+                    <option value="light">🌞 Tema Claro</option>
+                    <option value="dark">🌙 Tema Escuro</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- FONTES -->
+        <div class="settings-group">
+            <h3>🔤 Fontes</h3>
+            <div class="setting-item">
+                <label for="fontFamily">Fonte Principal</label>
+                <select id="fontFamily">
+                    <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="Calibri, sans-serif">Calibri</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Monotype Corsiva', cursive">Monotype</option>
+                    <option value="'Cambria Math', serif">Cambria Math</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ALINHAMENTO -->
+        <div class="settings-group">
+            <h3>📐 Alinhamento</h3>
+            <div class="setting-item">
+                <label for="textAlign">Alinhamento do Texto</label>
+                <select id="textAlign">
+                    <option value="left">⬅️ Esquerda</option>
+                    <option value="center">🔘 Centralizado</option>
+                    <option value="right">➡️ Direita</option>
+                    <option value="justify">📏 Justificado</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- LAYOUT E ESPAÇAMENTO -->
+        <div class="settings-group">
+            <h3>📏 Layout</h3>
+            <div class="setting-item">
+                <label for="pageMargins">Margens da Página: <span class="range-value" id="marginsValue">25mm</span></label>
+                <div class="range-container">
+                    <input type="range" id="pageMargins" min="10" max="40" step="1" value="25">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="zoomLevel">Zoom da Página: <span class="range-value" id="zoomValue">100%</span></label>
+                <div class="range-container">
+                    <input type="range" id="zoomRange" min="50" max="150" step="5" value="100">
+                </div>
+            </div>
+        </div>
+
+        <!-- ESPAÇAMENTOS DE TEXTO -->
+        <div class="settings-group">
+            <h3>📝 Espaçamentos</h3>
+            <div class="setting-item">
+                <label for="lineHeight">Entre Linhas: <span class="range-value" id="lineHeightValue">1.6</span></label>
+                <div class="range-container">
+                    <input type="range" id="lineHeight" min="1" max="3" step="0.1" value="1.6">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="letterSpacing">Entre Caracteres: <span class="range-value" id="letterSpacingValue">0px</span></label>
+                <div class="range-container">
+                    <input type="range" id="letterSpacing" min="0" max="5" step="0.1" value="0">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="wordSpacing">Entre Palavras: <span class="range-value" id="wordSpacingValue">0px</span></label>
+                <div class="range-container">
+                    <input type="range" id="wordSpacing" min="0" max="10" step="0.1" value="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- TAMANHOS DE FONTE -->
+        <div class="settings-group">
+            <h3>🔠 Tamanhos de Fonte</h3>
+            <div class="setting-item">
+                <label for="fontSizeBase">Texto Base: <span class="range-value" id="fontSizeBaseValue">14px</span></label>
+                <div class="range-container">
+                    <input type="range" id="fontSizeBase" min="10" max="20" step="1" value="14">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="fontSizeH1">Título H1: <span class="range-value" id="fontSizeH1Value">2.0em</span></label>
+                <div class="range-container">
+                    <input type="range" id="fontSizeH1" min="1.5" max="3" step="0.1" value="2.0">
+                </div>
+            </div>
+            <div class="setting-item">
+                <label for="fontSizeH2">Título H2: <span class="range-value" id="fontSizeH2Value">1.6em</span></label>
+                <div class="range-container">
+                    <input type="range" id="fontSizeH2" min="1.2" max="2.5" step="0.1" value="1.6">
+                </div>
+            </div>
+        </div>
+
+        <!-- CORES DOS TÍTULOS H1-H6 ORGANIZADAS -->
+        <div class="settings-group">
+            <h3>🎨 Cores dos Títulos</h3>
+            
+            <div class="setting-item">
+                <label>H1</label>
+                <div class="color-picker">
+                    <input type="color" id="h1Color" value="#1a1a1a">
+                    <span>Fonte</span>
+                    <input type="color" id="h1BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H2</label>
+                <div class="color-picker">
+                    <input type="color" id="h2Color" value="#2563eb">
+                    <span>Fonte</span>
+                    <input type="color" id="h2BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H3</label>
+                <div class="color-picker">
+                    <input type="color" id="h3Color" value="#059669">
+                    <span>Fonte</span>
+                    <input type="color" id="h3BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H4</label>
+                <div class="color-picker">
+                    <input type="color" id="h4Color" value="#7c3aed">
+                    <span>Fonte</span>
+                    <input type="color" id="h4BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H5</label>
+                <div class="color-picker">
+                    <input type="color" id="h5Color" value="#dc2626">
+                    <span>Fonte</span>
+                    <input type="color" id="h5BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <label>H6</label>
+                <div class="color-picker">
+                    <input type="color" id="h6Color" value="#ea580c">
+                    <span>Fonte</span>
+                    <input type="color" id="h6BgColor" value="#ffffff">
+                    <span>Fundo</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CORES DE CÓDIGO -->
+        <div class="settings-group">
+            <h3>💻 Cores do Código</h3>
+            <div class="setting-item">
+                <label for="codeBlockBg">Fundo do Bloco de Código</label>
+                <input type="color" id="codeBlockBg" value="#1e293b">
+            </div>
+            <div class="setting-item">
+                <label for="codeBlockText">Texto do Bloco de Código</label>
+                <input type="color" id="codeBlockText" value="#f1f5f9">
+            </div>
+            <div class="setting-item">
+                <label for="inlineCodeBg">Fundo do Código Inline</label>
+                <input type="color" id="inlineCodeBg" value="#e2e8f0">
+            </div>
+            <div class="setting-item">
+                <label for="inlineCodeText">Texto do Código Inline</label>
+                <input type="color" id="inlineCodeText" value="#0f172a">
+            </div>
+        </div>
+
+        <!-- BOTÕES DE AÇÃO -->
+        <div class="buttons" style="padding: 20px 0; justify-content: center; gap: 15px;">
+            <button class="primary-btn" id="applySettingsBtn">
+                <i class="fas fa-check"></i> Aplicar Tudo
+            </button>
+            <button class="secondary-btn" id="resetSettingsBtn">
+                <i class="fas fa-undo"></i> Restaurar Padrões
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

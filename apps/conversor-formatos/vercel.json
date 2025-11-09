@@ -1,0 +1,99 @@
+{
+  "version": 2,
+  "name": "conversor-formatos",
+  "alias": "conversor-formatos",
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))$",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(html|htm))$",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/conversor",
+      "dest": "/",
+      "permanent": true
+    },
+    {
+      "source": "/format-converter",
+      "dest": "/",
+      "permanent": true
+    },
+    {
+      "source": "/converter",
+      "dest": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs14.x"
+    }
+  },
+  "regions": ["sfo1", "iad1"],
+  "public": true
+}

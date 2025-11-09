@@ -1,0 +1,560 @@
+/* ===============================================
+   CONVERSOR DE FORMATOS - THEMES
+   =============================================== */
+
+/* ===============================================
+   TEMA ESCURO (PADRÃO)
+   =============================================== */
+[data-theme="dark"] {
+    /* Cores primárias */
+    --color-primary: #3B82F6;
+    --color-primary-hover: #2563EB;
+    --color-primary-active: #1D4ED8;
+    
+    /* Cores de fundo */
+    --color-background: #0A0A0A;
+    --color-surface: #141414;
+    --color-surface-elevated: #1A1A1A;
+    --color-surface-hover: #1E1E1E;
+    --color-surface-active: #252525;
+    
+    /* Cores de texto */
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #B3B3B3;
+    --color-text-tertiary: #666666;
+    --color-text-disabled: #404040;
+    
+    /* Cores de borda */
+    --color-border-primary: #333333;
+    --color-border-secondary: #262626;
+    --color-border-focus: #3B82F6;
+    
+    /* Estados de validação */
+    --color-success: #10B981;
+    --color-success-bg: rgba(16, 185, 129, 0.1);
+    --color-success-border: rgba(16, 185, 129, 0.2);
+    
+    --color-warning: #F59E0B;
+    --color-warning-bg: rgba(245, 158, 11, 0.1);
+    --color-warning-border: rgba(245, 158, 11, 0.2);
+    
+    --color-error: #EF4444;
+    --color-error-bg: rgba(239, 68, 68, 0.1);
+    --color-error-border: rgba(239, 68, 68, 0.2);
+    
+    --color-info: #3B82F6;
+    --color-info-bg: rgba(59, 130, 246, 0.1);
+    --color-info-border: rgba(59, 130, 246, 0.2);
+}
+
+/* ===============================================
+   TEMA CLARO
+   =============================================== */
+[data-theme="light"] {
+    /* Cores primárias */
+    --color-primary: #3B82F6;
+    --color-primary-hover: #2563EB;
+    --color-primary-active: #1D4ED8;
+    
+    /* Cores de fundo */
+    --color-background: #FFFFFF;
+    --color-surface: #F8F9FA;
+    --color-surface-elevated: #FFFFFF;
+    --color-surface-hover: #F1F3F4;
+    --color-surface-active: #E8EAED;
+    
+    /* Cores de texto */
+    --color-text-primary: #1F2937;
+    --color-text-secondary: #6B7280;
+    --color-text-tertiary: #9CA3AF;
+    --color-text-disabled: #D1D5DB;
+    
+    /* Cores de borda */
+    --color-border-primary: #E5E7EB;
+    --color-border-secondary: #D1D5DB;
+    --color-border-focus: #3B82F6;
+    
+    /* Estados de validação */
+    --color-success: #059669;
+    --color-success-bg: rgba(5, 150, 105, 0.1);
+    --color-success-border: rgba(5, 150, 105, 0.2);
+    
+    --color-warning: #D97706;
+    --color-warning-bg: rgba(217, 119, 6, 0.1);
+    --color-warning-border: rgba(217, 119, 6, 0.2);
+    
+    --color-error: #DC2626;
+    --color-error-bg: rgba(220, 38, 38, 0.1);
+    --color-error-border: rgba(220, 38, 38, 0.2);
+    
+    --color-info: #2563EB;
+    --color-info-bg: rgba(37, 99, 235, 0.1);
+    --color-info-border: rgba(37, 99, 235, 0.2);
+}
+
+/* ===============================================
+   TEMA AZUL
+   =============================================== */
+[data-theme="blue"] {
+    /* Cores primárias */
+    --color-primary: #1E40AF;
+    --color-primary-hover: #1E3A8A;
+    --color-primary-active: #1E3A8A;
+    
+    /* Cores de fundo */
+    --color-background: #0F172A;
+    --color-surface: #1E293B;
+    --color-surface-elevated: #334155;
+    --color-surface-hover: #475569;
+    --color-surface-active: #64748B;
+    
+    /* Cores de texto */
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #CBD5E1;
+    --color-text-tertiary: #94A3B8;
+    --color-text-disabled: #64748B;
+    
+    /* Cores de borda */
+    --color-border-primary: #475569;
+    --color-border-secondary: #334155;
+    --color-border-focus: #3B82F6;
+    
+    /* Estados de validação */
+    --color-success: #10B981;
+    --color-success-bg: rgba(16, 185, 129, 0.1);
+    --color-success-border: rgba(16, 185, 129, 0.2);
+    
+    --color-warning: #F59E0B;
+    --color-warning-bg: rgba(245, 158, 11, 0.1);
+    --color-warning-border: rgba(245, 158, 11, 0.2);
+    
+    --color-error: #EF4444;
+    --color-error-bg: rgba(239, 68, 68, 0.1);
+    --color-error-border: rgba(239, 68, 68, 0.2);
+    
+    --color-info: #3B82F6;
+    --color-info-bg: rgba(59, 130, 246, 0.1);
+    --color-info-border: rgba(59, 130, 246, 0.2);
+}
+
+/* ===============================================
+   TEMA VERDE
+   =============================================== */
+[data-theme="green"] {
+    /* Cores primárias */
+    --color-primary: #059669;
+    --color-primary-hover: #047857;
+    --color-primary-active: #065F46;
+    
+    /* Cores de fundo */
+    --color-background: #0F1F1B;
+    --color-surface: #1A2E28;
+    --color-surface-elevated: #2D4A3F;
+    --color-surface-hover: #3B5A4E;
+    --color-surface-active: #4A6B5D;
+    
+    /* Cores de texto */
+    --color-text-primary: #ECFDF5;
+    --color-text-secondary: #A7F3D0;
+    --color-text-tertiary: #6EE7B7;
+    --color-text-disabled: #34D399;
+    
+    /* Cores de borda */
+    --color-border-primary: #34D399;
+    --color-border-secondary: #10B981;
+    --color-border-focus: #34D399;
+    
+    /* Estados de validação */
+    --color-success: #10B981;
+    --color-success-bg: rgba(16, 185, 129, 0.1);
+    --color-success-border: rgba(16, 185, 129, 0.2);
+    
+    --color-warning: #F59E0B;
+    --color-warning-bg: rgba(245, 158, 11, 0.1);
+    --color-warning-border: rgba(245, 158, 11, 0.2);
+    
+    --color-error: #EF4444;
+    --color-error-bg: rgba(239, 68, 68, 0.1);
+    --color-error-border: rgba(239, 68, 68, 0.2);
+    
+    --color-info: #3B82F6;
+    --color-info-bg: rgba(59, 130, 246, 0.1);
+    --color-info-border: rgba(59, 130, 246, 0.2);
+}
+
+/* ===============================================
+   TEMA ROXO
+   =============================================== */
+[data-theme="purple"] {
+    /* Cores primárias */
+    --color-primary: #7C3AED;
+    --color-primary-hover: #6D28D9;
+    --color-primary-active: #5B21B6;
+    
+    /* Cores de fundo */
+    --color-background: #1F1625;
+    --color-surface: #2D1B2E;
+    --color-surface-elevated: #3D2A3D;
+    --color-surface-hover: #4D394D;
+    --color-surface-active: #5D485D;
+    
+    /* Cores de texto */
+    --color-text-primary: #FAF5FF;
+    --color-text-secondary: #E9D5FF;
+    --color-text-tertiary: #D8B4FE;
+    --color-text-disabled: #C084FC;
+    
+    /* Cores de borda */
+    --color-border-primary: #C084FC;
+    --color-border-secondary: #A855F7;
+    --color-border-focus: #C084FC;
+    
+    /* Estados de validação */
+    --color-success: #10B981;
+    --color-success-bg: rgba(16, 185, 129, 0.1);
+    --color-success-border: rgba(16, 185, 129, 0.2);
+    
+    --color-warning: #F59E0B;
+    --color-warning-bg: rgba(245, 158, 11, 0.1);
+    --color-warning-border: rgba(245, 158, 11, 0.2);
+    
+    --color-error: #EF4444;
+    --color-error-bg: rgba(239, 68, 68, 0.1);
+    --color-error-border: rgba(239, 68, 68, 0.2);
+    
+    --color-info: #3B82F6;
+    --color-info-bg: rgba(59, 130, 246, 0.1);
+    --color-info-border: rgba(59, 130, 246, 0.2);
+}
+
+/* ===============================================
+   TEMA LARANJA
+   =============================================== */
+[data-theme="orange"] {
+    /* Cores primárias */
+    --color-primary: #EA580C;
+    --color-primary-hover: #DC2626;
+    --color-primary-active: #B91C1C;
+    
+    /* Cores de fundo */
+    --color-background: #1F1610;
+    --color-surface: #2D1F0F;
+    --color-surface-elevated: #3D2A12;
+    --color-surface-hover: #4D3516;
+    --color-surface-active: #5D4019;
+    
+    /* Cores de texto */
+    --color-text-primary: #FFF7ED;
+    --color-text-secondary: #FED7AA;
+    --color-text-tertiary: #FDBA74;
+    --color-text-disabled: #FB923C;
+    
+    /* Cores de borda */
+    --color-border-primary: #FB923C;
+    --color-border-secondary: #F97316;
+    --color-border-focus: #FB923C;
+    
+    /* Estados de validação */
+    --color-success: #10B981;
+    --color-success-bg: rgba(16, 185, 129, 0.1);
+    --color-success-border: rgba(16, 185, 129, 0.2);
+    
+    --color-warning: #F59E0B;
+    --color-warning-bg: rgba(245, 158, 11, 0.1);
+    --color-warning-border: rgba(245, 158, 11, 0.2);
+    
+    --color-error: #EF4444;
+    --color-error-bg: rgba(239, 68, 68, 0.1);
+    --color-error-border: rgba(239, 68, 68, 0.2);
+    
+    --color-info: #3B82F6;
+    --color-info-bg: rgba(59, 130, 246, 0.1);
+    --color-info-border: rgba(59, 130, 246, 0.2);
+}
+
+/* ===============================================
+   SELETOR DE TEMA
+   =============================================== */
+.theme-selector {
+    position: relative;
+    display: inline-block;
+}
+
+.theme-selector-button {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 120px;
+}
+
+.theme-selector-button:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+}
+
+.theme-selector-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--spacing-xs);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    z-index: var(--z-dropdown);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all var(--transition-fast);
+    min-width: 150px;
+}
+
+.theme-selector.open .theme-selector-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.theme-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border-bottom: 1px solid var(--color-border-secondary);
+}
+
+.theme-option:last-child {
+    border-bottom: none;
+}
+
+.theme-option:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-primary);
+}
+
+.theme-option.selected {
+    background: var(--color-primary);
+    color: white;
+}
+
+.theme-preview {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-primary);
+    flex-shrink: 0;
+}
+
+.theme-preview.dark { background: linear-gradient(135deg, #0A0A0A 0%, #141414 100%); }
+.theme-preview.light { background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%); }
+.theme-preview.blue { background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); }
+.theme-preview.green { background: linear-gradient(135deg, #0F1F1B 0%, #1A2E28 100%); }
+.theme-preview.purple { background: linear-gradient(135deg, #1F1625 0%, #2D1B2E 100%); }
+.theme-preview.orange { background: linear-gradient(135deg, #1F1610 0%, #2D1F0F 100%); }
+
+/* ===============================================
+   TRANSIÇÕES DE TEMA
+   =============================================== */
+* {
+    transition: 
+        background-color var(--transition-normal),
+        border-color var(--transition-normal),
+        color var(--transition-normal);
+}
+
+/* Exceções para elementos que não devem ter transição de tema */
+.no-transition,
+.no-transition * {
+    transition: none !important;
+}
+
+/* ===============================================
+   PREFERÊNCIAS DO SISTEMA
+   =============================================== */
+
+/* Detecta preferências do sistema */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Se não houver tema definido, usar o escuro como padrão */
+        --color-primary: #3B82F6;
+        --color-primary-hover: #2563EB;
+        --color-primary-active: #1D4ED8;
+        
+        --color-background: #0A0A0A;
+        --color-surface: #141414;
+        --color-surface-elevated: #1A1A1A;
+        --color-surface-hover: #1E1E1E;
+        --color-surface-active: #252525;
+        
+        --color-text-primary: #FFFFFF;
+        --color-text-secondary: #B3B3B3;
+        --color-text-tertiary: #666666;
+        --color-text-disabled: #404040;
+        
+        --color-border-primary: #333333;
+        --color-border-secondary: #262626;
+        --color-border-focus: #3B82F6;
+    }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+    :root {
+        --color-border-primary: #666666;
+        --color-border-focus: #FFFFFF;
+        --shadow-sm: 0 1px 2px 0 rgba(255, 255, 255, 0.1);
+        --shadow-md: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
+    }
+}
+
+/* ===============================================
+   ANIMAÇÕES ESPECÍFICAS DE TEMA
+   =============================================== */
+@keyframes theme-transition {
+    0% {
+        filter: saturate(1) brightness(1);
+    }
+    50% {
+        filter: saturate(1.2) brightness(0.9);
+    }
+    100% {
+        filter: saturate(1) brightness(1);
+    }
+}
+
+.theme-transitioning {
+    animation: theme-transition 0.5s ease;
+}
+
+/* ===============================================
+   COMPONENTES COM TEMAS ESPECÍFICOS
+   =============================================== */
+
+/* Gradientes específicos por tema */
+[data-theme="dark"] .gradient-bg {
+    background: linear-gradient(135deg, #0A0A0A 0%, #141414 50%, #1A1A1A 100%);
+}
+
+[data-theme="light"] .gradient-bg {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 50%, #FFFFFF 100%);
+}
+
+[data-theme="blue"] .gradient-bg {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+}
+
+[data-theme="green"] .gradient-bg {
+    background: linear-gradient(135deg, #0F1F1B 0%, #1A2E28 50%, #2D4A3F 100%);
+}
+
+[data-theme="purple"] .gradient-bg {
+    background: linear-gradient(135deg, #1F1625 0%, #2D1B2E 50%, #3D2A3D 100%);
+}
+
+[data-theme="orange"] .gradient-bg {
+    background: linear-gradient(135deg, #1F1610 0%, #2D1F0F 50%, #3D2A12 100%);
+}
+
+/* Brilhos específicos por tema */
+[data-theme="dark"] .glow-effect {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="light"] .glow-effect {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="blue"] .glow-effect {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+[data-theme="green"] .glow-effect {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+[data-theme="purple"] .glow-effect {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+
+[data-theme="orange"] .glow-effect {
+    box-shadow: 0 0 20px rgba(234, 88, 12, 0.4);
+}
+
+/* ===============================================
+   COMPATIBILIDADE COM TEMA DINÂMICO DO SISTEMA
+   =============================================== */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme]) {
+        --color-primary: #3B82F6;
+        --color-primary-hover: #2563EB;
+        --color-primary-active: #1D4ED8;
+        
+        --color-background: #0A0A0A;
+        --color-surface: #141414;
+        --color-surface-elevated: #1A1A1A;
+        --color-surface-hover: #1E1E1E;
+        --color-surface-active: #252525;
+        
+        --color-text-primary: #FFFFFF;
+        --color-text-secondary: #B3B3B3;
+        --color-text-tertiary: #666666;
+        --color-text-disabled: #404040;
+        
+        --color-border-primary: #333333;
+        --color-border-secondary: #262626;
+        --color-border-focus: #3B82F6;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    body:not([data-theme]) {
+        --color-primary: #3B82F6;
+        --color-primary-hover: #2563EB;
+        --color-primary-active: #1D4ED8;
+        
+        --color-background: #FFFFFF;
+        --color-surface: #F8F9FA;
+        --color-surface-elevated: #FFFFFF;
+        --color-surface-hover: #F1F3F4;
+        --color-surface-active: #E8EAED;
+        
+        --color-text-primary: #1F2937;
+        --color-text-secondary: #6B7280;
+        --color-text-tertiary: #9CA3AF;
+        --color-text-disabled: #D1D5DB;
+        
+        --color-border-primary: #E5E7EB;
+        --color-border-secondary: #D1D5DB;
+        --color-border-focus: #3B82F6;
+    }
+}
+
+/* ===============================================
+   UTILITÁRIOS DE TEMA
+   =============================================== */
+.theme-bg-primary { background-color: var(--color-primary); }
+.theme-bg-surface { background-color: var(--color-surface); }
+.theme-bg-elevated { background-color: var(--color-surface-elevated); }
+
+.theme-text-primary { color: var(--color-text-primary); }
+.theme-text-secondary { color: var(--color-text-secondary); }
+.theme-text-tertiary { color: var(--color-text-tertiary); }
+
+.theme-border-primary { border-color: var(--color-border-primary); }
+.theme-border-secondary { border-color: var(--color-border-secondary); }
+
+.theme-accent { color: var(--color-primary); }
+.theme-accent-bg { background-color: var(--color-primary); }

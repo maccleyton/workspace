@@ -1,0 +1,14 @@
+{
+  "name": "mini-ide",
+  "version": "1.0.0",
+  "description": "Mini IDE para teste de scripts",
+  "private": true,
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "start": "python -m http.server 3000",
+    "build": "echo 'Static files - no build needed'"
+  },
+  "keywords": ["ide", "javascript", "python", "scripting"],
+  "author": "MiniMax Agent",
+  "license": "MIT"
+}

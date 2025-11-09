@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construtor de Páginas HTML - Workspace Hub</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/editor.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <h1 class="app-title">🎨 Construtor de Páginas HTML</h1>
+            <span class="app-subtitle">Crie páginas visuais sem código</span>
+        </div>
+        <div class="header-right">
+            <button id="saveToHub" class="btn btn-primary" title="Salvar no Hub">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                    <polyline points="7,3 7,8 15,8"></polyline>
+                </svg>
+                Salvar no Hub
+            </button>
+            <button id="exportHtml" class="btn btn-secondary" title="Exportar HTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7,10 12,15 17,10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Exportar
+            </button>
+            <button id="previewBtn" class="btn btn-secondary" title="Preview">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                Preview
+            </button>
+            <button id="newProject" class="btn btn-secondary" title="Novo Projeto">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                Novo
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Interface -->
+    <main class="main-container">
+        <!-- Sidebar Components -->
+        <aside class="sidebar-left">
+            <div class="sidebar-header">
+                <h3>Componentes</h3>
+                <input type="search" id="componentSearch" placeholder="Buscar..." class="search-input">
+            </div>
+            
+            <div class="components-list" id="componentsList">
+                <!-- Text Components -->
+                <div class="component-category">
+                    <div class="category-header" data-category="text">
+                        <h4>📝 Textos</h4>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="component-item" draggable="true" data-type="heading" data-content="Título Principal">
+                            <span class="component-icon">H1</span>
+                            <span class="component-name">Título H1</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="heading" data-level="2" data-content="Subtítulo">
+                            <span class="component-icon">H2</span>
+                            <span class="component-name">Título H2</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="text" data-content="Clique para editar o texto">
+                            <span class="component-icon">P</span>
+                            <span class="component-name">Parágrafo</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="span" data-content="Texto em linha">
+                            <span class="component-icon">S</span>
+                            <span class="component-name">Texto em linha</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Components -->
+                <div class="component-category">
+                    <div class="category-header" data-category="interactive">
+                        <h4>🎯 Interativo</h4>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="component-item" draggable="true" data-type="button" data-content="Clique aqui">
+                            <span class="component-icon">Btn</span>
+                            <span class="component-name">Botão</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="link" data-content="Link de exemplo" data-href="#">
+                            <span class="component-icon">🔗</span>
+                            <span class="component-name">Link</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Components -->
+                <div class="component-category">
+                    <div class="category-header" data-category="media">
+                        <h4>🖼️ Mídia</h4>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="component-item" draggable="true" data-type="image" data-src="https://via.placeholder.com/300x200" data-alt="Imagem de exemplo">
+                            <span class="component-icon">🖼️</span>
+                            <span class="component-name">Imagem</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layout Components -->
+                <div class="component-category">
+                    <div class="category-header" data-category="layout">
+                        <h4>📦 Layout</h4>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="component-item" draggable="true" data-type="container" data-class="container">
+                            <span class="component-icon">📦</span>
+                            <span class="component-name">Container</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="section" data-class="section">
+                            <span class="component-icon">📄</span>
+                            <span class="component-name">Seção</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="div" data-class="custom-div">
+                            <span class="component-icon">▫️</span>
+                            <span class="component-name">Div</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="card" data-class="card">
+                            <span class="component-icon">🎴</span>
+                            <span class="component-name">Card</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Components -->
+                <div class="component-category">
+                    <div class="category-header" data-category="forms">
+                        <h4>📋 Formulários</h4>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="component-item" draggable="true" data-type="input" data-placeholder="Digite aqui...">
+                            <span class="component-icon">📝</span>
+                            <span class="component-name">Input de Texto</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="textarea" data-placeholder="Mensagem...">
+                            <span class="component-icon">📄</span>
+                            <span class="component-name">Textarea</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="form" data-class="form">
+                            <span class="component-icon">📋</span>
+                            <span class="component-name">Formulário</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List Components -->
+                <div class="component-category">
+                    <div class="category-header" data-category="lists">
+                        <h4>📜 Listas</h4>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-items">
+                        <div class="component-item" draggable="true" data-type="ul" data-content="Item 1&#10;Item 2&#10;Item 3">
+                            <span class="component-icon">•</span>
+                            <span class="component-name">Lista com Bullets</span>
+                        </div>
+                        <div class="component-item" draggable="true" data-type="ol" data-content="Primeiro&#10;Segundo&#10;Terceiro">
+                            <span class="component-icon">1.</span>
+                            <span class="component-name">Lista Numerada</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Canvas Area -->
+        <main class="canvas-container">
+            <div class="canvas-header">
+                <div class="project-info">
+                    <input type="text" id="projectTitle" placeholder="Título do Projeto" value="Minha Página HTML">
+                    <span class="canvas-zoom">
+                        <button id="zoomOut" class="zoom-btn">-</button>
+                        <span id="zoomLevel">100%</span>
+                        <button id="zoomIn" class="zoom-btn">+</button>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <div class="canvas" id="canvas">
+                    <div class="canvas-placeholder" id="canvasPlaceholder">
+                        <div class="placeholder-content">
+                            <h3>🎨 Arraste componentes aqui</h3>
+                            <p>Selecione componentes na lateral esquerda e arraste para o canvas para começar a construir sua página</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zoom Controls -->
+            <div class="zoom-controls">
+                <button id="fitToWidth" class="btn btn-sm">Ajustar à largura</button>
+                <button id="resetZoom" class="btn btn-sm">100%</button>
+            </div>
+        </main>
+
+        <!-- Properties Panel -->
+        <aside class="sidebar-right">
+            <div class="sidebar-header">
+                <h3>Propriedades</h3>
+                <div class="element-actions" id="elementActions" style="display: none;">
+                    <button id="duplicateElement" class="btn btn-sm" title="Duplicar">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    <button id="deleteElement" class="btn btn-sm btn-danger" title="Excluir">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="properties-content">
+                <div class="no-selection" id="noSelection">
+                    <div class="placeholder-icon">👆</div>
+                    <h4>Nenhum elemento selecionado</h4>
+                    <p>Selecione um elemento no canvas para editar suas propriedades</p>
+                </div>
+
+                <div class="properties-panel" id="propertiesPanel" style="display: none;">
+                    <div class="property-section">
+                        <h4>📝 Conteúdo</h4>
+                        <div class="property-group">
+                            <label for="contentInput">Texto/Conteúdo:</label>
+                            <textarea id="contentInput" placeholder="Digite o texto..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="property-section">
+                        <h4>🎨 Estilo</h4>
+                        
+                        <div class="property-group">
+                            <label for="colorInput">Cor do texto:</label>
+                            <input type="color" id="colorInput" value="#000000">
+                        </div>
+
+                        <div class="property-group">
+                            <label for="backgroundColorInput">Cor de fundo:</label>
+                            <input type="color" id="backgroundColorInput" value="#ffffff">
+                        </div>
+
+                        <div class="property-group">
+                            <label for="fontSizeInput">Tamanho da fonte:</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="fontSizeInput" value="16" min="8" max="72">
+                                <select id="fontSizeUnit">
+                                    <option value="px">px</option>
+                                    <option value="em">em</option>
+                                    <option value="rem">rem</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="property-group">
+                            <label for="fontWeightInput">Peso da fonte:</label>
+                            <select id="fontWeightInput">
+                                <option value="normal">Normal</option>
+                                <option value="bold">Negrito</option>
+                                <option value="lighter">Leve</option>
+                            </select>
+                        </div>
+
+                        <div class="property-group">
+                            <label for="textAlignInput">Alinhamento:</label>
+                            <select id="textAlignInput">
+                                <option value="left">Esquerda</option>
+                                <option value="center">Centro</option>
+                                <option value="right">Direita</option>
+                                <option value="justify">Justificado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="property-section">
+                        <h4>📏 Dimensões</h4>
+                        
+                        <div class="property-group">
+                            <label>Largura:</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="widthInput" placeholder="auto">
+                                <select id="widthUnit">
+                                    <option value="auto">auto</option>
+                                    <option value="px">px</option>
+                                    <option value="%">%</option>
+                                    <option value="vh">vh</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="property-group">
+                            <label>Altura:</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="heightInput" placeholder="auto">
+                                <select id="heightUnit">
+                                    <option value="auto">auto</option>
+                                    <option value="px">px</option>
+                                    <option value="%">%</option>
+                                    <option value="vh">vh</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="property-section">
+                        <h4>🔲 Espaçamento</h4>
+                        
+                        <div class="property-group">
+                            <label>Margem (px):</label>
+                            <div class="spacing-inputs">
+                                <input type="number" id="marginTop" placeholder="0" title="Margem superior">
+                                <input type="number" id="marginRight" placeholder="0" title="Margem direita">
+                                <input type="number" id="marginBottom" placeholder="0" title="Margem inferior">
+                                <input type="number" id="marginLeft" placeholder="0" title="Margem esquerda">
+                            </div>
+                        </div>
+
+                        <div class="property-group">
+                            <label>Padding (px):</label>
+                            <div class="spacing-inputs">
+                                <input type="number" id="paddingTop" placeholder="0" title="Padding superior">
+                                <input type="number" id="paddingRight" placeholder="0" title="Padding direita">
+                                <input type="number" id="paddingBottom" placeholder="0" title="Padding inferior">
+                                <input type="number" id="paddingLeft" placeholder="0" title="Padding esquerda">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="property-section">
+                        <h4>🔲 Bordas</h4>
+                        
+                        <div class="property-group">
+                            <label for="borderColorInput">Cor da borda:</label>
+                            <input type="color" id="borderColorInput" value="#e0e0e0">
+                        </div>
+
+                        <div class="property-group">
+                            <label for="borderWidthInput">Largura da borda:</label>
+                            <input type="number" id="borderWidthInput" value="0" min="0" max="10">
+                        </div>
+
+                        <div class="property-group">
+                            <label for="borderStyleInput">Estilo da borda:</label>
+                            <select id="borderStyleInput">
+                                <option value="none">Nenhuma</option>
+                                <option value="solid">Sólida</option>
+                                <option value="dashed">Tracejada</option>
+                                <option value="dotted">Pontilhada</option>
+                            </select>
+                        </div>
+
+                        <div class="property-group">
+                            <label for="borderRadiusInput">Arredondamento:</label>
+                            <input type="number" id="borderRadiusInput" value="0" min="0" max="50">
+                        </div>
+                    </div>
+
+                    <div class="property-section">
+                        <h4>📱 Posicionamento</h4>
+                        
+                        <div class="property-group">
+                            <label for="positionInput">Posição:</label>
+                            <select id="positionInput">
+                                <option value="static">Estática</option>
+                                <option value="relative">Relativa</option>
+                                <option value="absolute">Absoluta</option>
+                                <option value="fixed">Fixa</option>
+                            </select>
+                        </div>
+
+                        <div class="property-group" id="positionInputs" style="display: none;">
+                            <label>Posição:</label>
+                            <div class="position-inputs">
+                                <input type="number" id="topInput" placeholder="top" title="Distância do topo">
+                                <input type="number" id="rightInput" placeholder="right" title="Distância da direita">
+                                <input type="number" id="bottomInput" placeholder="bottom" title="Distância do fundo">
+                                <input type="number" id="leftInput" placeholder="left" title="Distância da esquerda">
+                            </div>
+                        </div>
+
+                        <div class="property-group">
+                            <label for="zIndexInput">Camada (z-index):</label>
+                            <input type="number" id="zIndexInput" value="auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Modals -->
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Exportar HTML</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <label>
+                        <input type="radio" name="exportMode" value="single" checked>
+                        <span>HTML único (CSS inline)</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="exportMode" value="separated">
+                        <span>HTML + CSS separado</span>
+                    </label>
+                </div>
+                <div class="code-preview">
+                    <h4>Preview do código:</h4>
+                    <textarea id="codeOutput" readonly></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="copyCode" class="btn btn-primary">Copiar código</button>
+                <button id="downloadCode" class="btn btn-secondary">Baixar arquivo</button>
+                <button class="modal-close btn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Preview da Página</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <iframe id="previewFrame" sandbox="allow-scripts allow-forms"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-close btn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save to Hub Modal -->
+    <div id="saveToHubModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Salvar no Knowledge Hub</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="hubProjectName">Nome do projeto:</label>
+                    <input type="text" id="hubProjectName" placeholder="Minha Página HTML" value="Minha Página HTML">
+                </div>
+                <div class="form-group">
+                    <label for="hubProjectDescription">Descrição:</label>
+                    <textarea id="hubProjectDescription" placeholder="Descreva seu projeto..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="hubProjectTags">Tags (separadas por vírgula):</label>
+                    <input type="text" id="hubProjectTags" placeholder="html, web, design">
+                </div>
+                <div class="hub-status" id="hubStatus"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmSaveToHub" class="btn btn-primary">Salvar</button>
+                <button class="modal-close btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../scripts/hub-integration.js"></script>
+    <script src="scripts/canvas-manager.js"></script>
+    <script src="scripts/drag-drop.js"></script>
+    <script src="scripts/property-panel.js"></script>
+    <script src="scripts/export-manager.js"></script>
+    <script src="scripts/modal-manager.js"></script>
+    <script src="scripts/component-library.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

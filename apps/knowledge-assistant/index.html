@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Hub - Gerenciador de Documentos</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX para LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/themes.css">
+</head>
+<body data-theme="dark">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1><i class="fas fa-archive"></i> Knowledge Hub</h1>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Buscar documentos..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="themeToggle" class="theme-toggle" title="Alternar tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="addFileBtn" class="btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Adicionar Arquivo
+                </button>
+            </div>
+        </header>
+
+        <!-- Área Principal -->
+        <main class="main-content">
+            <!-- Grid de Arquivos -->
+            <section id="filesGrid" class="files-grid">
+                <!-- Cards de arquivos serão inseridos aqui dinamicamente -->
+            </section>
+
+            <!-- Área de Visualização (inicialmente oculta) -->
+            <section id="documentViewer" class="document-viewer" style="display: none;">
+                <div class="viewer-header">
+                    <button id="closeViewerBtn" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar ao Hub
+                    </button>
+                    <div class="viewer-title">
+                        <h2 id="documentTitle">Documento</h2>
+                        <span id="documentType" class="file-type-tag">MD</span>
+                    </div>
+                    <div class="viewer-actions">
+                        <button id="editDocumentBtn" class="btn-primary">
+                            <i class="fas fa-edit"></i>
+                            Editar
+                        </button>
+                        <button id="deleteDocumentBtn" class="btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="document-content">
+                    <div id="markdownPreview" class="markdown-content"></div>
+                    <div id="pdfViewer" class="pdf-content" style="display: none;">
+                        <embed id="pdfEmbed" type="application/pdf" width="100%" height="100%">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Adicionar Arquivo -->
+    <div id="addFileModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Novo Arquivo</h3>
+                <button class="modal-close" id="closeAddFileModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addFileForm">
+                    <div class="form-group">
+                        <label for="fileName">Nome do Arquivo:</label>
+                        <input type="text" id="fileName" name="fileName" required placeholder="ex: meu-projeto">
+                    </div>
+                    <div class="form-group">
+                        <label for="fileType">Tipo de Arquivo:</label>
+                        <select id="fileType" name="fileType" required>
+                            <option value="markdown">Markdown (.md)</option>
+                            <option value="pdf">PDF (.pdf)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fileContent">Conteúdo:</label>
+                        <textarea id="fileContent" name="fileContent" rows="10" placeholder="# Meu Documento&#10;&#10;Digite o conteúdo aqui..."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="cancelAddFile">Cancelar</button>
+                        <button type="submit" class="btn-primary">Salvar Arquivo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Upload PDF -->
+    <div id="uploadPdfModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload de PDF</h3>
+                <button class="modal-close" id="closeUploadPdfModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arraste e solte o arquivo PDF aqui ou clique para selecionar</p>
+                    <input type="file" id="pdfFileInput" accept=".pdf" style="display: none;">
+                    <button type="button" class="btn-secondary" id="selectPdfBtn">Selecionar Arquivo</button>
+                </div>
+                <div class="form-group">
+                    <label for="pdfName">Nome do Documento:</label>
+                    <input type="text" id="pdfName" name="pdfName" placeholder="nome-do-documento">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelPdfUpload">Cancelar</button>
+                    <button type="button" class="btn-primary" id="savePdfBtn" disabled>Salvar PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/storage-manager.js"></script>
+    <script src="scripts/document-renderer.js"></script>
+    <script src="scripts/ui-manager.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini IDE - Teste de Scripts</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Base (reutilizado do editor markdown) - Copiados para dentro do projeto -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/themes.css">
+    
+    <!-- CSS Específico da IDE -->
+    <link rel="stylesheet" href="styles/ide.css">
+    
+    <!-- Monaco Editor via CDN - Configuração Robusta -->
+    <script>
+        // Configuração robusta para Monaco Editor
+        window.MonacoEnvironment = {
+            getWorkerUrl: function (moduleId, label) {
+                const proxy = `
+                    self.MonacoEnvironment = { baseUrl: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/' };
+                    importScripts('https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/base/worker/workerMain.js');
+                `;
+                return 'data:text/javascript;charset=utf-8,' + encodeURIComponent(proxy);
+            }
+        };
+
+        var require = { 
+            paths: { 
+                'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' 
+            },
+            onError: function(error) {
+                console.error('Monaco Editor Error:', error);
+                // Fallback para carregamento local
+                if (error.requireType === 'load') {
+                    console.warn('Monaco Editor failed to load from CDN, trying alternative CDN...');
+                    // Tentar CDN alternativo
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+</head>
+<body data-theme="dark">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1><i class="fas fa-code"></i> Mini IDE</h1>
+            </div>
+            <div class="header-center">
+                <button class="btn-primary" id="runBtn" title="Executar (Ctrl+Enter)">
+                    <i class="fas fa-play"></i> Executar
+                </button>
+                <button class="btn-secondary" id="newFileBtn" title="Novo Arquivo (Ctrl+N)">
+                    <i class="fas fa-file-plus"></i> Novo
+                </button>
+                <button class="btn-secondary" id="openFileBtn" title="Abrir Arquivo (Ctrl+O)">
+                    <i class="fas fa-folder-open"></i> Abrir
+                </button>
+                <button class="btn-secondary" id="saveFileBtn" title="Salvar (Ctrl+S)">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </div>
+            <div class="header-right">
+                <button class="btn-icon" id="themeToggle" title="Alternar Tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn-icon" id="settingsBtn" title="Configurações">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- File Explorer -->
+            <aside class="file-explorer" id="fileExplorer">
+                <div class="explorer-header">
+                    <h3><i class="fas fa-folder"></i> Arquivos</h3>
+                    <div class="explorer-actions">
+                        <button class="btn-icon" id="newFileBtn2" title="Novo Arquivo">
+                            <i class="fas fa-file-plus"></i>
+                        </button>
+                        <button class="btn-icon" id="refreshFilesBtn" title="Atualizar">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="file-list" id="fileList">
+                    <!-- Arquivos serão listados aqui -->
+                </div>
+                
+                <!-- Templates Section -->
+                <div class="templates-section">
+                    <h4><i class="fas fa-layer-group"></i> Templates</h4>
+                    <select id="templateSelect" class="template-selector">
+                        <option value="">Selecionar Template...</option>
+                    </select>
+                    <button class="btn-small" id="insertTemplateBtn" disabled>
+                        <i class="fas fa-plus"></i> Inserir
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Editor Area -->
+            <section class="editor-area">
+                <div class="editor-tabs" id="editorTabs">
+                    <!-- Tabs dos arquivos -->
+                </div>
+                <div class="editor-container">
+                    <div id="editor" class="editor-pane"></div>
+                </div>
+            </section>
+
+            <!-- Output Panel -->
+            <aside class="output-panel" id="outputPanel">
+                <div class="output-header">
+                    <h3><i class="fas fa-terminal"></i> Saída</h3>
+                    <div class="output-controls">
+                        <button class="btn-icon" id="clearOutputBtn" title="Limpar Saída">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn-icon" id="exportOutputBtn" title="Exportar Saída">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="btn-icon" id="toggleOutputBtn" title="Ocultar Painel">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="execution-status" id="executionStatus" style="display: none;">
+                    <!-- Status da execução -->
+                </div>
+                <div class="output-content" id="outputContent">
+                    <div class="output-placeholder">
+                        <i class="fas fa-terminal"></i>
+                        <p>Execute um script para ver a saída aqui</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Console -->
+        <footer class="console-bar" id="consoleBar">
+            <div class="console-header">
+                <span><i class="fas fa-bug"></i> Console</span>
+                <div class="console-controls">
+                    <button class="btn-icon" id="clearConsoleBtn" title="Limpar Console">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn-icon" id="toggleConsoleBtn" title="Ocultar Console">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="console-content" id="consoleContent" style="display: none;">
+                <div class="console-output" id="consoleOutput">
+                    <!-- Console logs -->
+                </div>
+                <div class="console-input">
+                    <input type="text" id="consoleInput" placeholder="Digite comandos JS aqui...">
+                    <button class="btn-icon" id="runConsoleBtn" title="Executar Comando">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-container settings-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Configurações</h2>
+                <button class="btn-icon modal-close" id="closeSettingsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-nav">
+                    <button class="settings-nav-item active" data-tab="editor">Editor</button>
+                    <button class="settings-nav-item" data-tab="execution">Execução</button>
+                    <button class="settings-nav-item" data-tab="ui">Interface</button>
+                    <button class="settings-nav-item" data-tab="shortcuts">Atalhos</button>
+                </div>
+                <div class="settings-content">
+                    <!-- Editor Settings -->
+                    <div class="settings-tab active" id="editorSettings">
+                        <h3>Configurações do Editor</h3>
+                        <div class="form-group">
+                            <label for="fontSizeInput">Tamanho da Fonte</label>
+                            <input type="range" id="fontSizeInput" min="10" max="24" value="14">
+                            <span class="value-display" id="fontSizeValue">14px</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="tabSizeInput">Tamanho da Tab</label>
+                            <input type="number" id="tabSizeInput" min="1" max="8" value="2">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="wordWrapInput" checked>
+                                Quebra de Linha Automática
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="lineNumbersInput" checked>
+                                Mostrar Números de Linha
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="minimapInput" checked>
+                                Mostrar Minimap
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Execution Settings -->
+                    <div class="settings-tab" id="executionSettings">
+                        <h3>Configurações de Execução</h3>
+                        <div class="form-group">
+                            <label for="timeoutInput">Timeout (ms)</label>
+                            <input type="number" id="timeoutInput" min="1000" max="60000" value="30000">
+                        </div>
+                        <div class="form-group">
+                            <label for="maxOutputInput">Tamanho Máximo da Saída (chars)</label>
+                            <input type="number" id="maxOutputInput" min="1000" max="100000" value="10000">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="clearOutputOnRunInput" checked>
+                                Limpar Saída a Cada Execução
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="showExecutionTimeInput" checked>
+                                Mostrar Tempo de Execução
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- UI Settings -->
+                    <div class="settings-tab" id="uiSettings">
+                        <h3>Configurações da Interface</h3>
+                        <div class="form-group">
+                            <label for="sidebarWidthInput">Largura da Barra Lateral (px)</label>
+                            <input type="range" id="sidebarWidthInput" min="200" max="400" value="240">
+                            <span class="value-display" id="sidebarWidthValue">240px</span>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="showConsoleInput" checked>
+                                Mostrar Console por Padrão
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="compactModeInput">
+                                Modo Compacto
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Shortcuts Settings -->
+                    <div class="settings-tab" id="shortcutsSettings">
+                        <h3>Atalhos de Teclado</h3>
+                        <div class="shortcuts-list" id="shortcutsList">
+                            <!-- Lista de atalhos -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="resetSettingsBtn">Restaurar Padrões</button>
+                <button class="btn-primary" id="saveSettingsBtn">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New File Modal -->
+    <div class="modal-overlay" id="newFileModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">Novo Arquivo</h2>
+                <button class="btn-icon modal-close" id="closeNewFileModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newFileName">Nome do Arquivo</label>
+                    <input type="text" id="newFileName" placeholder="ex: script.js" value="script.js">
+                </div>
+                <div class="form-group">
+                    <label for="newFileTemplate">Template (opcional)</label>
+                    <select id="newFileTemplate">
+                        <option value="">Arquivo em branco</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newFileLanguage">Linguagem</label>
+                    <select id="newFileLanguage">
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="shell">Shell/Bash</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelNewFileBtn">Cancelar</button>
+                <button class="btn-primary" id="createFileBtn">Criar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification" style="display: none;">
+        <div class="notification-content">
+            <span class="notification-message" id="notificationMessage"></span>
+            <button class="btn-icon notification-close" id="notificationClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/main.js"></script>
+    <script src="scripts/editor.js"></script>
+    <script src="scripts/executor.js"></script>
+    <script src="scripts/file-manager.js"></script>
+    <script src="scripts/templates.js"></script>
+    <script src="scripts/settings.js"></script>
+    <script src="scripts/console.js"></script>
+</body>
+</html>

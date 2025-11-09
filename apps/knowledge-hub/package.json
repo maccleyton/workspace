@@ -1,0 +1,47 @@
+{
+  "name": "knowledge-hub",
+  "version": "1.0.0",
+  "description": "Hub de conhecimento para gerenciar documentos Markdown e PDF com renderização avançada",
+  "private": true,
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "start": "python -m http.server 3000",
+    "build": "echo 'Static files - no build needed'",
+    "test": "echo 'No tests specified'",
+    "lint": "echo 'No linting configured'"
+  },
+  "keywords": [
+    "knowledge-hub",
+    "markdown",
+    "pdf",
+    "document-manager",
+    "note-taking",
+    "knowledge-base",
+    "storage",
+    "indexeddb",
+    "latex",
+    "katex",
+    "knowledge-management",
+    "documentation",
+    "hub",
+    "center"
+  ],
+  "author": "MiniMax Agent",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/minimax/knowledge-hub"
+  },
+  "bugs": {
+    "url": "https://github.com/minimax/knowledge-hub/issues"
+  },
+  "homepage": "https://knowledge-hub.vercel.app"
+}
