@@ -2,6 +2,10 @@
 
 Um editor markdown completo e moderno com recursos avançados, desenvolvido com HTML5, CSS3 e JavaScript vanilla.
 
+## Link para acesso
+
+https://workspace-mac.vercel.app
+
 ## ✨ Funcionalidades
 
 ### 📝 Editor Principal
