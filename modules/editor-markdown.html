@@ -1033,6 +1033,9 @@
         <div class="menu-item" onclick="exportDocument()">
             <i class="fas fa-download"></i> Exportar
         </div>
+        <div class="menu-item" id="toGoBackBtn">
+            <i class="fas fa-chevron-left"></i> Voltar
+        </div>
     </div>
 
     <!-- Tabs Container -->
@@ -2026,6 +2029,13 @@ $$
                 location.reload();
             }
         }
+
+		document.getElementById('toGoBackBtn').addEventListener('click', toGoBack);
+		
+		function toGoBack() {
+			const base = window.location.origin;
+			window.location.href = "../index.html";
+		}
 
         // Close settings on overlay click
         settingsOverlay.addEventListener('click', (e) => {

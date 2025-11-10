@@ -740,7 +740,6 @@ function toGoBack() {
 	window.location.href = "../index.html";
 }
 
-
 function printDocument() {
 	window.print();
 }

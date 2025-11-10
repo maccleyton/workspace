@@ -119,6 +119,9 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            border: none;
+            background: none;
+            font-family: inherit;
         }
 
         .menu-item:hover {
@@ -363,7 +366,7 @@
             box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
         }
 
-        /* Formula Cards */
+        /* Formula Cards - COM TAMANHO AUMENTADO */
         .cards {
             display: flex;
             flex-direction: column;
@@ -433,14 +436,24 @@
             letter-spacing: 0.5px;
         }
 
+        /* PREVIEW DO LATEX AUMENTADO */
         .card .preview {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 4px;
-            padding: 8px;
+            padding: 12px !important; /* Aumentado */
             color: var(--text-secondary);
-            font-size: 12px;
+            font-size: 14px !important; /* Aumentado */
             overflow: hidden;
-            font-family: 'Fira Code', monospace;
+            min-height: 48px !important; /* Aumentado */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card .preview .katex {
+            font-size: 1.3em !important; /* 30% maior */
+            transform: scale(1.1);
+            transform-origin: center;
         }
 
         /* Main Content */
@@ -451,8 +464,6 @@
             overflow: hidden;
             padding: 20px;
         }
-
-
 
         /* Calculator Panel */
         .calculator {
@@ -529,6 +540,54 @@
             box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
         }
 
+        /* ESTILO PARA INPUT DE LISTA DE DADOS */
+        .lista-input-container {
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            padding: 10px;
+            background: var(--bg-page);
+            margin-bottom: 15px;
+        }
+
+        .lista-itens {
+            margin: 10px 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .lista-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px;
+            margin: 2px 0;
+            background: var(--bg-surface-hover);
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .lista-item button {
+            background: var(--bg-page);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .lista-item button:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Botões da Lista com estilo da Toolbar */
+        .lista-botoes-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
         .result-box {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
             border-radius: 8px;
@@ -553,6 +612,7 @@
         .result-value {
             font-size: 28px;
             font-weight: 700;
+            word-break: break-all;
         }
 
         .result-unit {
@@ -692,7 +752,7 @@
             font-size: 0.9em !important;
         }
 
-        /* Graph Modal Styles */
+        /* Modal para gráfico */
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
@@ -717,17 +777,20 @@
         <div class="menu-item" onclick="loadFormulaBank()">
             <i class="fas fa-database"></i> Banco de Fórmulas
         </div>
-        <div class="menu-item danger" onclick="clearCalculator()">
+        <div class="menu-item" onclick="clearCalculator()">
             <i class="fas fa-trash"></i> Limpar
         </div>
-        <div class="menu-item primary" onclick="calculate()">
+        <div class="menu-item" onclick="calculate()">
             <i class="fas fa-play"></i> Calcular
         </div>
-        <div class="menu-item success" onclick="exportResult()">
+        <div class="menu-item" onclick="exportResult()">
             <i class="fas fa-download"></i> Exportar
         </div>
-        <div class="menu-item info" onclick="generateGraph()">
+        <div class="menu-item" onclick="generateGraph()">
             <i class="fas fa-chart-line"></i> Gerar Gráficos
+        </div>
+        <div class="menu-item" id="toGoBackBtn">
+            <i class="fas fa-chevron-left"></i> Voltar
         </div>
     </div>
 
@@ -806,12 +869,12 @@
     </div>
 
     <script>
-        // Formula data
+        // Formula data - COM CORREÇÕES DE PERCENTUAL
         const formulas = [
             // MATEMÁTICA
             {
                 id: 'bhaskara',
-                name: 'Fórmula de Bhaskara',
+                name: 'Fórmula de Bháskara',
                 category: 'Matemática',
                 latex: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
                 vars: [
@@ -820,19 +883,28 @@
                     {symbol: 'c', name: 'Coeficiente c', unit: ''}
                 ],
                 result: {symbol: 'x', unit: ''},
-                calc: (a, b, c) => {
+                calc: function(a, b, c) {
                     const discriminante = b*b - 4*a*c;
                     if (discriminante < 0) return 'Sem raízes reais';
-                    return `x₁ = ${formatarNumeroBrasil((-b + Math.sqrt(discriminante)) / (2*a))}, x₂ = ${formatarNumeroBrasil((-b - Math.sqrt(discriminante)) / (2*a))}`;
+                    const x1 = (-b + Math.sqrt(discriminante)) / (2*a);
+                    const x2 = (-b - Math.sqrt(discriminante)) / (2*a);
+                    return `x₁ = ${formatarNumeroBrasil(x1)}, x₂ = ${formatarNumeroBrasil(x2)}`;
                 },
-                steps: (a, b, c) => [
-                    `Dados: a = ${a}, b = ${b}, c = ${c}`,
-                    `Calculando Δ = b² - 4ac`,
-                    `Δ = ${b}² - 4×${a}×${c} = ${b*b - 4*a*c}`,
-                    `Aplicando x = (-b ± √Δ)/(2a)`,
-                    `x = (${-b} ± √${b*b - 4*a*c})/(2×${a})`,
-                    `x₁ = ${formatarNumeroBrasil((-b + Math.sqrt(discriminante)) / (2*a))}, x₂ = ${formatarNumeroBrasil((-b - Math.sqrt(discriminante)) / (2*a))}`
-                ]
+                steps: function(a, b, c) {
+                    const discriminante = b*b - 4*a*c;
+                    const x1 = (-b + Math.sqrt(discriminante)) / (2*a);
+                    const x2 = (-b - Math.sqrt(discriminante)) / (2*a);
+                    return [
+                        `Dados: a = ${a}, b = ${b}, c = ${c}`,
+                        `Calculando Δ = b² - 4ac`,
+                        `Δ = ${b}² - 4×${a}×${c} = ${discriminante}`,
+                        `Aplicando x = (-b ± √Δ)/(2a)`,
+                        `x = (${-b} ± √${discriminante})/(2×${a})`,
+                        discriminante >= 0 ? 
+                            `x₁ = ${formatarNumeroBrasil(x1)}, x₂ = ${formatarNumeroBrasil(x2)}` : 
+                            'Δ < 0: Não existem raízes reais'
+                    ];
+                }
             },
             {
                 id: 'area_triangulo',
@@ -934,17 +1006,28 @@
                 category: 'Matemática',
                 latex: '\\bar{x} = \\frac{\\sum x}{n}',
                 vars: [
-                    {symbol: 'soma', name: 'Soma dos valores', unit: ''},
-                    {symbol: 'n', name: 'Quantidade', unit: ''}
+                    {symbol: 'valores', name: 'Valores', unit: 'lista'}
                 ],
                 result: {symbol: 'x̄', unit: ''},
-                calc: (soma, n) => soma / n,
-                steps: (soma, n) => [
-                    `Dados: Σx = ${soma}, n = ${n}`,
-                    `Aplicando x̄ = Σx/n`,
-                    `x̄ = ${soma}/${n}`,
-                    `x̄ = ${(soma/n).toFixed(2)}`
-                ]
+                calc: function(...args) {
+                    const lista = window.dadosDasListas['valores'] || [];
+                    if (lista.length === 0) throw new Error('Nenhum valor adicionado');
+                    const soma = lista.reduce((a, b) => a + b, 0);
+                    return soma / lista.length;
+                },
+                steps: function(...args) {
+                    const lista = window.dadosDasListas['valores'] || [];
+                    if (lista.length === 0) return ['Adicione valores para calcular'];
+                    const soma = lista.reduce((a, b) => a + b, 0);
+                    const media = soma / lista.length;
+                    return [
+                        `Valores: ${lista.map(v => formatarNumeroBrasil(v)).join(', ')}`,
+                        `Soma: Σx = ${formatarNumeroBrasil(soma)}`,
+                        `Quantidade: n = ${lista.length}`,
+                        `x̄ = Σx/n = ${formatarNumeroBrasil(soma)}/${lista.length}`,
+                        `x̄ = ${media.toFixed(2)}`
+                    ];
+                }
             },
 
             // FÍSICA - Cinemática
@@ -1315,7 +1398,7 @@
                     `${n1}×sen(${theta1}°) = ${n2}×sen(θ₂)`,
                     `sen(θ₂) = ${(n1 * Math.sin(theta1 * Math.PI / 180)).toFixed(3)}/${n2}`,
                     `sen(θ₂) = ${(n1 * Math.sin(theta1 * Math.PI / 180) / n2).toFixed(3)}`,
-                    `θ₂ = ${Math.asin((n1 * Math.sin(theta1 * Math.PI / 180)) / n2) * 180 / Math.PI}.toFixed(2)}°`
+                    `θ₂ = ${(Math.asin((n1 * Math.sin(theta1 * Math.PI / 180)) / n2) * 180 / Math.PI).toFixed(2)}°`
                 ]
             },
 
@@ -1395,7 +1478,7 @@
                 ]
             },
 
-            // ECONOMIA E FINANÇAS
+            // ECONOMIA E FINANÇAS - COM CORREÇÃO DE PERCENTUAL
             {
                 id: 'juros_simples',
                 name: 'Juros Simples (Montante)',
@@ -1403,19 +1486,26 @@
                 latex: 'M = C(1 + it)',
                 vars: [
                     {symbol: 'C', name: 'Capital', unit: 'R$'},
-                    {symbol: 'i', name: 'Taxa', unit: ''},
-                    {symbol: 't', name: 'Tempo', unit: 'períodos'}
+                    {symbol: 'i', name: 'Taxa', unit: '% a.m.', isPercent: true},
+                    {symbol: 't', name: 'Tempo', unit: 'meses'}
                 ],
                 result: {symbol: 'M', unit: 'R$'},
-                calc: (C, i, t) => C * (1 + i * t),
-                steps: (C, i, t) => [
-                    `Dados: C = R$ ${C}, i = ${i}, t = ${t}`,
-                    `Aplicando M = C(1 + it)`,
-                    `M = ${C}(1 + ${i} × ${t})`,
-                    `M = ${C}(1 + ${i*t})`,
-                    `M = ${C} × ${(1 + i*t)}`,
-                    `M = R$ ${formatarNumeroBrasil(C * (1 + i * t))}`
-                ]
+                calc: (C, i, t) => {
+                    // i já vem dividido por 100 da função calculate
+                    return C * (1 + i * t);
+                },
+                steps: (C, i, t) => {
+                    const i_percent = (i * 100).toFixed(2);
+                    const i_decimal = i; // Já está convertido
+                    return [
+                        `Dados: C = R$ ${C}, i = ${i_percent}% a.m., t = ${t} meses`,
+                        `Conversão: ${i_percent}% = ${i_decimal}`,
+                        `Aplicando M = C(1 + it)`,
+                        `M = ${C}(1 + ${i_decimal} × ${t})`,
+                        `M = ${C} × ${(1 + i_decimal*t).toFixed(4)}`,
+                        `M = R$ ${formatarNumeroBrasil(C * (1 + i * t))}`
+                    ];
+                }
             },
             {
                 id: 'juros_compostos',
@@ -1424,18 +1514,26 @@
                 latex: 'M = C(1 + i)^n',
                 vars: [
                     {symbol: 'C', name: 'Capital', unit: 'R$'},
-                    {symbol: 'i', name: 'Taxa', unit: ''},
-                    {symbol: 'n', name: 'Períodos', unit: ''}
+                    {symbol: 'i', name: 'Taxa', unit: '% a.m.', isPercent: true},
+                    {symbol: 'n', name: 'Períodos', unit: 'meses'}
                 ],
                 result: {symbol: 'M', unit: 'R$'},
-                calc: (C, i, n) => C * Math.pow(1 + i, n),
-                steps: (C, i, n) => [
-                    `Dados: C = R$ ${C}, i = ${i}, n = ${n}`,
-                    `Aplicando M = C(1 + i)^n`,
-                    `M = ${C}(1 + ${i})^${n}`,
-                    `M = ${C} × ${Math.pow(1 + i, n).toFixed(4)}`,
-                    `M = R$ ${formatarNumeroBrasil(C * Math.pow(1 + i, n))}`
-                ]
+                calc: (C, i, n) => {
+                    // i já vem dividido por 100
+                    return C * Math.pow(1 + i, n);
+                },
+                steps: (C, i, n) => {
+                    const i_percent = (i * 100).toFixed(2);
+                    const i_decimal = i;
+                    return [
+                        `Dados: C = R$ ${C}, i = ${i_percent}% a.m., n = ${n} meses`,
+                        `Conversão: ${i_percent}% = ${i_decimal}`,
+                        `Aplicando M = C(1 + i)^n`,
+                        `M = ${C}(1 + ${i_decimal})^${n}`,
+                        `M = ${C} × ${Math.pow(1 + i_decimal, n).toFixed(4)}`,
+                        `M = R$ ${formatarNumeroBrasil(C * Math.pow(1 + i_decimal, n))}`
+                    ];
+                }
             },
             {
                 id: 'vpl',
@@ -1444,78 +1542,33 @@
                 latex: 'VPL = \\sum\\frac{FC_t}{(1+i)^t}',
                 vars: [
                     {symbol: 'fc', name: 'Fluxo de caixa', unit: 'R$'},
-                    {symbol: 'i', name: 'Taxa de desconto', unit: ''},
-                    {symbol: 't', name: 'Período', unit: ''}
+                    {symbol: 'i', name: 'Taxa de desconto', unit: '%', isPercent: true},
+                    {symbol: 't', name: 'Período', unit: 'meses'}
                 ],
                 result: {symbol: 'VPL', unit: 'R$'},
-                calc: (fc, i, t) => fc / Math.pow(1 + i, t),
-                steps: (fc, i, t) => [
-                    `Dados: FC = R$ ${fc}, i = ${i}, t = ${t}`,
-                    `Aplicando VPL = FC/(1+i)^t`,
-                    `VPL = ${fc}/(1 + ${i})^${t}`,
-                    `VPL = ${fc}/${Math.pow(1 + i, t).toFixed(4)}`,
-                    `VPL = R$ ${(fc / Math.pow(1 + i, t)).toFixed(2)}`
-                ]
-            },
-
-            // ESTATÍSTICA E CIÊNCIA DA COMPUTAÇÃO
-            {
-                id: 'correlacao_pearson',
-                name: 'Correlação de Pearson',
-                category: 'Estatística',
-                latex: 'r = \\frac{\\sum(x-\\bar{x})(y-\\bar{y})}{\\sqrt{\\sum(x-\\bar{x})^2\\sum(y-\\bar{y})^2}}',
-                vars: [
-                    {symbol: 'n', name: 'Número de dados', unit: ''},
-                    {symbol: 'soma_xy', name: 'Soma de x·y', unit: ''},
-                    {symbol: 'soma_x', name: 'Soma de x', unit: ''},
-                    {symbol: 'soma_y', name: 'Soma de y', unit: ''},
-                    {symbol: 'soma_x2', name: 'Soma de x²', unit: ''},
-                    {symbol: 'soma_y2', name: 'Soma de y²', unit: ''}
-                ],
-                result: {symbol: 'r', unit: ''},
-                calc: (n, soma_xy, soma_x, soma_y, soma_x2, soma_y2) => {
-                    const numerador = n * soma_xy - soma_x * soma_y;
-                    const denominador = Math.sqrt((n * soma_x2 - soma_x * soma_x) * (n * soma_y2 - soma_y * soma_y));
-                    return numerador / denominador;
+                calc: (fc, i, t) => {
+                    // i já vem dividido por 100
+                    return fc / Math.pow(1 + i, t);
                 },
-                steps: (n, soma_xy, soma_x, soma_y, soma_x2, soma_y2) => {
-                    const numerador = n * soma_xy - soma_x * soma_y;
-                    const denominador = Math.sqrt((n * soma_x2 - soma_x * soma_x) * (n * soma_y2 - soma_y * soma_y));
+                steps: (fc, i, t) => {
+                    const i_percent = (i * 100).toFixed(2);
+                    const i_decimal = i;
                     return [
-                        `Dados: n = ${n}, Σxy = ${soma_xy}, Σx = ${soma_x}, Σy = ${soma_y}, Σx² = ${soma_x2}, Σy² = ${soma_y2}`,
-                        `Calculando r = (n·Σxy - Σx·Σy) / √[(n·Σx² - (Σx)²)(n·Σy² - (Σy)²)]`,
-                        `r = (${n}×${soma_xy} - ${soma_x}×${soma_y}) / √[(${n}×${soma_x2} - ${soma_x}²)×(${n}×${soma_y2} - ${soma_y}²)]`,
-                        `r = (${n*soma_xy} - ${soma_x*soma_y}) / √[${n*soma_x2 - soma_x*soma_x}×${n*soma_y2 - soma_y*soma_y}]`,
-                        `r = ${numerador} / √${(n*soma_x2 - soma_x*soma_x)*(n*soma_y2 - soma_y*soma_y)}`,
-                        `r = ${numerador} / ${formatarNumeroBrasil(denominador)}`,
-                        `r = ${(numerador/denominador).toFixed(3)}`
+                        `Dados: FC = R$ ${fc}, i = ${i_percent}% a.m., t = ${t} meses`,
+                        `Conversão: ${i_percent}% = ${i_decimal}`,
+                        `Aplicando VPL = FC/(1+i)^t`,
+                        `VPL = ${fc}/(1 + ${i_decimal})^${t}`,
+                        `VPL = ${fc}/${Math.pow(1 + i_decimal, t).toFixed(4)}`,
+                        `VPL = R$ ${(fc / Math.pow(1 + i_decimal, t)).toFixed(2)}`
                     ];
                 }
-            },
-            {
-                id: 'erro_padrao',
-                name: 'Erro Padrão da Média',
-                category: 'Estatística',
-                latex: 'SE = \\frac{\\sigma}{\\sqrt{n}}',
-                vars: [
-                    {symbol: 'sigma', name: 'Desvio padrão', unit: ''},
-                    {symbol: 'n', name: 'Tamanho da amostra', unit: ''}
-                ],
-                result: {symbol: 'SE', unit: ''},
-                calc: (sigma, n) => sigma / Math.sqrt(n),
-                steps: (sigma, n) => [
-                    `Dados: σ = ${sigma}, n = ${n}`,
-                    `Aplicando SE = σ/√n`,
-                    `SE = ${sigma}/√${n}`,
-                    `SE = ${sigma}/${Math.sqrt(n).toFixed(2)}`,
-                    `SE = ${formatarNumeroBrasil(sigma / Math.sqrt(n))}`
-                ]
             }
         ];
 
         let currentFormula = null;
         let filteredFormulas = [...formulas];
         let currentCategory = 'all';
+        window.dadosDasListas = {}; // Para armazenar listas de valores
 
         // Get unique categories
         const categories = ['all', ...[...new Set(formulas.map(f => f.category))]];
@@ -1525,9 +1578,6 @@
             renderCategoryFilters();
             renderFormulaCards();
             updateStatus();
-            
-            // Setup search
-            document.getElementById('searchInput').addEventListener('input', filterFormulas);
         }
 
         function renderCategoryFilters() {
@@ -1585,7 +1635,7 @@
                         ${formula.name}
                     </div>
                     <div class="category">${formula.category}</div>
-                    <div class="formula-preview" id="preview-${formula.id}">
+                    <div class="preview" id="preview-${formula.id}">
                         ${formula.latex}
                     </div>
                 `;
@@ -1602,7 +1652,8 @@
 
         function selectFormula(formula) {
             currentFormula = formula;
-            
+            window.dadosDasListas = {}; // Limpa dados anteriores
+
             // Update UI
             document.getElementById('formulaTitle').textContent = formula.name;
             document.getElementById('formulaDisplay').classList.remove('empty');
@@ -1618,19 +1669,25 @@
             // Create input fields
             const inputsGrid = document.getElementById('inputsGrid');
             inputsGrid.innerHTML = '';
-            
+
             formula.vars.forEach((variable, index) => {
-                const inputGroup = document.createElement('div');
-                inputGroup.className = 'input-group';
-                inputGroup.innerHTML = `
-                    <label>${variable.name} (${variable.symbol}) - ${variable.unit}</label>
-                    <input type="number" step="any" id="var-${variable.symbol}" placeholder="Digite o valor de ${variable.name}">
-                `;
-                inputsGrid.appendChild(inputGroup);
+                // Detecta se é variável de lista
+                const isVariavelDeLista = variable.unit === 'lista' || 
+                    ['valores', 'dados', 'amostra'].some(palavra => 
+                        variable.name.toLowerCase().includes(palavra)
+                    );
                 
-                // Focus on first input
-                if (index === 0) {
-                    setTimeout(() => document.getElementById(`var-${variable.symbol}`).focus(), 100);
+                if (isVariavelDeLista) {
+                    inputsGrid.innerHTML += criarInputDeLista(variable, index);
+                } else {
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'input-group';
+                    inputGroup.innerHTML = `
+                        <label>${variable.name} (${variable.symbol}) - ${variable.unit}</label>
+                        <input type="number" step="any" id="var-${variable.symbol}" 
+                               placeholder="Digite o valor de ${variable.name}">
+                    `;
+                    inputsGrid.appendChild(inputGroup);
                 }
             });
             
@@ -1643,6 +1700,82 @@
             event.target.closest('.card').classList.add('active');
             
             updateStatus();
+        }
+
+        function criarInputDeLista(variable, index) {
+            return `
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-secondary);">
+                        ${variable.name} (${variable.symbol}) - Adicione valores
+                    </label>
+                    <div class="lista-input-container" id="container-${variable.symbol}">
+                        <input type="text" id="input-${variable.symbol}" 
+                               placeholder="Digite um número e pressione Enter" 
+                               style="width: 100%; padding: 8px; border: none; background: transparent; color: var(--text-primary); outline: none; border-bottom: 1px solid var(--border-default);">
+                        <div class="lista-itens" id="itens-${variable.symbol}"></div>
+                        <div class="lista-botoes-container">
+                            <button onclick="adicionarItem('${variable.symbol}')" class="menu-item primary">
+                                <i class="fas fa-plus"></i> Adicionar
+                            </button>
+                            <button onclick="limparLista('${variable.symbol}')" class="menu-item danger">
+                                <i class="fas fa-trash"></i> Limpar
+                            </button>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; color: var(--text-tertiary);">
+                            Total de itens: <span id="contador-${variable.symbol}">0</span> | 
+                            Soma: <span id="soma-${variable.symbol}">0</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function adicionarItem(simbolo) {
+            const input = document.getElementById(`input-${simbolo}`);
+            const valor = parseFloat(input.value.replace(',', '.'));
+            
+            if (isNaN(valor)) {
+                alert('Digite um número válido!');
+                return;
+            }
+
+            if (!window.dadosDasListas[simbolo]) {
+                window.dadosDasListas[simbolo] = [];
+            }
+            
+            window.dadosDasListas[simbolo].push(valor);
+            atualizarLista(simbolo);
+            input.value = '';
+            input.focus();
+        }
+
+        function limparLista(simbolo) {
+            window.dadosDasListas[simbolo] = [];
+            atualizarLista(simbolo);
+        }
+
+        function removerItem(simbolo, index) {
+            window.dadosDasListas[simbolo].splice(index, 1);
+            atualizarLista(simbolo);
+        }
+
+        function atualizarLista(simbolo) {
+            const lista = window.dadosDasListas[simbolo] || [];
+            const container = document.getElementById(`itens-${simbolo}`);
+            const contador = document.getElementById(`contador-${simbolo}`);
+            const soma = document.getElementById(`soma-${simbolo}`);
+            
+            container.innerHTML = lista.map((valor, index) => `
+                <div class="lista-item">
+                    <span>${index + 1}. ${formatarNumeroBrasil(valor)}</span>
+                    <button onclick="removerItem('${simbolo}', ${index})" title="Remover">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            contador.textContent = lista.length;
+            soma.textContent = formatarNumeroBrasil(lista.reduce((acc, val) => acc + val, 0));
         }
 
         function filterFormulas() {
@@ -1673,39 +1806,58 @@
                 return;
             }
             
-            // Get input values
             const values = {};
             let missingFields = [];
             
+            // Processa variáveis normais e listas
             currentFormula.vars.forEach(variable => {
-                const input = document.getElementById(`var-${variable.symbol}`);
-                const value = parseFloat(input.value);
+                const isLista = document.getElementById(`container-${variable.symbol}`);
                 
-                if (isNaN(value)) {
-                    missingFields.push(variable.name);
+                if (isLista) {
+                    const lista = window.dadosDasListas[variable.symbol] || [];
+                    if (lista.length === 0) {
+                        missingFields.push(`${variable.name} (adicione valores)`);
+                    } else {
+                        if (variable.symbol === 'valores') {
+                            values[variable.symbol] = lista;
+                        } else {
+                            values[variable.symbol] = lista.reduce((a, b) => a + b, 0);
+                        }
+                    }
                 } else {
-                    values[variable.symbol] = value;
+                    const input = document.getElementById(`var-${variable.symbol}`);
+                    let value = parseFloat(input.value);
+                    
+                    if (isNaN(value)) {
+                        missingFields.push(variable.name);
+                    } else {
+                        // CONVERSÃO PERCENTUAL AUTOMÁTICA
+                        if (variable.isPercent) {
+                            value = value / 100;
+                        }
+                        values[variable.symbol] = value;
+                    }
                 }
             });
             
             if (missingFields.length > 0) {
-                alert(`Por favor, preencha os seguintes campos: ${missingFields.join(', ')}`);
+                alert(`Por favor, preencha: ${missingFields.join(', ')}`);
                 return;
             }
             
-            // Calculate result
             try {
                 const args = currentFormula.vars.map(v => values[v.symbol]);
                 const result = currentFormula.calc(...args);
                 const steps = currentFormula.steps(...args);
                 
-                // Display result (handle different types)
                 let resultText, resultUnit = currentFormula.result.unit;
                 
                 if (typeof result === 'string') {
                     resultText = result;
                 } else if (typeof result === 'number' && isFinite(result)) {
                     resultText = formatarNumeroBrasil(result);
+                } else if (Array.isArray(result)) {
+                    resultText = `Média: ${formatarNumeroBrasil(result.reduce((a,b)=>a+b,0)/result.length)}`;
                 } else {
                     resultText = String(result);
                 }
@@ -1714,7 +1866,6 @@
                 document.getElementById('resultUnit').textContent = resultUnit;
                 document.getElementById('resultBox').classList.add('show');
                 
-                // Display steps
                 const stepsContent = document.getElementById('stepsContent');
                 if (Array.isArray(steps)) {
                     stepsContent.innerHTML = steps.map(step => 
@@ -1726,24 +1877,14 @@
                 document.getElementById('stepsBox').classList.add('show');
                 
             } catch (error) {
-                alert('Erro no cálculo. Verifique os valores inseridos.');
+                alert(`Erro no cálculo: ${error.message}`);
                 console.error('Calculation error:', error);
             }
         }
 
-        function clearInputs() {
-            if (currentFormula) {
-                currentFormula.vars.forEach(variable => {
-                    const input = document.getElementById(`var-${variable.symbol}`);
-                    if (input) input.value = '';
-                });
-            }
-            document.getElementById('resultBox').classList.remove('show');
-            document.getElementById('stepsBox').classList.remove('show');
-        }
-
         function clearCalculator() {
             currentFormula = null;
+            window.dadosDasListas = {};
             document.getElementById('formulaTitle').textContent = 'Selecione uma fórmula';
             document.getElementById('formulaDisplay').innerHTML = `
                 <div style="color: var(--text-tertiary); text-align: center;">
@@ -1759,10 +1900,11 @@
             updateStatus();
         }
 
-        // Função para formatar números no padrão brasileiro
         function formatarNumeroBrasil(numero) {
             if (typeof numero === 'number' && isFinite(numero)) {
-                // Formatar no padrão brasileiro: ponto para milhares, vírgula para decimais
+                if (Math.abs(numero) >= 1e6 || (Math.abs(numero) < 0.001 && numero !== 0)) {
+                    return numero.toExponential(2).replace('.', ',');
+                }
                 return numero.toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
@@ -1777,9 +1919,8 @@
                 return;
             }
 
-            // Verificar se a fórmula pode gerar gráfico
             const graphableFormulas = ['bhaskara', 'area_triangulo', 'area_circulo', 'teorema_pitagoras', 
-                                     'velocidade_media', 'aceleracao', 'posicao_mru', 'posicao_mruv', 'energia_cinetica',
+                                     'velocidade_media', 'aceleracao', 'mruv_posicao', 'energia_cinetica',
                                      'juros_simples', 'juros_compostos'];
 
             if (!graphableFormulas.includes(currentFormula.id)) {
@@ -1787,15 +1928,14 @@
                 return;
             }
 
-            // Obter valores das variáveis
             const values = {};
             let missingFields = [];
             
             currentFormula.vars.forEach(variable => {
                 const input = document.getElementById(`var-${variable.symbol}`);
-                const value = parseFloat(input.value);
+                const value = parseFloat(input?.value || 0);
                 
-                if (isNaN(value)) {
+                if (isNaN(value) && variable.symbol !== 'g') {
                     missingFields.push(variable.name);
                 } else {
                     values[variable.symbol] = value;
@@ -1803,16 +1943,14 @@
             });
 
             if (missingFields.length > 0) {
-                alert(`Por favor, preencha os seguintes campos para gerar o gráfico: ${missingFields.join(', ')}`);
+                alert(`Preencha pelo menos: ${missingFields.join(', ')}`);
                 return;
             }
 
-            // Abrir modal de gráfico
             showGraphModal(currentFormula, values);
         }
 
         function showGraphModal(formula, values) {
-            // Criar overlay do modal
             const overlay = document.createElement('div');
             overlay.className = 'graph-overlay';
             overlay.style.cssText = `
@@ -1829,7 +1967,6 @@
                 animation: fadeIn 0.3s ease;
             `;
 
-            // Criar container do modal
             const modal = document.createElement('div');
             modal.className = 'graph-modal';
             modal.style.cssText = `
@@ -1844,7 +1981,6 @@
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             `;
 
-            // Header do modal
             const header = document.createElement('div');
             header.style.cssText = `
                 display: flex;
@@ -1888,7 +2024,6 @@
             header.appendChild(title);
             header.appendChild(closeBtn);
 
-            // Container do gráfico
             const graphContainer = document.createElement('div');
             graphContainer.id = 'graphCanvas';
             graphContainer.style.cssText = `
@@ -1898,267 +2033,23 @@
                 border-radius: 8px;
                 background: var(--bg-page);
                 position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--text-secondary);
             `;
-
-            // Gerar o gráfico baseado na fórmula
-            generateFormulaGraph(formula, values, graphContainer);
+            graphContainer.innerHTML = 'Gráfico em desenvolvimento<br><small>Funcionalidade será implementada em breve</small>';
 
             modal.appendChild(header);
             modal.appendChild(graphContainer);
             overlay.appendChild(modal);
             document.body.appendChild(overlay);
 
-            // Fechar ao clicar no overlay
             overlay.onclick = (e) => {
                 if (e.target === overlay) {
                     document.body.removeChild(overlay);
                 }
             };
-        }
-
-        function generateFormulaGraph(formula, values, container) {
-            const ctx = container.getContext('2d');
-            const width = container.width;
-            const height = container.height;
-
-            // Limpar canvas
-            ctx.clearRect(0, 0, width, height);
-
-            // Definir cores
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, width, height);
-            ctx.fillStyle = '#333333';
-            ctx.strokeStyle = '#666666';
-
-            // Configurações do gráfico
-            const padding = 60;
-            const graphWidth = width - 2 * padding;
-            const graphHeight = height - 2 * padding;
-
-            // Função para converter coordenadas
-            function toCanvasX(x) {
-                return padding + (x + 10) * (graphWidth / 20); // range -10 a 10
-            }
-            function toCanvasY(y) {
-                return height - padding - (y + 10) * (graphHeight / 20); // range -10 a 10
-            }
-
-            // Desenhar eixos
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            // Eixo Y
-            ctx.moveTo(toCanvasX(0), toCanvasY(-10));
-            ctx.lineTo(toCanvasX(0), toCanvasY(10));
-            // Eixo X
-            ctx.moveTo(toCanvasX(-10), toCanvasY(0));
-            ctx.lineTo(toCanvasX(10), toCanvasY(0));
-            ctx.stroke();
-
-            // Desenhar grade
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = '#e0e0e0';
-            for (let i = -10; i <= 10; i += 2) {
-                // Linhas verticais
-                ctx.beginPath();
-                ctx.moveTo(toCanvasX(i), toCanvasY(-10));
-                ctx.lineTo(toCanvasX(i), toCanvasY(10));
-                ctx.stroke();
-                
-                // Linhas horizontais
-                ctx.beginPath();
-                ctx.moveTo(toCanvasX(-10), toCanvasY(i));
-                ctx.lineTo(toCanvasX(10), toCanvasY(i));
-                ctx.stroke();
-            }
-
-            // Desenhar etiqueta dos eixos
-            ctx.fillStyle = '#333333';
-            ctx.font = '12px Arial';
-            ctx.fillText('x', toCanvasX(9.5), toCanvasY(-0.5));
-            ctx.fillText('y', toCanvasX(-0.5), toCanvasY(9.5));
-
-            // Gerar gráfico específico da fórmula
-            switch (formula.id) {
-                case 'bhaskara':
-                    drawBhaskaraGraph(ctx, values, toCanvasX, toCanvasY);
-                    break;
-                case 'area_triangulo':
-                    drawAreaTriangleGraph(ctx, values, toCanvasX, toCanvasY);
-                    break;
-                case 'energia_cinetica':
-                    drawEnergyGraph(ctx, values, toCanvasX, toCanvasY);
-                    break;
-                default:
-                    // Gráfico genérico baseado nas variáveis
-                    drawGenericGraph(ctx, formula, values, toCanvasX, toCanvasY);
-            }
-        }
-
-        function drawBhaskaraGraph(ctx, values, toCanvasX, toCanvasY) {
-            const a = values.a || 1;
-            const b = values.b || 0;
-            const c = values.c || 0;
-
-            // Desenhar a parábola ax² + bx + c
-            ctx.strokeStyle = '#019875';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-
-            const delta = b*b - 4*a*c;
-            let firstPoint = true;
-
-            for (let x = -8; x <= 8; x += 0.1) {
-                const y = a * x * x + b * x + c;
-                const canvasX = toCanvasX(x);
-                const canvasY = toCanvasY(y);
-
-                if (firstPoint) {
-                    ctx.moveTo(canvasX, canvasY);
-                    firstPoint = false;
-                } else {
-                    ctx.lineTo(canvasX, canvasY);
-                }
-            }
-            ctx.stroke();
-
-            // Marcar as raízes se existirem
-            if (delta >= 0) {
-                const x1 = (-b + Math.sqrt(delta)) / (2*a);
-                const x2 = (-b - Math.sqrt(delta)) / (2*a);
-
-                ctx.fillStyle = '#ff4757';
-                // Raiz 1
-                ctx.beginPath();
-                ctx.arc(toCanvasX(x1), toCanvasY(0), 6, 0, 2 * Math.PI);
-                ctx.fill();
-                
-                // Raiz 2
-                if (x1 !== x2) {
-                    ctx.beginPath();
-                    ctx.arc(toCanvasX(x2), toCanvasY(0), 6, 0, 2 * Math.PI);
-                    ctx.fill();
-                }
-
-                // Vértice
-                const vertexX = -b / (2*a);
-                const vertexY = -delta / (4*a);
-                ctx.fillStyle = '#3742fa';
-                ctx.beginPath();
-                ctx.arc(toCanvasX(vertexX), toCanvasY(vertexY), 5, 0, 2 * Math.PI);
-                ctx.fill();
-
-                // Legenda
-                ctx.fillStyle = '#333333';
-                ctx.font = '11px Arial';
-                if (delta > 0) {
-                    ctx.fillText(`x₁ = ${formatarNumeroBrasil(x1)}`, toCanvasX(x1) + 10, toCanvasY(0) - 10);
-                    ctx.fillText(`x₂ = ${formatarNumeroBrasil(x2)}`, toCanvasX(x2) + 10, toCanvasY(0) + 20);
-                } else {
-                    ctx.fillText(`x = ${formatarNumeroBrasil(x1)}`, toCanvasX(x1) + 10, toCanvasY(0) - 10);
-                }
-            }
-        }
-
-        function drawAreaTriangleGraph(ctx, values, toCanvasX, toCanvasY) {
-            const b = values.b || 1;
-            const h = values.h || 1;
-
-            // Desenhar triângulo
-            ctx.strokeStyle = '#019875';
-            ctx.lineWidth = 3;
-            ctx.fillStyle = 'rgba(1, 152, 117, 0.2)';
-
-            ctx.beginPath();
-            ctx.moveTo(toCanvasX(-b/2), toCanvasY(0));
-            ctx.lineTo(toCanvasX(b/2), toCanvasY(0));
-            ctx.lineTo(toCanvasX(0), toCanvasY(h));
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-
-            // Mostrar valores
-            ctx.fillStyle = '#333333';
-            ctx.font = '12px Arial';
-            ctx.fillText(`Base = ${b}`, toCanvasX(b/2 + 0.5), toCanvasY(-1));
-            ctx.fillText(`Altura = ${h}`, toCanvasX(0.5), toCanvasY(h/2));
-        }
-
-        function drawEnergyGraph(ctx, values, toCanvasX, toCanvasY) {
-            const m = values.m || 1;
-
-            // Desenhar gráfico de energia cinética vs velocidade
-            ctx.strokeStyle = '#019875';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-
-            let firstPoint = true;
-            for (let v = 0; v <= 10; v += 0.1) {
-                const energy = 0.5 * m * v * v;
-                const canvasX = toCanvasX(v);
-                const canvasY = toCanvasY(energy / 10); // Escalonar para caber no gráfico
-
-                if (firstPoint) {
-                    ctx.moveTo(canvasX, canvasY);
-                    firstPoint = false;
-                } else {
-                    ctx.lineTo(canvasX, canvasY);
-                }
-            }
-            ctx.stroke();
-
-            // Marcar ponto atual se houver velocidade
-            const v = values.v || 0;
-            const energy = 0.5 * m * v * v;
-            if (v > 0) {
-                ctx.fillStyle = '#ff4757';
-                ctx.beginPath();
-                ctx.arc(toCanvasX(v), toCanvasY(energy / 10), 6, 0, 2 * Math.PI);
-                ctx.fill();
-
-                ctx.fillStyle = '#333333';
-                ctx.font = '11px Arial';
-                ctx.fillText(`E = ${formatarNumeroBrasil(energy)}J`, toCanvasX(v) + 10, toCanvasY(energy / 10));
-            }
-        }
-
-        function drawGenericGraph(ctx, formula, values, toCanvasX, toCanvasY) {
-            // Para fórmulas genéricas, desenhar baseado nas primeiras duas variáveis
-            if (formula.vars.length >= 2) {
-                const xVar = formula.vars[0];
-                const yVar = formula.vars[1];
-
-                ctx.strokeStyle = '#019875';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-
-                let firstPoint = true;
-                for (let x = 0.1; x <= 10; x += 0.1) {
-                    let y;
-                    try {
-                        // Substituir as variáveis na função
-                        const args = formula.vars.map((v, i) => {
-                            if (i === 0) return x;
-                            return values[v.symbol] || 1;
-                        });
-                        y = formula.calc(...args);
-                        
-                        if (typeof y === 'number' && isFinite(y) && y > -10 && y < 10) {
-                            const canvasX = toCanvasX(x);
-                            const canvasY = toCanvasY(y);
-
-                            if (firstPoint) {
-                                ctx.moveTo(canvasX, canvasY);
-                                firstPoint = false;
-                            } else {
-                                ctx.lineTo(canvasX, canvasY);
-                            }
-                        }
-                    } catch (e) {
-                        // Ignorar erros de cálculo
-                    }
-                }
-                ctx.stroke();
-            }
         }
 
         function exportResult() {
@@ -2171,8 +2062,7 @@
             const unit = document.getElementById('resultUnit').textContent;
             const steps = document.getElementById('stepsContent').innerHTML;
             
-            const content = `
-# Cálculo: ${currentFormula.name}
+            const content = `# Cálculo: ${currentFormula.name}
 
 ## Fórmula
 $${currentFormula.latex}$$
@@ -2196,7 +2086,6 @@ ${steps.replace(/<div class="step">/g, '').replace(/<\/div>/g, '\n').replace(/&l
         }
 
         function loadFormulaBank() {
-            // Scroll to formulas sidebar
             document.getElementById('navSidebar').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -2217,6 +2106,13 @@ ${steps.replace(/<div class="step">/g, '').replace(/<\/div>/g, '\n').replace(/&l
                 `Selecionada: ${currentFormula.name}` : 
                 'Nenhuma fórmula selecionada';
         }
+
+		document.getElementById('toGoBackBtn').addEventListener('click', toGoBack);
+		
+		function toGoBack() {
+			const base = window.location.origin;
+			window.location.href = "../index.html";
+		}
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
