@@ -521,6 +521,12 @@
                     </svg>
                     Limpar
                 </button>
+                <button class="btn btn-secondary" id="toGoBackBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M15 6l-6 6 6 6"/>
+					</svg>
+                    Voltar
+                </button>
             </div>
         </div>
     </header>
@@ -1670,6 +1676,13 @@
                 }
             }
         }
+
+		document.getElementById('toGoBackBtn').addEventListener('click', toGoBack);
+		
+		function toGoBack() {
+			const base = window.location.origin;
+			window.location.href = "../index.html";
+		}
 
         function exportSchedule() {
             alert('Funcionalidade de exportação em desenvolvimento. O cronograma pode ser copiado selecionando a tabela.');
