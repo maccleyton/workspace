@@ -12,8 +12,8 @@
 	
 	/* ✅ NOVOS ESTILOS LaTeX BASEADOS NO EDITOR */
 	--latex-block-color: #1a1a2e;
-	--latex-block-bg: #e3f2fd;
-	--latex-block-border: #2196F3;
+	--latex-block-bg: #000814;
+	--latex-block-border: #3b82f6;
 	
 	--latex-inline-text: #e0e0e0;
 	--latex-inline-bg: transparent;
