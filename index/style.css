@@ -2188,3 +2188,63 @@ footer {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* ================================
+   AJUSTES MOBILE DO WORKSPACE
+   ================================ */
+
+@media (max-width: 600px) {
+
+    /* Header mais compacto */
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px 16px !important;
+        gap: 12px;
+    }
+
+    /* Título e logo centralizados */
+    .header-left {
+        justify-content: center;
+    }
+
+    .header-left h1 {
+        font-size: 20px;
+    }
+
+    /* Caixa de busca 100% */
+    .search-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        display: flex;
+        justify-content: center;
+    }
+
+    .search-box input {
+        width: 100% !important;
+    }
+
+    /* Botões ficam lado a lado */
+    .header-right {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        position: static !important;
+        transform: none !important;
+    }
+
+    /* Remove comportamento errado do CSS antigo */
+    .theme-toggle,
+    .profile-btn {
+        position: static !important;
+        transform: none !important;
+        margin: 0 !important;
+    }
+
+    /* Reduz tamanho dos ícones */
+    .theme-toggle ion-icon,
+    .profile-btn ion-icon {
+        font-size: 20px !important;
+    }
+}

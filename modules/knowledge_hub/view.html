@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowledge Hub - Visualizador</title>
     <link rel="stylesheet" href="./css/view.css">
-	
+
     <!-- ✅ MATHJAX 3 - CONFIGURAÇÃO IDÊNTICA AO EDITOR -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script type="text/javascript">
         window.MathJax = {
           tex: {
@@ -19,21 +17,27 @@
             ready: () => {
               MathJax.startup.defaultReady();
               MathJax.startup.promise.then(() => {
-                // Add wrapper to LaTeX blocks after rendering
-                setTimeout(wrapLatexBlocks, 500);
+                // Depois do typeset, garante os wrappers de LaTeX
+                setTimeout(() => {
+                  if (window.wrapLatexBlocks) {
+                    window.wrapLatexBlocks();
+                  }
+                }, 500);
               });
             }
           }
         };
     </script>
-    
+    <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <!-- Highlight.js para syntax highlighting -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    
+
     <!-- Marked.js -->
     <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
-    
 </head>
 <body>
     <div class="container">
@@ -53,8 +57,8 @@
             <div class="toolbar">
                 <div class="doc-title" id="docTitle">Carregando...</div>
                 <div class="toolbar-actions">
-                    <a href="edit.html" class="toolbar-btn">Editar</a>
-					<a href="assistant.html" class="toolbar-btn">🤖 Assistente</a>
+                    <a id="editLink" href="#" class="toolbar-btn">Editar</a>
+                    <a href="assistant.html" class="toolbar-btn">🤖 Assistente</a>
                     <button class="toolbar-btn" onclick="exportPDF()">Exportar PDF</button>
                     <button class="toolbar-btn" onclick="printDoc()">Imprimir</button>
                     <a href="index.html" class="toolbar-btn">Voltar</a>
@@ -71,7 +75,8 @@
             </div>
         </main>
     </div>
-	<script type="module" src="./js/hub-api.js"></script>
-    <script type="module" src="./js/view.js"></script>	
+
+    <!-- Só o view.js; ele importa o hub-api.js -->
+    <script type="module" src="./js/view.js"></script>
 </body>
 </html>

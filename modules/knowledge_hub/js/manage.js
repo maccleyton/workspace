@@ -1,138 +1,121 @@
 // ======================================================
 // =============== IMPORTAÇÃO DA API =====================
 // ======================================================
-import { 
-    listDocs, 
-    getDoc, 
-    updateDoc, 
-    createDoc 
-} from "./hub-api.js";
+import { getDoc, listDocs, linkDoc, unlinkDoc, createDoc } from "./hub-api.js";
 
 // ======================================================
-// ===================== ESTADO ==========================
+// ==================== ESTADO ==========================
 // ======================================================
-let currentId = null;
-let currentDoc = null;
+let parentId = null;
+let parentDoc = null;
 let allDocs = [];
-let children = [];
-let parentIdOriginal = null;
+let selectedChildId = null; // documento escolhido para vínculo
+let uploadedFile = null; // upload por arquivo
 
 // ======================================================
-// ===================== BOOTSTRAP ========================
+// ===================== INICIALIZAÇÃO ===================
 // ======================================================
-window.addEventListener("DOMContentLoaded", async () => {
-    currentId = getIdFromURL();
-    if (!currentId) {
-        showError("Nenhum documento informado.");
+window.addEventListener("DOMContentLoaded", initManage);
+
+async function initManage() {
+    parentId = getDocumentIdFromURL();
+    if (!parentId) {
+        alert("Nenhum ID encontrado na URL.");
         return;
     }
 
-    await loadCurrentDocument();
+    await loadParentDocument();
     await loadAllDocs();
+    renderParentData();
     renderChildren();
-    renderPossibleParents();
-    setupNavigation();
-});
-
-// ======================================================
-// ===================== UTIL =============================
-// ======================================================
-function getIdFromURL() {
-    const p = new URLSearchParams(window.location.search);
-    return p.get("id");
-}
-
-function showError(msg) {
-    const el = document.getElementById("docTitle");
-    if (el) el.innerHTML = `<div class="error">${msg}</div>`;
+    renderExistingDocs();
 }
 
 // ======================================================
-// =============== CARREGAR DOCUMENTO =====================
+// ===================== BUSCAR ID =======================
 // ======================================================
-async function loadCurrentDocument() {
+function getDocumentIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("id");
+}
+
+// ======================================================
+// =============== CARREGAR DOCUMENTO PAI ================
+// ======================================================
+async function loadParentDocument() {
     try {
-        currentDoc = await getDoc(currentId);
-        parentIdOriginal = currentDoc.parent_id;
-
-        document.getElementById("docTitle").textContent = currentDoc.title;
-        document.title = `${currentDoc.title} – Vincular Documentos`;
-
-        // Carregar filhos reais
-        children = allDocs.filter(d => d.parent_id === currentId);
-
+        parentDoc = await getDoc(parentId);
     } catch (err) {
         console.error(err);
-        showError("Erro ao buscar documento.");
+        alert("Erro ao carregar o documento.");
     }
 }
 
 // ======================================================
-// ================== CARREGAR TODOS ======================
+// =============== CARREGAR TODOS DOCUMENTOS =============
 // ======================================================
 async function loadAllDocs() {
     try {
         allDocs = await listDocs();
-        children = allDocs.filter(d => d.parent_id === currentId);
     } catch (err) {
         console.error(err);
-        alert("Erro ao carregar lista de documentos.");
+        alert("Erro ao carregar documentos.");
     }
 }
 
 // ======================================================
-// ================= RENDERIZAR FILHOS ====================
+// =============== RENDERIZAR DADOS DO PAI ===============
+// ======================================================
+function renderParentData() {
+    document.getElementById("docTitle").textContent = parentDoc.title;
+    document.getElementById("docMeta").textContent =
+        "Atualizado: " + new Date(parentDoc.updated_at).toLocaleString("pt-BR");
+}
+
+// ======================================================
+// ============ RENDERIZAR FILHOS DO DOCUMENTO ===========
 // ======================================================
 function renderChildren() {
-    const area = document.getElementById("childrenList");
-    area.innerHTML = "";
+    const list = document.getElementById("childrenList");
+    list.innerHTML = "";
 
-    if (!children.length) {
-        area.innerHTML = `<div class="empty">Nenhum documento vinculado ainda.</div>`;
+    const children = allDocs.filter(d => d.parent_id === parentId);
+
+    if (children.length === 0) {
+        list.innerHTML = `<p class="empty-text">Nenhum documento filho vinculado.</p>`;
         return;
     }
 
-    children.forEach(c => {
-        const div = document.createElement("div");
-        div.className = "child-item";
+    children.forEach(child => {
+        const item = document.createElement("div");
+        item.className = "child-item";
 
-        div.innerHTML = `
-            <div class="child-info">
-                <div class="child-title">📄 ${c.title}</div>
+        item.innerHTML = `
+            <div>
+                <strong>${child.title}</strong><br>
+                <small>${new Date(child.updated_at).toLocaleString("pt-BR")}</small>
             </div>
-            <button class="unlink-btn" data-id="${c.id}">Remover vínculo</button>
+            <button class="remove-child-btn">Remover</button>
         `;
 
-        area.appendChild(div);
-    });
+        item.querySelector(".remove-child-btn").onclick = () =>
+            handleUnlink(child.id);
 
-    document.querySelectorAll(".unlink-btn").forEach(btn => {
-        btn.addEventListener("click", async e => {
-            const childId = e.target.dataset.id;
-            await unlinkChild(childId);
-        });
+        list.appendChild(item);
     });
 }
 
 // ======================================================
-// ================ REMOVER VÍNCULO =======================
+// ============== REMOVER VÍNCULO PAI → FILHO ============
 // ======================================================
-async function unlinkChild(childId) {
+async function handleUnlink(id) {
+    if (!confirm("Remover este vínculo?")) return;
+
     try {
-        const child = allDocs.find(d => d.id === childId);
-        if (!child) return;
-
-        await updateDoc(childId, {
-            title: child.title,
-            content: child.content,
-            parentId: null
-        });
-
+        await unlinkDoc(id);
         await loadAllDocs();
-        children = allDocs.filter(d => d.parent_id === currentId);
         renderChildren();
-        renderPossibleParents();
-
+        renderExistingDocs();
     } catch (err) {
         console.error(err);
         alert("Erro ao remover vínculo.");
@@ -140,115 +123,150 @@ async function unlinkChild(childId) {
 }
 
 // ======================================================
-// ============== RENDERIZAR LISTA PARA VINCULAR =========
+// ============== RENDERIZAR LISTA DE DOCUMENTOS =========
 // ======================================================
-function renderPossibleParents() {
-    const list = document.getElementById("docsList");
-    list.innerHTML = "";
+function renderExistingDocs() {
+    const grid = document.getElementById("existingDocsGrid");
+    grid.innerHTML = "";
 
-    const possible = allDocs.filter(
-        d => d.id !== currentId && d.parent_id !== currentId
-    );
+    const docs = allDocs.filter(d => d.id !== parentId);
 
-    possible.forEach(doc => {
-        const div = document.createElement("div");
-        div.className = "doc-item";
+    docs.forEach(doc => {
+        const card = document.createElement("div");
+        card.className = "existing-doc-card";
+        card.dataset.id = doc.id;
 
-        div.innerHTML = `
-            <div class="doc-line">📄 ${doc.title}</div>
-            <button class="link-btn" data-id="${doc.id}">Vincular</button>
+        card.innerHTML = `
+            <div class="doc-title">${doc.title}</div>
+            <div class="doc-meta">${new Date(doc.updated_at).toLocaleString("pt-BR")}</div>
         `;
 
-        list.appendChild(div);
-    });
+        card.onclick = () => selectExistingDoc(doc.id);
 
-    document.querySelectorAll(".link-btn").forEach(btn => {
-        btn.addEventListener("click", async e => {
-            const childId = e.target.dataset.id;
-            await linkChild(childId);
-        });
+        grid.appendChild(card);
     });
 }
 
 // ======================================================
-// ===================== VINCULAR =========================
+// ============= SELECIONAR DOC EXISTENTE ===============
 // ======================================================
-async function linkChild(childId) {
-    try {
-        const child = allDocs.find(d => d.id === childId);
-        if (!child) return;
+function selectExistingDoc(id) {
+    selectedChildId = id;
 
-        await updateDoc(childId, {
-            title: child.title,
-            content: child.content,
-            parentId: currentId
-        });
+    document.querySelectorAll(".existing-doc-card")
+        .forEach(card => card.classList.remove("selected"));
 
-        await loadAllDocs();
-        children = allDocs.filter(d => d.parent_id === currentId);
-        renderChildren();
-        renderPossibleParents();
+    const card = document.querySelector(`.existing-doc-card[data-id="${id}"]`);
+    if (card) card.classList.add("selected");
+}
 
-    } catch (err) {
-        console.error(err);
-        alert("Erro ao vincular documento.");
+// ======================================================
+// ================== ABRIR / FECHAR MODAL ===============
+// ======================================================
+function openAddChildModal() {
+    selectedChildId = null;
+    uploadedFile = null;
+
+    document.getElementById("existingDocsGrid")
+        .querySelectorAll(".selected")
+        .forEach(el => el.classList.remove("selected"));
+
+    document.getElementById("fileInput").value = "";
+
+    document.getElementById("existingDocsTab").style.display = "block";
+    document.getElementById("uploadTab").style.display = "none";
+
+    document.getElementById("tabExisting").classList.add("active");
+    document.getElementById("tabUpload").classList.remove("active");
+
+    document.getElementById("addChildModal").style.display = "flex";
+}
+
+function closeAddChildModal() {
+    document.getElementById("addChildModal").style.display = "none";
+}
+
+// ======================================================
+// ============== TROCAR ENTRE TABS =====================
+// ======================================================
+function switchTab(tab) {
+    if (tab === "existing") {
+        document.getElementById("existingDocsTab").style.display = "block";
+        document.getElementById("uploadTab").style.display = "none";
+
+        document.getElementById("tabExisting").classList.add("active");
+        document.getElementById("tabUpload").classList.remove("active");
+    } else {
+        document.getElementById("existingDocsTab").style.display = "none";
+        document.getElementById("uploadTab").style.display = "block";
+
+        document.getElementById("tabExisting").classList.remove("active");
+        document.getElementById("tabUpload").classList.add("active");
     }
 }
 
 // ======================================================
-// =============== CRIAR DOCUMENTO FILHO =================
+// ================ UPLOAD DE NOVO DOC ===================
 // ======================================================
-document.getElementById("uploadInput")?.addEventListener("change", async e => {
-    const file = e.target.files[0];
-    if (!file) return;
+function handleFileUpload(event) {
+    uploadedFile = event.target.files[0] || null;
+}
 
-    if (!file.name.endsWith(".md")) {
-        alert("Selecione um arquivo .md");
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = async ev => {
-        const content = ev.target.result;
-        const title = extractH1(content);
-
+// ======================================================
+// ================= CONFIRMAR AÇÃO ======================
+// ======================================================
+async function confirmAddChild() {
+    // Opção 1 → documento existente selecionado
+    if (selectedChildId) {
         try {
-            await createDoc({
-                title,
-                content,
-                parentId: currentId
-            });
+            await linkDoc(selectedChildId, parentId);
+            await loadAllDocs();
+            renderChildren();
+            renderExistingDocs();
+            closeAddChildModal();
+            return;
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao vincular documento.");
+        }
+    }
+
+    // Opção 2 → upload de novo documento
+    if (uploadedFile) {
+        try {
+            const content = await uploadedFile.text();
+            const title = extractH1(content) || uploadedFile.name;
+
+            const newDoc = await createDoc({ title, content });
+            await linkDoc(newDoc.id, parentId);
 
             await loadAllDocs();
-            children = allDocs.filter(d => d.parent_id === currentId);
             renderChildren();
-            renderPossibleParents();
-
+            renderExistingDocs();
+            closeAddChildModal();
+            return;
         } catch (err) {
             console.error(err);
             alert("Erro ao criar documento.");
         }
-    };
+    }
 
-    reader.readAsText(file);
-});
+    alert("Selecione um documento ou envie um arquivo.");
+}
 
 // ======================================================
-// ====================== UTIL ============================
+// ======== UTIL: extrair título do markdown ============
 // ======================================================
 function extractH1(md) {
-    const m = md.match(/^#\s+(.+)$/m);
-    return m ? m[1] : "Novo Documento";
+    const match = md.match(/^#\s+(.+)/m);
+    return match ? match[1].trim() : null;
 }
 
 // ======================================================
-// ================= NAVEGAÇÃO (BACK) =====================
+// =========== EXPOSE FUNCTIONS FOR HTML =================
 // ======================================================
-function setupNavigation() {
-    const backBtn = document.getElementById("backBtn");
-    if (backBtn) {
-        backBtn.addEventListener("click", () => {
-            window.location.href = "index.html";
-        });
-    }
-}
+window.openAddChildModal = openAddChildModal;
+window.closeAddChildModal = closeAddChildModal;
+window.switchTab = switchTab;
+window.handleFileUpload = handleFileUpload;
+window.confirmAddChild = confirmAddChild;
