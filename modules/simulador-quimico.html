@@ -3,64 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Lab - Módulo Químico</title>
+    <title>Simulador Químico - Workspace</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <meta name="description" content="Simulador Químico - Tabela Periódica Interativa, Simulador de Reações e Visualização 3D Molecular">
+    <meta name="keywords" content="química, simulador, tabela periódica, reações, moléculas, 3D">
+    <meta name="author" content="MiniMax Agent">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <style>
-        /* === CSS VARIABLES (Design System Nuclear) === */
+        /* === WORKSPACE DESIGN SYSTEM === */
         :root {
-            /* Color System */
-            --color-primary-100: #E8F4F8;
-            --color-primary-500: #00BF93; /* Verde ciano workspace */
-            --color-primary-700: #00A085;
+            /* Primary Colors - Workspace Green */
+            --color-primary-500: #10b981;
+            --color-primary-400: #34d399;
+            --color-primary-700: #047857;
             
-            --color-nuclear-100: #FEF2F2;
-            --color-nuclear-500: #DC2626; /* Vermelho nuclear */
-            --color-nuclear-700: #B91C1C;
-            
-            --color-bg-page: #0A0A0A;
+            /* Background Colors */
+            --color-bg-page: #0a0a0a;
             --color-bg-surface: #141414;
-            --color-bg-surface-hover: rgba(22, 22, 22, 0.5);
+            --color-bg-surface-hover: #1a1a1a;
             
-            --color-border-default: #3f3f46;
-            --color-border-focus: #00BF93;
-            --color-border-light: #262626;
+            /* Text Colors */
+            --color-text-primary: #e0e0e0;
+            --color-text-secondary: #9ca3af;
+            --color-text-tertiary: #6b7280;
             
-            --color-text-primary: #E4E4E7;
-            --color-text-secondary: #A1A1AA;
-            --color-text-high-contrast: #FFFFFF;
+            /* Border Colors */
+            --color-border-default: #1a1a1a;
+            --color-border-interactive: #374151;
             
-            --color-success: #22C55E;
-            --color-warning: #FBBF24;
-            --color-error: #F43F5E;
+            /* Semantic Colors */
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
             
             /* Chemistry-specific colors */
-            --color-acid: #DC2626;     /* Ácido - Vermelho */
-            --color-base: #0284C7;     /* Base - Azul */
-            --color-salt: #16A34A;     /* Sal - Verde */
-            --color-organic: #8B5CF6;  /* Orgânico - Roxo */
+            --color-acid: #ef4444;
+            --color-base: #3b82f6;
+            --color-salt: #10b981;
+            --color-organic: #8b5cf6;
             
             /* Element categories */
-            --color-alkali-metal: #EF4444;
-            --color-alkaline-earth: #F97316;
-            --color-transition-metal: #3B82F6;
-            --color-basic-metal: #10B981;
-            --color-semimetal: #8B5CF6;
-            --color-nonmetal: #EC4899;
-            --color-halogen: #FBBF24;
-            --color-noble-gas: #06B6D4;
-            --color-lanthanide: #7C3AED;
-            --color-actinide: #F43F5E;
+            --color-alkali-metal: #ef4444;
+            --color-alkaline-earth: #f97316;
+            --color-transition-metal: #3b82f6;
+            --color-basic-metal: #10b981;
+            --color-semimetal: #8b5cf6;
+            --color-nonmetal: #ec4899;
+            --color-halogen: #f59e0b;
+            --color-noble-gas: #06b6d4;
+            --color-lanthanide: #7c3aed;
+            --color-actinide: #f43f5e;
 
             /* Typography */
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-size-h1: 48px;
+            --font-size-h1: 32px;
             --font-size-h2: 24px;
-            --font-size-h3: 16px;
+            --font-size-h3: 18px;
             --font-size-body: 16px;
             --font-size-body-sm: 14px;
             
@@ -76,11 +89,11 @@
             --space-lg: 24px;
             --space-xl: 32px;
             --space-xxl: 48px;
-            --space-xxxl: 64px;
             
             /* Layout */
-            --layout-max-width: 1440px;
-            --radius-sm: 8px;
+            --layout-max-width: 1400px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
             --border-width: 1px;
             
             /* Animations */
@@ -88,7 +101,7 @@
             --transition-normal: 200ms ease-out;
         }
 
-        /* === GLOBAL STYLES === */
+        /* === BASE STYLES === */
         * {
             margin: 0;
             padding: 0;
@@ -104,62 +117,156 @@
             min-height: 100vh;
         }
 
-        /* === HEADER === */
+        /* === HEADER - IDÊNTICO AO WORKSPACE === */
         .app-header {
-            background: linear-gradient(135deg, var(--color-bg-surface) 0%, #1a1a1a 100%);
-            border-bottom: var(--border-width) solid var(--color-border-light);
-            padding: var(--space-xl) var(--space-xxl);
+            background: var(--color-bg-surface);
+            border-bottom: var(--border-width) solid var(--color-border-default);
+            padding: 12px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
-        .header-content {
-            max-width: var(--layout-max-width);
-            margin: 0 auto;
+        .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .app-title {
-            font-size: 32px;
-            font-weight: var(--font-weight-bold);
-            color: var(--color-primary-500);
-            letter-spacing: -0.5%;
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .chemistry-icon {
-            font-size: 36px;
-            opacity: 0.8;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: var(--space-lg);
-            align-items: center;
-        }
-
-        .subtitle {
-            font-size: var(--font-size-body);
-            color: var(--color-text-secondary);
-            margin-top: var(--space-xs);
-        }
-
-        /* === MAIN LAYOUT === */
-        .app-main {
+            width: 100%;
             max-width: var(--layout-max-width);
             margin: 0 auto;
-            padding: var(--space-xxl);
         }
 
-        .app-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--space-xl);
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--color-primary-500);
+        }
+
+        .header-title { 
+            color: var(--color-primary-500); 
+            font-size: 20px; 
+            font-weight: var(--font-weight-semibold); 
+            margin: 0;
+        }
+
+        /* Search Container */
+        .header-center {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 40px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--color-text-tertiary);
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-default);
+            color: var(--color-text-primary);
+            padding: 10px 16px 10px 40px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-body-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Header Right - Botões com hover effects */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle,
+        .user-menu {
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-default);
+            color: var(--color-text-primary);
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-body-sm);
+            transition: all var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+            width: 36px;
+            height: 36px;
+        }
+
+        .theme-toggle:hover,
+        .theme-toggle:focus,
+        .user-menu:hover,
+        .user-menu:focus {
+            border-color: var(--color-primary-500);
+            background: var(--color-bg-page);
+            color: var(--color-primary-500);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+        }
+
+        .theme-icon,
+        .user-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* === MAIN CONTENT === */
+        .main-content {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            padding: 40px 24px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .content-container {
+            width: 100%;
+        }
+
+        /* === WELCOME SECTION === */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-title {
+            color: var(--color-primary-500);
+            font-size: 32px;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 16px;
+        }
+
+        .welcome-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         /* === TAB SYSTEM === */
@@ -169,7 +276,7 @@
             border-radius: var(--radius-sm) var(--radius-sm) 0 0;
             overflow: hidden;
             margin-bottom: 0;
-            border: var(--border-width) solid var(--color-border-light);
+            border: var(--border-width) solid var(--color-border-default);
             border-bottom: none;
         }
 
@@ -206,7 +313,7 @@
             min-height: 600px;
             width: 100%;
             overflow-x: hidden;
-            border: var(--border-width) solid var(--color-border-light);
+            border: var(--border-width) solid var(--color-border-default);
             border-top: none;
         }
 
@@ -220,7 +327,6 @@
             font-weight: var(--font-weight-semibold);
             color: var(--color-text-primary);
             margin-bottom: var(--space-lg);
-            letter-spacing: -1%;
         }
 
         .control-group {
@@ -230,7 +336,7 @@
             margin-bottom: var(--space-lg);
             width: 100%;
             overflow-x: hidden;
-            border: var(--border-width) solid var(--color-border-light);
+            border: var(--border-width) solid var(--color-border-default);
         }
 
         .control-group h3 {
@@ -253,7 +359,7 @@
             padding: var(--space-sm);
             background: var(--color-bg-surface);
             border-radius: var(--radius-sm);
-            border: var(--border-width) solid var(--color-border-light);
+            border: var(--border-width) solid var(--color-border-default);
         }
 
         .element {
@@ -275,7 +381,7 @@
         .element.selected {
             border-color: var(--color-primary-500);
             background: var(--color-primary-500);
-            color: var(--color-text-high-contrast);
+            color: white;
         }
 
         .element-symbol {
@@ -317,7 +423,7 @@
             background: var(--color-bg-page);
             border-radius: var(--radius-sm);
             padding: var(--space-lg);
-            border: var(--border-width) solid var(--color-border-light);
+            border: var(--border-width) solid var(--color-border-default);
         }
 
         .reagent-selector {
@@ -345,7 +451,7 @@
         }
 
         .reagent-input:hover {
-            border-color: var(--color-border-focus);
+            border-color: var(--color-primary-500);
         }
 
         .dropdown-content {
@@ -367,7 +473,7 @@
         .reagent-option {
             padding: var(--space-md);
             cursor: pointer;
-            border-bottom: var(--border-width) solid var(--color-border-light);
+            border-bottom: var(--border-width) solid var(--color-border-default);
             transition: background var(--transition-normal);
             font-size: var(--font-size-body-sm);
         }
@@ -404,7 +510,7 @@
             margin: var(--space-lg) 0;
         }
 
-        /* === BUTTONS === */
+        /* === BUTTONS - WORKSPACE STYLE === */
         .btn {
             padding: var(--space-md) var(--space-lg);
             border: none;
@@ -423,7 +529,7 @@
 
         .btn-primary {
             background: var(--color-primary-500);
-            color: var(--color-text-high-contrast);
+            color: white;
         }
 
         .btn-primary:hover {
@@ -433,22 +539,22 @@
 
         .btn-acid {
             background: var(--color-acid);
-            color: var(--color-text-high-contrast);
+            color: white;
         }
 
         .btn-base {
             background: var(--color-base);
-            color: var(--color-text-high-contrast);
+            color: white;
         }
 
         .btn-salt {
             background: var(--color-salt);
-            color: var(--color-text-high-contrast);
+            color: white;
         }
 
         .btn-organic {
             background: var(--color-organic);
-            color: var(--color-text-high-contrast);
+            color: white;
         }
 
         /* === 3D VIEWER === */
@@ -457,7 +563,7 @@
             height: 400px;
             background: var(--color-bg-page);
             border-radius: var(--radius-sm);
-            border: var(--border-width) solid var(--color-border-light);
+            border: var(--border-width) solid var(--color-border-default);
             position: relative;
             overflow: hidden;
         }
@@ -482,14 +588,14 @@
         }
 
         .viewer-btn:hover {
-            border-color: var(--color-border-focus);
+            border-color: var(--color-primary-500);
             transform: translateY(-2px);
         }
 
         .viewer-btn.active {
             background: var(--color-primary-500);
             border-color: var(--color-primary-700);
-            color: var(--color-text-high-contrast);
+            color: white;
         }
 
         /* === TOGGLE SWITCH === */
@@ -546,7 +652,7 @@
 
         input:checked + .toggle-slider:before {
             transform: translateX(26px);
-            background-color: var(--color-text-high-contrast);
+            background-color: white;
         }
 
         .toggle-label {
@@ -567,7 +673,7 @@
             padding: var(--space-lg);
             border-radius: var(--radius-sm);
             border-left: 4px solid var(--color-primary-500);
-            border: var(--border-width) solid var(--color-border-light);
+            border: var(--border-width) solid var(--color-border-default);
         }
 
         .info-card h4 {
@@ -581,14 +687,14 @@
             justify-content: space-between;
             margin: var(--space-sm) 0;
             padding-bottom: var(--space-sm);
-            border-bottom: var(--border-width) solid var(--color-border-light);
+            border-bottom: var(--border-width) solid var(--color-border-default);
             font-size: var(--font-size-body-sm);
         }
 
         /* === MOLECULE BUILDER === */
         .builder-container {
             display: grid;
-            grid-template-columns: 350px 1fr; /* Largura aumentada */
+            grid-template-columns: 350px 1fr;
             gap: var(--space-lg);
         }
 
@@ -598,8 +704,8 @@
             padding: var(--space-lg);
             max-height: 450px;
             overflow-y: auto;
-            border: var(--border-width) solid var(--color-border-light);
-            min-width: 350px; /* Largura mínima garantida */
+            border: var(--border-width) solid var(--color-border-default);
+            min-width: 350px;
         }
 
         .element-category {
@@ -626,7 +732,7 @@
             transition: all var(--transition-normal);
             font-size: var(--font-size-body-sm);
             font-weight: var(--font-weight-medium);
-            min-width: 50px; /* Largura mínima para elementos */
+            min-width: 50px;
             text-align: center;
         }
 
@@ -669,13 +775,13 @@
         }
 
         .bond-btn:hover {
-            border-color: var(--color-border-focus);
+            border-color: var(--color-primary-500);
         }
 
         .bond-btn.active {
             background: var(--color-primary-500);
             border-color: var(--color-primary-700);
-            color: var(--color-text-high-contrast);
+            color: white;
         }
 
         .molecule-stats {
@@ -683,7 +789,7 @@
             border-radius: var(--radius-sm);
             padding: var(--space-lg);
             margin-top: var(--space-lg);
-            border: var(--border-width) solid var(--color-border-light);
+            border: var(--border-width) solid var(--color-border-default);
         }
 
         .molecule-stats h4 {
@@ -720,22 +826,26 @@
             .builder-container {
                 grid-template-columns: 1fr;
             }
-            
-            .app-title {
-                font-size: var(--font-size-h2);
-            }
-            
-            .chemistry-icon {
-                font-size: 28px;
-            }
         }
 
         @media (max-width: 768px) {
-            .app-main {
-                padding: var(--space-lg);
+            .app-header {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 16px;
             }
             
-            .app-header {
+            .header-container {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .header-center {
+                margin: 0;
+                max-width: 100%;
+            }
+            
+            .main-content {
                 padding: var(--space-lg);
             }
             
@@ -748,41 +858,85 @@
                 grid-template-columns: 1fr;
             }
             
-            .header-content {
-                flex-direction: column;
-                gap: var(--space-lg);
-                text-align: center;
-            }
-            
             .bond-buttons {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .element-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-title {
+                font-size: 24px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-header">
-        <div class="header-content">
-            <div>
-                <h1 class="app-title">
-                    <span class="chemistry-icon">⚗️</span>
-                    MÓDULO QUÍMICO
-                </h1>
-                <p class="subtitle">Tabela Periódica Interativa, Simulador de Reações e Visualização 3D Molecular</p>
+    <!-- Header - Idêntico ao Workspace -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-left">
+                <i data-lucide="flask" class="header-icon"></i>
+                <h1 class="header-title">Simulador Químico</h1>
             </div>
-            <div class="header-actions">
-                <!-- Reserved for future actions -->
+            
+            <div class="header-center">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Buscar elementos, reações..."
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="Alternar tema">
+                    <i data-lucide="sun" class="theme-icon" id="themeIcon"></i>
+                </button>
+                <div class="user-menu">
+                    <i data-lucide="user" class="user-icon"></i>
+                </div>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div class="app-main">
-        <div class="app-grid">
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <h2 class="welcome-title">Laboratório Virtual de Química</h2>
+                <p class="welcome-subtitle">
+                    Explore a tabela periódica, simule reações químicas e visualize moléculas em 3D. 
+                    Ferramentas interativas para aprendizado e experimentação.
+                </p>
+            </section>
+
+            <!-- Tab System -->
             <div class="tabs">
-                <div class="tab active" data-tab="periodic-table">📊 Tabela Periódica</div>
-                <div class="tab" data-tab="reactions">🧪 Simulador de Reações</div>
-                <div class="tab" data-tab="3d-viewer">🔬 Visualizador 3D</div>
-                <div class="tab" data-tab="molecule-builder">⚛️ Construtor Molecular</div>
+                <div class="tab active" data-tab="periodic-table">
+                    <i data-lucide="grid-3x3" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    Tabela Periódica
+                </div>
+                <div class="tab" data-tab="reactions">
+                    <i data-lucide="flask-conical" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    Simulador de Reações
+                </div>
+                <div class="tab" data-tab="3d-viewer">
+                    <i data-lucide="atom" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    Visualizador 3D
+                </div>
+                <div class="tab" data-tab="molecule-builder">
+                    <i data-lucide="wrench" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    Construtor Molecular
+                </div>
             </div>
 
             <!-- ABA: Tabela Periódica -->
@@ -1063,10 +1217,27 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
-        // Dados da Tabela Periódica (exemplo reduzido - você irá adicionar os 118 elementos)
+        // Inicializar ícones Lucide
+        lucide.createIcons();
+
+        // Sistema de temas (simplificado)
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('light-theme');
+            const icon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('light-theme')) {
+                icon.setAttribute('data-lucide', 'moon');
+            } else {
+                icon.setAttribute('data-lucide', 'sun');
+            }
+            lucide.createIcons();
+        });
+
+        // ========== CÓDIGO JAVASCRIPT COMPLETO DO SIMULADOR QUÍMICO ==========
+
+        // Dados da Tabela Periódica (exemplo reduzido)
 		const periodicTable = [
 			// Período 1
 			{ number: 1, symbol: "H", name: "Hidrogênio", mass: "1.008", category: "nonmetal", state: "Gasoso", density: "0.0000899", melting: "-259.16", boiling: "-252.87", electronegativity: "2.20", configuration: "1s¹", radius: "53", discovered: "1766" },
@@ -1201,7 +1372,7 @@
 			{ number: 118, symbol: "Og", name: "Oganessônio", mass: "[294]", category: "noble-gas", state: "Gasoso", density: "4.9", melting: "~52", boiling: "~177", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", radius: "~157", discovered: "2006" }
 		];
 
-        // Dados dos Reagentes EXPANDIDOS com informações de reação
+        // Dados dos Reagentes
         const reagents = {
             acidos: [
                 { 
@@ -1282,32 +1453,11 @@
                     type: "metal",
                     elements: { 'Al': 1 }
                 }
-            ],
-            organicos: [
-                { 
-                    name: "Metano", 
-                    formula: "CH₄", 
-                    type: "organic",
-                    elements: { 'C': 1, 'H': 4 }
-                },
-                { 
-                    name: "Etanol", 
-                    formula: "C₂H₅OH", 
-                    type: "organic",
-                    elements: { 'C': 2, 'H': 6, 'O': 1 }
-                },
-                { 
-                    name: "Benzeno", 
-                    formula: "C₆H₆", 
-                    type: "organic",
-                    elements: { 'C': 6, 'H': 6 }
-                }
             ]
         };
 
         // Banco de dados de reações conhecidas
         const knownReactions = {
-            // Reações Ácido-Base
             'HCl+NaOH': {
                 reactants: ['HCl', 'NaOH'],
                 products: ['NaCl', 'H₂O'],
@@ -1322,15 +1472,6 @@
                 type: 'neutralization',
                 description: 'Neutralização com ácido diprótico'
             },
-            'HNO₃+KOH': {
-                reactants: ['HNO₃', 'KOH'],
-                products: ['KNO₃', 'H₂O'],
-                coefficients: [1, 1, 1, 1],
-                type: 'neutralization',
-                description: 'Neutralização simples'
-            },
-            
-            // Reações com Metais
             'Zn+HCl': {
                 reactants: ['Zn', 'HCl'],
                 products: ['ZnCl₂', 'H₂'],
@@ -1338,48 +1479,16 @@
                 type: 'metal-acid',
                 description: 'Metal + Ácido → Sal + Hidrogênio'
             },
-            'Fe+H₂SO₄': {
-                reactants: ['Fe', 'H₂SO₄'],
-                products: ['FeSO₄', 'H₂'],
-                coefficients: [1, 1, 1, 1],
-                type: 'metal-acid',
-                description: 'Ferro com ácido sulfúrico'
-            },
-            'Al+HCl': {
-                reactants: ['Al', 'HCl'],
-                products: ['AlCl₃', 'H₂'],
-                coefficients: [2, 6, 2, 3],
-                type: 'metal-acid',
-                description: 'Alumínio com ácido clorídrico'
-            },
-            
-            // Reações com Carbonatos
             'CaCO₃+HCl': {
                 reactants: ['CaCO₃', 'HCl'],
                 products: ['CaCl₂', 'H₂O', 'CO₂'],
                 coefficients: [1, 2, 1, 1, 1],
                 type: 'carbonate-acid',
                 description: 'Carbonato + Ácido → Sal + Água + CO₂'
-            },
-            
-            // Reações de Combustão
-            'CH₄+O₂': {
-                reactants: ['CH₄', 'O₂'],
-                products: ['CO₂', 'H₂O'],
-                coefficients: [1, 2, 1, 2],
-                type: 'combustion',
-                description: 'Combustão completa do metano'
-            },
-            'C₂H₅OH+O₂': {
-                reactants: ['C₂H₅OH', 'O₂'],
-                products: ['CO₂', 'H₂O'],
-                coefficients: [1, 3, 2, 3],
-                type: 'combustion',
-                description: 'Combustão do etanol'
             }
         };
 
-        // Dados das Moléculas COMPLETOS
+        // Dados das Moléculas COMPLETO
         const molecules = {
             'h2o': {
                 name: 'Água',
@@ -1629,15 +1738,6 @@
                     setBondType(bondType);
                 });
             });
-
-            // Botões de tipo de reação
-            document.querySelectorAll('.btn[onclick*="loadReactionExample"]').forEach(btn => {
-                const originalOnClick = btn.getAttribute('onclick');
-                const match = originalOnClick.match(/loadReactionExample\('([^']+)'\)/);
-                if (match) {
-                    btn.onclick = () => loadReactionExample(match[1]);
-                }
-            });
         }
 
         // Sistema de Abas
@@ -1755,50 +1855,6 @@
             }
         }
 
-        // Funções para balanceamento de equações
-        function parseFormula(formula) {
-            const elements = {};
-            let currentElement = '';
-            let currentCount = '';
-            
-            for (let i = 0; i < formula.length; i++) {
-                const char = formula[i];
-                
-                if (char === char.toUpperCase() && char.match(/[A-Z]/)) {
-                    // Novo elemento
-                    if (currentElement) {
-                        elements[currentElement] = (elements[currentElement] || 0) + 
-                                                  (parseInt(currentCount) || 1);
-                    }
-                    currentElement = char;
-                    currentCount = '';
-                } else if (char === char.toLowerCase() && char.match(/[a-z]/)) {
-                    // Continuação do elemento (minúscula)
-                    currentElement += char;
-                } else if (char.match(/\d/)) {
-                    // Número
-                    currentCount += char;
-                } else if (char === '₀') currentCount += '0';
-                else if (char === '₁') currentCount += '1';
-                else if (char === '₂') currentCount += '2';
-                else if (char === '₃') currentCount += '3';
-                else if (char === '₄') currentCount += '4';
-                else if (char === '₅') currentCount += '5';
-                else if (char === '₆') currentCount += '6';
-                else if (char === '₇') currentCount += '7';
-                else if (char === '₈') currentCount += '8';
-                else if (char === '₉') currentCount += '9';
-            }
-            
-            // Adicionar o último elemento
-            if (currentElement) {
-                elements[currentElement] = (elements[currentElement] || 0) + 
-                                          (parseInt(currentCount) || 1);
-            }
-            
-            return elements;
-        }
-
         function balanceEquation() {
             if (!selectedReagents.reactant1 || !selectedReagents.reactant2) {
                 alert('Selecione ambos os reagentes primeiro!');
@@ -1852,48 +1908,37 @@
             // Mostrar informações adicionais
             document.getElementById('reactionResult').innerHTML = `
                 <div style="text-align: left;">
-                    <strong style="color: var(--color-primary-500);">✓ Equação Balanceada</strong><br>
+                    <strong style="color: var(--color-success);">✓ Equação Balanceada</strong><br>
                     <strong>Tipo:</strong> ${reaction.type}<br>
                     <strong>Descrição:</strong> ${reaction.description}<br>
                     <strong>Estado:</strong> Reação viável ✅
                 </div>
             `;
             document.getElementById('reactionResult').style.display = 'block';
-            
-            // Atualizar informações da reação
-            updateReactionInfo(reaction.type);
         }
 
         function attemptAutoBalance(r1, r2) {
             // Análise básica dos elementos
-            const elements1 = parseFormula(r1.formula);
-            const elements2 = parseFormula(r2.formula);
-            
-            // Determinar tipo de reação baseado nos reagentes
             let reactionType = 'unknown';
             let products = [];
             let description = 'Reação genérica';
             
             if (r1.type === 'acid' && r2.type === 'base') {
                 reactionType = 'neutralization';
-                products = determineNeutralizationProducts(r1, r2);
+                products = ['Sal', 'H₂O'];
                 description = 'Neutralização ácido-base';
             } else if (r2.type === 'acid' && r1.type === 'base') {
                 reactionType = 'neutralization';
-                products = determineNeutralizationProducts(r2, r1);
+                products = ['Sal', 'H₂O'];
                 description = 'Neutralização ácido-base';
             } else if (r1.type === 'metal' && r2.type === 'acid') {
                 reactionType = 'metal-acid';
-                products = determineMetalAcidProducts(r1, r2);
+                products = ['Sal', 'H₂'];
                 description = 'Metal + Ácido';
             } else if (r2.type === 'metal' && r1.type === 'acid') {
                 reactionType = 'metal-acid';
-                products = determineMetalAcidProducts(r2, r1);
+                products = ['Sal', 'H₂'];
                 description = 'Metal + Ácido';
-            } else if ((r1.type === 'salt' && r2.type === 'acid') || 
-                      (r2.type === 'salt' && r1.type === 'acid')) {
-                reactionType = 'salt-acid';
-                description = 'Sal + Ácido';
             }
             
             if (products.length > 0) {
@@ -1921,71 +1966,6 @@
             }
             
             document.getElementById('reactionResult').style.display = 'block';
-            updateReactionInfo(reactionType);
-        }
-
-        function determineNeutralizationProducts(acid, base) {
-            // Lógica simplificada para determinar produtos de neutralização
-            const acidElements = parseFormula(acid.formula);
-            const baseElements = parseFormula(base.formula);
-            
-            // Extrair cátions e ânions
-            let cation = Object.keys(baseElements).find(el => ['Na', 'K', 'Ca'].includes(el));
-            let anion = Object.keys(acidElements).find(el => ['Cl', 'SO₄', 'NO₃'].includes(el));
-            
-            if (!cation) cation = 'Metal';
-            if (!anion) anion = 'Ânion';
-            
-            const salt = cation + anion;
-            return [salt, 'H₂O'];
-        }
-
-        function determineMetalAcidProducts(metal, acid) {
-            const metalSymbol = metal.formula;
-            const acidElements = parseFormula(acid.formula);
-            
-            let anion = Object.keys(acidElements).find(el => ['Cl', 'SO₄', 'NO₃'].includes(el));
-            if (!anion) anion = 'X';
-            
-            const salt = metalSymbol + (anion === 'Cl' ? 'Cl₂' : anion === 'SO₄' ? 'SO₄' : 'X₂');
-            return [salt, 'H₂'];
-        }
-
-        function updateReactionInfo(type) {
-            const infoMap = {
-                'neutralization': `
-                    <strong>Neutralização Ácido-Base</strong><br>
-                    Caracterizada pela reação entre um ácido e uma base, produzindo sal e água.<br>
-                    <strong>Exemplo:</strong> HCl + NaOH → NaCl + H₂O<br>
-                    <strong>Importância:</strong> Reações fundamentais em química analítica
-                `,
-                'metal-acid': `
-                    <strong>Metal + Ácido</strong><br>
-                    Metais reagem com ácidos produzindo sal e gás hidrogênio.<br>
-                    <strong>Exemplo:</strong> Zn + 2HCl → ZnCl₂ + H₂<br>
-                    <strong>Observação:</strong> A reatividade depende da série de reatividade dos metais
-                `,
-                'combustion': `
-                    <strong>Combustão</strong><br>
-                    Reação com oxigênio produzindo dióxido de carbono e água.<br>
-                    <strong>Exemplo:</strong> CH₄ + 2O₂ → CO₂ + 2H₂O<br>
-                    <strong>Característica:</strong> Reação exotérmica que libera energia
-                `,
-                'carbonate-acid': `
-                    <strong>Carbonato + Ácido</strong><br>
-                    Produz sal, água e dióxido de carbono.<br>
-                    <strong>Exemplo:</strong> CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂<br>
-                    <strong>Aplicação:</strong> Identificação de carbonatos
-                `,
-                'unknown': `
-                    <strong>Reação Não Identificada</strong><br>
-                    Esta combinação de reagentes não corresponde a um padrão conhecido.<br>
-                    <strong>Sugestão:</strong> Tente combinações como Ácido+Base ou Metal+Ácido
-                `
-            };
-            
-            document.getElementById('reactionDetails').innerHTML = 
-                infoMap[type] || infoMap['unknown'];
         }
 
         function simulateReaction() {
@@ -2037,7 +2017,6 @@
             }
         }
 
-        // Funções auxiliares para os exemplos
         function loadExample(example) {
             const examples = {
                 'neutralization': {
@@ -2051,10 +2030,6 @@
                 'metal': {
                     r1: reagents.metais[0], // Zn
                     r2: reagents.acidos[0]  // HCl
-                },
-                'combustion': {
-                    r1: reagents.organicos[0], // CH₄
-                    r2: { name: "Oxigênio", formula: "O₂", type: "gas" }
                 }
             };
 
@@ -2081,7 +2056,7 @@
             }
         }
 
-        // Visualizador 3D
+        // Visualizador 3D - COM ELÉTRONS INTERATIVOS
         function initialize3DViewer() {
             const container = document.getElementById('moleculeViewer');
             if (!container) return;
@@ -2100,6 +2075,7 @@
             
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
             
             const ambientLight = new THREE.AmbientLight(0x404040);
             scene.add(ambientLight);
@@ -2108,14 +2084,17 @@
             directionalLight.position.set(5, 5, 5);
             scene.add(directionalLight);
             
+            // Cancelar animação anterior se existir
             if (animationId) {
                 cancelAnimationFrame(animationId);
             }
             
+            // Função de animação COM ELÉTRONS
             function animate() {
                 animationId = requestAnimationFrame(animate);
                 
                 if (isInteractiveMode) {
+                    // Animar grupos de átomos com elétrons
                     scene.children.forEach(child => {
                         if (child.userData.isAtomGroup) {
                             animateAtomGroup(child);
@@ -2128,6 +2107,7 @@
             }
             animate();
             
+            // Redimensionamento responsivo
             window.addEventListener('resize', () => {
                 if (container.clientWidth > 0) {
                     camera.aspect = container.clientWidth / container.clientHeight;
@@ -2136,17 +2116,11 @@
                 }
             });
             
+            // Carregar molécula inicial
             loadMolecule('h2o');
         }
 
-        function createAtom(atom, position, isInteractive) {
-            if (isInteractive) {
-                return createInteractiveAtom(atom, position);
-            } else {
-                return createStaticAtom(atom, position);
-            }
-        }
-
+        // Função para criar átomo INTERATIVO com elétrons
         function createInteractiveAtom(atom, position) {
             const group = new THREE.Group();
             group.userData.isAtomGroup = true;
@@ -2157,11 +2131,12 @@
             };
             group.userData.electronSpeeds = [];
             
-            // Núcleo
+            // NÚCLEO
             const nucleusGeometry = new THREE.SphereGeometry(0.4, 16, 16);
             const nucleusMaterial = new THREE.MeshPhongMaterial({ 
                 color: getAtomColor(atom.element),
-                emissive: getAtomEmissive(atom.element)
+                emissive: getAtomEmissive(atom.element),
+                shininess: 100
             });
             const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
             nucleus.userData.rotationSpeed = {
@@ -2171,12 +2146,12 @@
             };
             group.add(nucleus);
             
-            // Elétrons nas órbitas
+            // ELÉTRONS NAS ÓRBITAS
             const orbits = getElectronConfiguration(atom.element);
             orbits.forEach((electronCount, orbitIndex) => {
                 const orbitRadius = 0.8 + orbitIndex * 0.6;
                 
-                // Órbita visual
+                // Órbita visual (transparente)
                 const orbitGeometry = new THREE.RingGeometry(orbitRadius - 0.02, orbitRadius + 0.02, 32);
                 const orbitMaterial = new THREE.MeshBasicMaterial({ 
                     color: 0x444444,
@@ -2188,13 +2163,14 @@
                 orbit.rotation.x = Math.PI / 2;
                 group.add(orbit);
                 
-                // Elétrons
+                // Elétrons individuais
                 for (let i = 0; i < electronCount; i++) {
                     const angle = (i / electronCount) * Math.PI * 2;
-                    const electronGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                    const electronGeometry = new THREE.SphereGeometry(0.08, 8, 8);
                     const electronMaterial = new THREE.MeshPhongMaterial({ 
                         color: 0xffff00,
-                        emissive: 0x444400
+                        emissive: 0x444400,
+                        shininess: 100
                     });
                     const electron = new THREE.Mesh(electronGeometry, electronMaterial);
                     
@@ -2205,6 +2181,7 @@
                     
                     group.userData.electronSpeeds.push(electron.userData.speed);
                     
+                    // Posicionar elétron na órbita
                     electron.position.x = Math.cos(angle) * orbitRadius;
                     electron.position.z = Math.sin(angle) * orbitRadius;
                     
@@ -2216,20 +2193,49 @@
             return group;
         }
 
+        // Função para criar átomo ESTÁTICO (sem elétrons)
         function createStaticAtom(atom, position) {
-            const group = new THREE.Group();
-            
-            // Apenas o núcleo (esfera simples)
-            const nucleusGeometry = new THREE.SphereGeometry(0.5, 16, 16);
-            const nucleusMaterial = new THREE.MeshPhongMaterial({ 
+            const geometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const material = new THREE.MeshPhongMaterial({ 
                 color: getAtomColor(atom.element),
-                emissive: getAtomEmissive(atom.element)
+                shininess: 100
             });
-            const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
-            group.add(nucleus);
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.copy(position);
+            sphere.userData.isAtom = true;
+            return sphere;
+        }
+
+        // Função para animar grupos de átomos com elétrons
+        function animateAtomGroup(atomGroup) {
+            // Rotação do grupo inteiro
+            atomGroup.rotation.x += atomGroup.userData.rotationSpeed.x;
+            atomGroup.rotation.y += atomGroup.userData.rotationSpeed.y;
+            atomGroup.rotation.z += atomGroup.userData.rotationSpeed.z;
             
-            group.position.copy(position);
-            return group;
+            // Rotação do núcleo
+            const nucleus = atomGroup.children[0];
+            if (nucleus.userData.rotationSpeed) {
+                nucleus.rotation.x += nucleus.userData.rotationSpeed.x;
+                nucleus.rotation.y += nucleus.userData.rotationSpeed.y;
+                nucleus.rotation.z += nucleus.userData.rotationSpeed.z;
+            }
+            
+            // Animar elétrons (começando do índice 1 porque o índice 0 é o núcleo)
+            for (let i = 1; i < atomGroup.children.length; i++) {
+                const child = atomGroup.children[i];
+                if (child.userData.orbitRadius !== undefined) {
+                    // Elétron - atualizar posição orbital
+                    child.userData.angle += child.userData.speed;
+                    child.position.x = Math.cos(child.userData.angle) * child.userData.orbitRadius;
+                    child.position.z = Math.sin(child.userData.angle) * child.userData.orbitRadius;
+                    
+                    // Adicionar pequena oscilação vertical para órbitas externas
+                    if (child.userData.orbitIndex > 0) {
+                        child.position.y = Math.sin(Date.now() * 0.001 + child.userData.orbitIndex) * 0.1;
+                    }
+                }
+            }
         }
 
         function getAtomColor(element) {
@@ -2250,32 +2256,6 @@
             return emissive[element] || 0x222222;
         }
 
-        function animateAtomGroup(atomGroup) {
-            atomGroup.rotation.x += atomGroup.userData.rotationSpeed.x;
-            atomGroup.rotation.y += atomGroup.userData.rotationSpeed.y;
-            atomGroup.rotation.z += atomGroup.userData.rotationSpeed.z;
-            
-            const nucleus = atomGroup.children[0];
-            if (nucleus.userData.rotationSpeed) {
-                nucleus.rotation.x += nucleus.userData.rotationSpeed.x;
-                nucleus.rotation.y += nucleus.userData.rotationSpeed.y;
-                nucleus.rotation.z += nucleus.userData.rotationSpeed.z;
-            }
-            
-            for (let i = 1; i < atomGroup.children.length; i++) {
-                const child = atomGroup.children[i];
-                if (child.userData.orbitRadius !== undefined) {
-                    child.userData.angle += child.userData.speed;
-                    child.position.x = Math.cos(child.userData.angle) * child.userData.orbitRadius;
-                    child.position.z = Math.sin(child.userData.angle) * child.userData.orbitRadius;
-                    
-                    if (child.userData.orbitIndex > 0) {
-                        child.position.y = Math.sin(Date.now() * 0.001 + child.userData.orbitIndex) * 0.1;
-                    }
-                }
-            }
-        }
-
         function getElectronConfiguration(element) {
             const configurations = {
                 'H': [1], 'C': [2, 4], 'O': [2, 6], 'N': [2, 5],
@@ -2290,28 +2270,42 @@
             if (!scene) return;
             
             const molecule = molecules[moleculeKey];
-            if (!molecule) return;
+            if (!molecule) {
+                console.error('Molécula não encontrada:', moleculeKey);
+                return;
+            }
             
             currentMolecule = moleculeKey;
             
+            // Atualizar botões ativos
             document.querySelectorAll('.viewer-btn').forEach(btn => btn.classList.remove('active'));
             const activeButton = document.querySelector(`.viewer-btn[data-molecule="${moleculeKey}"]`);
             if (activeButton) {
                 activeButton.classList.add('active');
             }
             
+            // Limpar cena
             scene.children.slice().forEach(child => {
                 if (child.type !== 'AmbientLight' && child.type !== 'DirectionalLight') {
                     scene.remove(child);
                 }
             });
             
+            // Adicionar átomos (interativos ou estáticos)
             molecule.atoms.forEach((atom, index) => {
                 const position = new THREE.Vector3(atom.x * 3, atom.y * 3, atom.z * 3);
-                const atomGroup = createAtom(atom, position, isInteractiveMode);
-                scene.add(atomGroup);
+                let atomMesh;
+                
+                if (isInteractiveMode) {
+                    atomMesh = createInteractiveAtom(atom, position);
+                } else {
+                    atomMesh = createStaticAtom(atom, position);
+                }
+                
+                scene.add(atomMesh);
             });
             
+            // Adicionar ligações
             molecule.bonds.forEach(bond => {
                 const atom1 = molecule.atoms[bond.from];
                 const atom2 = molecule.atoms[bond.to];
@@ -2339,6 +2333,7 @@
                 scene.add(bondCylinder);
             });
             
+            // Atualizar informações da molécula
             document.getElementById('moleculeName').textContent = molecule.name;
             document.getElementById('moleculeFormula').textContent = molecule.formula;
             document.getElementById('moleculeMass').textContent = molecule.mass;
@@ -2408,12 +2403,12 @@
             );
             
             const atomData = { element: element };
-            const atomGroup = createStaticAtom(atomData, position);
-            builderScene.add(atomGroup);
+            const atomMesh = createStaticAtom(atomData, position);
+            builderScene.add(atomMesh);
             
             builderAtoms.push({
                 data: atomData,
-                group: atomGroup
+                mesh: atomMesh
             });
             
             updateBuilderStats();
@@ -2461,7 +2456,7 @@
             if (!builderScene) return;
             
             builderAtoms.forEach(atom => {
-                builderScene.remove(atom.group);
+                builderScene.remove(atom.mesh);
             });
             builderBonds.forEach(bond => {
                 builderScene.remove(bond);
@@ -2497,6 +2492,7 @@
                 });
             }
         });
+
     </script>
 </body>
 </html>

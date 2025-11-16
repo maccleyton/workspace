@@ -1280,3 +1280,911 @@ footer {
 		padding: 20px;
 	}
 }
+
+/* ========================================
+   WORKSPACE HUB - CORES CONSISTENTES LIGHT MODE
+   Ajuste completo das cores no modo claro
+   ======================================== */
+
+/* Module Cards - Já funcionando, mantendo para referência */
+[data-theme="light"] .module-card {
+  background: transparent;
+  border: 1px solid #E2E8F0;
+}
+
+[data-theme="light"] .module-card:hover {
+  background: #F8FAFC;
+  border-color: #019875;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .card-title {
+  color: #1E293B !important;
+}
+
+[data-theme="light"] .card-desc {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .card-link {
+  color: #019875;
+}
+
+[data-theme="light"] .status-ready {
+  background: rgba(1, 152, 117, 0.15);
+  color: #047857;
+  border: 1px solid rgba(1, 152, 117, 0.3);
+}
+
+[data-theme="light"] .status-dev {
+  background: rgba(220, 38, 38, 0.15);
+  color: #B91C1C;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+[data-theme="light"] .status-planning {
+  background: rgba(234, 88, 12, 0.15);
+  color: #C2410C;
+  border: 1px solid rgba(234, 88, 12, 0.3);
+}
+
+/* ========================================
+   CORREÇÕES GERAIS PARA TODOS OS TEXTOS NO LIGHT MODE
+   ======================================== */
+
+/* Textos primários - Cinza muito escuro (quase preto) */
+[data-theme="light"] .welcome-title,
+[data-theme="light"] .section-title,
+[data-theme="light"] .modal-title,
+[data-theme="light"] .app-card-title,
+[data-theme="light"] .stat-value,
+[data-theme="light"] .toast-title,
+[data-theme="light"] .app-info-value {
+  color: #1E293B !important;
+}
+
+/* Textos secundários - Cinza escuro */
+[data-theme="light"] .welcome-subtitle,
+[data-theme="light"] .stat-label,
+[data-theme="light"] .app-card-description,
+[data-theme="light"] .app-card-version,
+[data-theme="light"] .app-card-date,
+[data-theme="light"] .app-info-label,
+[data-theme="light"] .app-preview-text,
+[data-theme="light"] .toast-message,
+[data-theme="light"] .future-title {
+  color: #475569 !important;
+}
+
+/* Textos terciários - Cinza médio */
+[data-theme="light"] .search-input::placeholder,
+[data-theme="light"] .btn-filter:not(.active) {
+  color: #64748B !important;
+}
+
+/* ========================================
+   BOTÕES E ELEMENTOS INTERATIVOS NO LIGHT MODE
+   ======================================== */
+
+/* Botão filtro ativo - Fundo verde escuro */
+[data-theme="light"] .btn-filter.active {
+  background-color: #047857 !important; /* Verde mais escuro */
+  border-color: #047857 !important;
+  color: white !important;
+}
+
+/* Botões primários - Verde escuro para melhor contraste */
+[data-theme="light"] .btn-primary {
+  background-color: #047857 !important;
+  border-color: #047857 !important;
+  color: white !important;
+}
+
+[data-theme="light"] .btn-primary:hover:not(:disabled) {
+  background-color: #065F46 !important;
+  border-color: #065F46 !important;
+}
+
+/* Botões secundários */
+[data-theme="light"] .btn-secondary {
+  background-color: transparent;
+  color: #1E293B !important;
+  border: 1px solid #CBD5E1;
+}
+
+[data-theme="light"] .btn-secondary:hover:not(:disabled) {
+  background-color: #F1F5F9;
+  border-color: #94A3B8;
+  color: #1E293B !important;
+}
+
+/* Botões ghost */
+[data-theme="light"] .btn-ghost {
+  background-color: transparent;
+  color: #475569 !important;
+  border: none;
+}
+
+[data-theme="light"] .btn-ghost:hover:not(:disabled) {
+  background-color: #F1F5F9;
+  color: #1E293B !important;
+}
+
+/* ========================================
+   CARDS E SUPERFÍCIES NO LIGHT MODE
+   ======================================== */
+
+/* App Cards */
+[data-theme="light"] .app-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .app-card:hover {
+  background-color: #F8FAFC;
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Stats Container */
+[data-theme="light"] .stats-container {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+}
+
+[data-theme="light"] .stat-divider {
+  background-color: #E2E8F0;
+}
+
+/* Modal */
+[data-theme="light"] .modal {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .modal-header,
+[data-theme="light"] .modal-footer {
+  border-color: #E2E8F0;
+}
+
+[data-theme="light"] .modal-footer {
+  background-color: #F8FAFC;
+}
+
+/* App Info */
+[data-theme="light"] .app-info-item {
+  border-bottom-color: #E2E8F0;
+}
+
+/* App Preview */
+[data-theme="light"] .app-preview {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+}
+
+/* Toast */
+[data-theme="light"] .toast {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   HEADER E NAVEGAÇÃO NO LIGHT MODE
+   ======================================== */
+
+/* Header */
+[data-theme="light"] .app-header {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+[data-theme="light"] .header-title {
+  background: linear-gradient(to right, #047857, #059669);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+[data-theme="light"] .search-input {
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #1E293B;
+}
+
+[data-theme="light"] .search-input:focus {
+  border-color: #047857;
+  box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1);
+}
+
+[data-theme="light"] .search-input::placeholder {
+  color: #64748B;
+}
+
+[data-theme="light"] .theme-toggle:hover,
+[data-theme="light"] .user-menu:hover {
+  background-color: #F1F5F9;
+}
+
+/* ========================================
+   ESTADOS E STATUS NO LIGHT MODE
+   ======================================== */
+
+/* Status Tags */
+[data-theme="light"] .status-tag.active {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #16A34A !important;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+[data-theme="light"] .status-tag.completed {
+  background-color: rgba(100, 116, 139, 0.1);
+  color: #475569 !important;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+[data-theme="light"] .status-tag.future {
+  background-color: rgba(14, 165, 233, 0.1);
+  color: #0369A1 !important;
+  border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+/* ========================================
+   EFEITOS E ANIMAÇÕES NO LIGHT MODE
+   ======================================== */
+
+/* Focus states */
+[data-theme="light"] .search-input:focus,
+[data-theme="light"] .modal-input:focus,
+[data-theme="light"] .modal-textarea:focus {
+  border-color: #047857;
+  box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1);
+}
+
+/* Hover effects */
+[data-theme="light"] .app-card:hover .app-card-title,
+[data-theme="light"] .app-card:hover .app-card-description {
+  color: #1E293B !important;
+}
+
+/* Footer */
+[data-theme="light"] footer {
+  color: #64748B;
+  border-top: 1px solid #E2E8F0;
+}
+
+/* ============ CSS - COLE NO SEU STYLE.CSS ============ */
+
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.module-card {
+    background: transparent;
+    border-radius: 8px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #545454;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+.module-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #019875;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.module-card:hover::before {
+    transform: scaleX(1);
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    background: #1a1a1a;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border-color: #019875;
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #019875;
+}
+
+.card-title {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.card-desc {
+    color: #cfcfcf;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+/* IMPORTANTE: Container do footer */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid rgba(84, 84, 84, 0.3);
+    gap: 10px;
+}
+
+.card-status {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-ready {
+    background: rgba(1, 152, 117, 0.2);
+    color: #019875;
+    border: 1px solid rgba(1, 152, 117, 0.3);
+}
+
+.status-dev {
+    background: rgba(220, 38, 38, 0.2);
+    color: #dc2626;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.status-planning {
+    background: rgba(234, 88, 12, 0.2);
+    color: #ea580c;
+    border: 1px solid rgba(234, 88, 12, 0.3);
+}
+
+.card-link {
+    display: flex;
+    align-items: center;
+    color: #019875;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.card-link i {
+    margin-left: 6px;
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.module-card:hover .card-link i {
+    transform: translateX(3px);
+}
+
+/* ========================================
+   CORREÇÃO ESPECÍFICA PARA ÍCONES NO MODO LIGHT
+   ======================================== */
+
+/* ✅ Ícones do header no modo light */
+[data-theme="light"] .theme-icon,
+[data-theme="light"] .user-icon {
+    color: #64748B !important; /* Cinza escuro para boa visibilidade */
+}
+
+[data-theme="light"] .theme-toggle:hover .theme-icon,
+[data-theme="light"] .user-menu:hover .user-icon {
+    color: #019875 !important; /* Verde quando em hover */
+}
+
+/* ✅ Ícone de busca no modo light */
+[data-theme="light"] .search-icon {
+    color: #64748B !important; /* Cor escura para contraste */
+}
+
+/* ✅ Ícones dos cards no modo light */
+[data-theme="light"] .card-icon {
+    color: #019875 !important; /* Manter verde para consistência */
+}
+
+/* ✅ Ícones de status e elementos pequenos no modo light */
+[data-theme="light"] .status-dev {
+    background: rgba(220, 38, 38, 0.15) !important;
+    color: #B91C1C !important;
+    border: 1px solid rgba(220, 38, 38, 0.3) !important;
+}
+
+[data-theme="light"] .status-ready {
+    background: rgba(1, 152, 117, 0.15) !important;
+    color: #047857 !important;
+    border: 1px solid rgba(1, 152, 117, 0.3) !important;
+}
+
+[data-theme="light"] .status-planning {
+    background: rgba(234, 88, 12, 0.15) !important;
+    color: #C2410C !important;
+    border: 1px solid rgba(234, 88, 12, 0.3) !important;
+}
+
+/* ✅ Texto dos status em modo light - garantir contraste */
+[data-theme="light"] .status-dev,
+[data-theme="light"] .status-ready,
+[data-theme="light"] .status-planning {
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* ✅ Garantir que elementos de interface não tenham problemas de cor */
+[data-theme="light"] .module-card {
+    background: transparent !important;
+    border: 1px solid #E2E8F0 !important;
+}
+
+[data-theme="light"] .module-card:hover {
+    background: #F8FAFC !important;
+    border-color: #019875 !important;
+}
+
+/* ✅ Header completo no modo light */
+[data-theme="light"] .app-header {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+}
+
+/* ✅ Body no modo light */
+[data-theme="light"] body {
+    background-color: #FFFFFF !important;
+    color: #1E293B !important;
+}
+
+/* ✅ Garantir contraste em todos os textos importantes */
+[data-theme="light"] .welcome-title,
+[data-theme="light"] .section-title {
+    color: #1E293B !important;
+}
+
+[data-theme="light"] .welcome-subtitle,
+[data-theme="light"] .card-desc {
+    color: #475569 !important;
+}
+
+/* ✅ Botão toggle tema - estado inicial */
+[data-theme="light"] .theme-toggle {
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    color: #64748B !important;
+}
+
+[data-theme="light"] .theme-toggle:hover {
+    background: #F1F5F9 !important;
+    border-color: #019875 !important;
+    color: #019875 !important;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15) !important;
+}
+
+/* ✅ Footer no modo light */
+[data-theme="light"] footer {
+    color: #64748B !important;
+    border-top: 1px solid #E2E8F0 !important;
+}
+
+/* ✅ Container principal */
+[data-theme="light"] .content-container {
+    background: transparent;
+}
+
+/* ✅ Garantir scrollbar visível no modo light */
+[data-theme="light"] * {
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 #F1F5F9;
+}
+
+[data-theme="light"] *::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-theme="light"] *::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+
+[data-theme="light"] *::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+
+[data-theme="light"] *::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+/* ✅ CORREÇÃO ESPECÍFICA PARA BOTÕES DO HEADER NO MODO LIGHT */
+html[data-theme="light"] .header-right .theme-toggle,
+html[data-theme="light"] .header-right .user-menu {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    border-color: #CBD5E1 !important;
+    color: #64748B !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+html[data-theme="light"] .theme-toggle:hover,
+html[data-theme="light"] .user-menu:hover {
+    background: #F1F5F9 !important;
+    background-color: #F1F5F9 !important;
+    border-color: #019875 !important;
+    color: #019875 !important;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15) !important;
+}/* ✅ CORREÇÃO ESPECÍFICA PARA BOTÕES DE FILTRO NO MODO LIGHT */
+[data-theme="light"] .btn-filter:not(.active) {
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    color: #64748B !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .btn-filter:not(.active):hover {
+    background: #F8FAFC !important;
+    border-color: #019875 !important;
+    color: #019875 !important;
+    box-shadow: 0 4px 12px rgba(1, 152, 117, 0.15) !important;
+}
+
+[data-theme="light"] .btn-filter.active {
+    background: #019875 !important;
+    border-color: #019875 !important;
+    color: white !important;
+}/* ✅ CORREÇÃO PARA ÍCONES LUCIDE NO MODO LIGHT */
+[data-theme="light"] svg,
+[data-theme="light"] [data-lucide] {
+    color: #64748B !important;
+    stroke: #64748B !important;
+}
+
+[data-theme="light"] .theme-toggle:hover svg,
+[data-theme="light"] .theme-toggle:hover [data-lucide],
+[data-theme="light"] .user-menu:hover svg,
+[data-theme="light"] .user-menu:hover [data-lucide] {
+    color: #019875 !important;
+    stroke: #019875 !important;
+}
+
+/* ✅ ESTILOS CORRIGIDOS PARA CABEÇALHO E BOTÕES */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { 
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+	background: #000; 
+	color: #e0e0e0; 
+}
+
+/* Header - mais compacto */
+.app-header {
+	background: #0a0a0a;
+	border-bottom: 1px solid #1a1a1a;
+	padding: 12px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	min-height: 48px;
+}
+
+.header-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	max-width: 1400px;
+	margin: 0 auto;
+}
+
+.header-left {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.header-icon {
+	width: 32px;
+	height: 32px;
+	color: #10b981;
+}
+
+.header-title { 
+	color: #10b981; 
+	font-size: 20px; 
+	font-weight: 600; 
+	margin: 0;
+}
+
+/* Search Container */
+.header-center {
+	flex: 1;
+	max-width: 400px;
+	margin: 0 40px;
+}
+
+.search-container {
+	position: relative;
+	width: 100%;
+}
+
+.search-icon {
+	position: absolute;
+	left: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 16px;
+	color: #6b7280;
+}
+
+.search-input {
+	width: 100%;
+	background: #1a1a1a;
+	border: 1px solid #1a1a1a;
+	color: #e0e0e0;
+	padding: 10px 16px 10px 40px;
+	border-radius: 6px;
+	font-size: 14px;
+	transition: all 0.3s;
+}
+
+.search-input:focus {
+	outline: none;
+	border-color: #10b981;
+	box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Header Right - Botões com hover effects */
+.header-right {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.theme-toggle,
+.user-menu {
+	background: #1a1a1a;
+	border: 1px solid #1a1a1a;
+	color: #e0e0e0;
+	padding: 8px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: all 0.3s;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: none;
+	width: 36px;
+	height: 36px;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus,
+.user-menu:hover,
+.user-menu:focus {
+	border-color: #10b981;
+	background: #1a1a1a;
+	color: #10b981;
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+}
+
+/* Feedback visual especial para toggle de tema ativo */
+.theme-toggle.active {
+	background: rgba(16, 185, 129, 0.2);
+	border-color: #10b981;
+	color: #10b981;
+}
+
+/* Animação suave para o ícone do tema */
+.theme-icon {
+	transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .theme-icon {
+	transform: rotate(20deg) scale(1.1);
+}
+
+.theme-icon,
+.user-icon {
+	width: 20px;
+	height: 20px;
+}
+
+/* Main Content */
+.main-content {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 40px 24px;
+	min-height: calc(100vh - 200px); /* Remove espaço extra */
+}
+
+.content-container {
+	width: 100%;
+}
+
+/* Welcome Section */
+.welcome-section {
+	text-align: center;
+	margin-bottom: 40px;
+}
+
+.welcome-title {
+	color: #10b981;
+	font-size: 32px;
+	font-weight: 700;
+	margin-bottom: 16px;
+}
+
+.welcome-subtitle {
+	color: #9ca3af;
+	font-size: 18px;
+	line-height: 1.6;
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+/* Stats Section */
+.stats-section {
+	margin-bottom: 40px;
+}
+
+.stats-container {
+	background: #0a0a0a;
+	border: 1px solid #1a1a1a;
+	border-radius: 12px;
+	padding: 24px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.stat-block {
+	text-align: center;
+}
+
+.stat-value {
+	color: #10b981;
+	font-size: 28px;
+	font-weight: 700;
+	margin-bottom: 4px;
+}
+
+.stat-label {
+	color: #6b7280;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.stat-divider {
+	width: 1px;
+	height: 40px;
+	background: #1a1a1a;
+}
+
+/* Apps Section */
+.apps-section {
+	margin-bottom: 40px;
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 24px;
+}
+
+.section-title {
+	color: #e0e0e0;
+	font-size: 24px;
+	font-weight: 600;
+}
+
+.section-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.btn-filter {
+	background: #1a1a1a;
+	border: 1px solid #1a1a1a;
+	color: #e0e0e0;
+	padding: 8px 16px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: all 0.3s;
+}
+
+.btn-filter:hover,
+.btn-filter:focus {
+	border-color: #10b981;
+	color: #10b981;
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+}
+
+.btn-filter.active {
+	background: #10b981;
+	border-color: #10b981;
+	color: white;
+}
+
+
+
+/* Footer */
+footer {
+	text-align: center;
+	padding: 40px 24px;
+	color: #6b7280;
+	border-top: 1px solid #1a1a1a;
+	margin-top: 0; /* Remove espaço extra */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.app-header {
+		padding: 12px 16px;
+		flex-direction: column;
+		gap: 16px;
+	}
+	
+	.header-container {
+		flex-direction: column;
+		gap: 16px;
+	}
+	
+	.header-center {
+		margin: 0;
+		max-width: 100%;
+	}
+	
+	.section-header {
+		flex-direction: column;
+		gap: 16px;
+		align-items: stretch;
+	}
+	
+	.welcome-title {
+		font-size: 24px;
+	}
+	
+	.stats-container {
+		flex-direction: column;
+		gap: 16px;
+	}
+	
+	.stat-divider {
+		width: 40px;
+		height: 1px;
+	}
+	
+	.modules-grid,
+	.future-grid {
+		grid-template-columns: 1fr;
+	}
+}

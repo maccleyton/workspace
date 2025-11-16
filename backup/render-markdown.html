@@ -1,0 +1,107 @@
+// ✅ FUNÇÃO DE RENDERIZAÇÃO AVANÇADA - VERSÃO 2 (para outro contexto)
+function renderMarkdownAdvanced(markdownText) {
+    try {
+        // Salvar posição do scroll antes de atualizar
+        const contentWrapper = document.querySelector('.content-wrapper');
+        const scrollPos = contentWrapper ? contentWrapper.scrollTop : 0;
+        const scrollPercentage = contentWrapper && contentWrapper.scrollHeight > 0 ? scrollPos / contentWrapper.scrollHeight : 0;
+        
+        // ✅ PROCESSAR LINHA POR LINHA PARA PROTEGER PIPES EM CÓDIGO INLINE
+        const lines = markdownText.split('\n');
+        const processedLines = lines.map(line => {
+            // Detectar se é uma linha de tabela (contém | fora de backticks)
+            // Contar pipes fora de código
+            let inCode = false;
+            let pipeCount = 0;
+            
+            for (let i = 0; i < line.length; i++) {
+                if (line[i] === '`') {
+                    inCode = !inCode;
+                } else if (line[i] === '|' && !inCode) {
+                    pipeCount++;
+                }
+            }
+            
+            // Se tem pelo menos 1 pipe fora de código, é provável que seja tabela
+            if (pipeCount > 0) {
+                // Proteger pipes dentro de código usando barra invertida
+                let result = '';
+                let inBacktick = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    if (line[i] === '`') {
+                        inBacktick = !inBacktick;
+                        result += line[i];
+                    } else if (line[i] === '|' && inBacktick) {
+                        // Usar barra invertida para escapar pipe dentro de código
+                        result += '\\|';
+                    } else {
+                        result += line[i];
+                    }
+                }
+                
+                return result;
+            }
+            
+            return line;
+        });
+        
+        markdownText = processedLines.join('\n');
+        
+        // Configurar marked.js
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+        
+        // ✅ RENDERIZAR COM MARKED
+        let htmlContent = marked.parse(markdownText);
+        
+        // ✅ INSERIR NO DOM ANTES DO MATHJAX
+        document.getElementById('content').innerHTML = htmlContent;
+
+        // ✅ PROCESSAR HIGHLIGHT.JS
+        document.querySelectorAll('pre code').forEach((block) => {
+            if (typeof hljs !== 'undefined') {
+                hljs.highlightBlock(block);
+            }
+        });
+
+        // ✅ RENDERIZAR LATEX COM MATHJAX
+        if (window.MathJax) {
+            setTimeout(() => {
+                MathJax.typesetPromise([document.getElementById('content')]).then(() => {
+                    // ✅ WRAP LATEX BLOCKS COM ESTILO VISUAL
+                    wrapLatexBlocks();
+                    
+                    // ✅ RESTAURAR POSIÇÃO DO SCROLL
+                    if (contentWrapper) {
+                        setTimeout(() => {
+                            contentWrapper.scrollTop = contentWrapper.scrollHeight * scrollPercentage;
+                        }, 50);
+                    }
+                    
+                    // ✅ ATUALIZAR TOC
+                    updateTOC();
+                    
+                }).catch((err) => {
+                    console.error('Erro MathJax:', err);
+                    updateTOC();
+                });
+            }, 0);
+        } else {
+            // Se não houver MathJax, apenas atualizar TOC
+            setTimeout(() => {
+                if (contentWrapper) {
+                    contentWrapper.scrollTop = contentWrapper.scrollHeight * scrollPercentage;
+                }
+                updateTOC();
+            }, 50);
+        }
+
+    } catch (e) {
+        console.error('Erro ao renderizar:', e);
+        document.getElementById('content').innerHTML = 
+            `<div class="error">❌ Erro ao renderizar: ${e.message}</div>`;
+    }
+}

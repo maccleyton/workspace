@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Nuclear</title>
+
+    <!-- Fonts / Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+	<!-- Three.js para visualização 3D -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+</head>
+<body>
+	<header class="app-header">
+		<div class="header-left">
+			<i class="fas fa-atom"></i>
+			<div class="header-title">Simulador Nuclear</div>
+		</div>
+		<div class="header-left">
+			<button class="back-button" id="toGoBackBtn">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="m15 18-6-6 6-6"/>
+				</svg>
+			</button>
+		</div>
+	</header>
+
+	<main class="app-main">
+		<!-- COLUNA 1 - ELEMENTOS -->
+		<section class="left-panel card">
+			<div class="left-scroll">
+				<!-- Elementos -->
+				<div class="panel-card">
+					<div class="section-header">
+						<i class="fas fa-radiation-alt"></i>
+						<div class="section-title">Elementos Radioativos</div>
+					</div>
+					<div class="elements-list" id="elementsList"></div>
+				</div>
+			</div>
+		</section>
+
+		<!-- COLUNA 2 - ANIMAÇÕES -->
+		<section class="center-panel card">
+			<!-- Animação partículas -->
+			<div class="panel-card">
+				<div class="section-header">
+					<i class="fas fa-wave-square"></i>
+					<div class="section-title">Animação de Decaimento</div>
+				</div>
+				<div class="particle-canvas" id="particleCanvas"></div>
+				<div class="decay-indicator">
+					<span>Tipo de Decaimento:</span>
+					<span id="decayTypeBadge" class="decay-type-badge">ALPHA</span>
+				</div>
+			</div>
+
+			<!-- Animação 3D -->
+			<div class="panel-card">
+				<div class="section-header">
+					<i class="fas fa-cubes"></i>
+					<div class="section-title">Estrutura Atômica 3D</div>
+				</div>
+
+				<div class="atom-wrapper">
+					<canvas id="atomCanvas"></canvas>
+					<div class="atom-info" id="atomInfo">
+						Carregando estrutura atômica...
+					</div>
+
+					<div class="toggle-group">
+						<div class="toggle-row">
+							<span class="toggle-label-side">Interativo</span>
+							<label class="toggle-wrapper">
+								<input type="checkbox" id="interactiveToggle" class="toggle-input" checked>
+								<div class="toggle-switch">
+									<div class="toggle-knob"></div>
+								</div>
+							</label>
+							<span class="toggle-label-side">Estático</span>
+						</div>
+
+						<div class="toggle-row">
+							<span class="toggle-label-side">Órbitas</span>
+							<label class="toggle-wrapper">
+								<input type="checkbox" id="representationToggle" class="toggle-input">
+								<div class="toggle-switch">
+									<div class="toggle-knob"></div>
+								</div>
+							</label>
+							<span class="toggle-label-side">Nuvem</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- COLUNA 3 - GRÁFICO (ALTURA REDUZIDA) -->
+		<section class="right-panel card">
+			<div class="right-card">
+				<div class="tabs-row">
+					<div class="tab-buttons">
+						<button class="tab-btn active" onclick="switchTab('decay', this)">
+							<i class="fas fa-chart-line"></i>
+							Decaimento
+						</button>
+						<button class="tab-btn" onclick="switchTab('details', this)">
+							<i class="fas fa-info-circle"></i>
+							Detalhes
+						</button>
+						<button class="tab-btn" onclick="switchTab('structure', this)">
+							<i class="fas fa-atom"></i>
+							Estrutura
+						</button>
+					</div>
+					<div class="tab-actions">
+						<button class="tab-action-btn" onclick="startSimulation()">
+							<i class="fas fa-play"></i> Simular
+						</button>
+						<button class="tab-action-btn secondary" onclick="resetSimulation()">
+							<i class="fas fa-broom"></i> Limpar
+						</button>
+					</div>
+				</div>
+
+				<!-- TAB: DECAIMENTO -->
+				<div class="tab-content active" id="tab-decay">
+					<div class="chart-container">
+						<canvas id="decayChart"></canvas>
+					</div>
+					<div class="info-bar">
+						<div>
+							<div class="info-slot-label">Elemento</div>
+							<div class="info-slot-value" id="infoElement">Urânio-238</div>
+						</div>
+						<div>
+							<div class="info-slot-label">Meia-vida</div>
+							<div class="info-slot-value" id="infoHalfLife">4.5B anos</div>
+						</div>
+						<div>
+							<div class="info-slot-label">Constante λ</div>
+							<div class="info-slot-value" id="infoLambda">1.55e-10</div>
+						</div>
+						<div>
+							<div class="info-slot-label">Atividade</div>
+							<div class="info-slot-value" id="infoActivity">0 Bq</div>
+						</div>
+						<div>
+							<div class="info-slot-label">Produto</div>
+							<div class="info-slot-value" id="infoProduct">Th-234</div>
+						</div>
+						<div>
+							<div class="info-slot-label">Energia</div>
+							<div class="info-slot-value" id="infoEnergy">4.27 MeV</div>
+						</div>
+					</div>
+					
+					<!-- Parâmetros movidos para cá -->
+					<div class="params-section">
+						<div class="section-header">
+							<i class="fas fa-sliders-h"></i>
+							<div class="section-title">Parâmetros</div>
+						</div>
+
+						<div class="param-row">
+							<div class="param-label">Quantidade Inicial (N₀)</div>
+							<div class="slider-header">
+								<span>Átomos</span>
+								<span id="initialAtomsValue" class="slider-value">1.000</span>
+							</div>
+							<input type="range" id="initialAtoms" min="100" max="10000" step="100" value="1000">
+						</div>
+
+						<div class="param-row">
+							<div class="param-label">Tempo de Simulação</div>
+							<div class="slider-header">
+								<span>Anos</span>
+								<span id="timeValue" class="slider-value">1.000</span>
+							</div>
+							<input type="range" id="timeRange" min="100" max="10000" step="100" value="1000">
+						</div>
+					</div>
+				</div>
+
+				<!-- TAB: DETALHES -->
+				<div class="tab-content" id="tab-details">
+					<!-- Lei do decaimento movida para cá -->
+					<div class="panel-card">
+						<div class="section-header">
+							<i class="fas fa-function"></i>
+							<div class="section-title">Lei do Decaimento Radioativo</div>
+						</div>
+						<div class="law-body">
+							<div class="formula-main" id="decayFormula"></div>
+							<div class="formula-caption">
+								Lei fundamental que descreve como a quantidade de núcleos radioativos diminui com o tempo.
+							</div>
+							<div class="law-grid">
+								<div><b>N(t)</b> – Quantidade no tempo t</div>
+								<div><b>N₀</b> – Quantidade inicial</div>
+								<div><b>λ</b> – Constante de decaimento</div>
+								<div><b>t</b> – Tempo decorrido</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="panel-card">
+						<div class="section-header">
+							<i class="fas fa-info-circle"></i>
+							<div class="section-title" id="detailsTitle">Informações do Elemento</div>
+						</div>
+						<div class="details-body" id="detailsBody">
+							<!-- preenchido via JS -->
+						</div>
+					</div>
+				</div>
+
+				<!-- TAB: ESTRUTURA 3D -->
+				<div class="tab-content" id="tab-structure">
+					<div class="structure-body">
+						<div class="structure-preview" id="structurePreview">
+							<!-- Visualização esquemática do átomo -->
+							<canvas id="structureCanvas"></canvas>
+							<div class="structure-placeholder-text">
+								Visualização detalhada da estrutura atômica
+							</div>
+						</div>
+						<div class="structure-side">
+							<h4>Informações Estruturais</h4>
+							<ul id="structureInfo">
+								<li><b>Prótons:</b> <span id="protonCount">-</span></li>
+								<li><b>Nêutrons:</b> <span id="neutronCount">-</span></li>
+								<li><b>Elétrons:</b> <span id="electronCount">-</span></li>
+								<li><b>Configuração:</b> <span id="electronConfig">-</span></li>
+								<li><b>Massa Atômica:</b> <span id="atomicMass">-</span></li>
+							</ul>
+							<h4 style="margin-top: 8px;">Como interpretar</h4>
+							<ul>
+								<li><b>Núcleo</b> concentra massa e carga positiva</li>
+								<li><b>Elétrons</b> definem propriedades químicas</li>
+								<li><b>Isótopos</b> têm mesmo prótons, nêutrons diferentes</li>
+								<li><b>Radioatividade</b> vem de núcleo instável</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+	<script src="app.js"></script>
+</body>
+</html>

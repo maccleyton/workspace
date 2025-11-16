@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Hub Central de Aplicações</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <meta name="description" content="Workspace - Hub central para gerenciamento de aplicações de desenvolvimento">
+    <meta name="keywords" content="workspace, hub, editor, ide, calculator, knowledge">
+    <meta name="author" content="MiniMax Agent">
+
+    <link rel="stylesheet" href="./index/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-left">
+                <i data-lucide="layout-dashboard" class="header-icon"></i>
+                <h1 class="header-title">Workspace</h1>
+            </div>
+            
+            <div class="header-center">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Buscar aplicações..."
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="Alternar tema">
+                    <i data-lucide="sun" class="theme-icon" id="themeIcon"></i>
+                </button>
+                <div class="user-menu">
+                    <i data-lucide="user" class="user-icon"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <h2 class="welcome-title">Bem-vindo ao Workspace</h2>
+                <p class="welcome-subtitle">
+                    Hub central para todas as suas aplicações de desenvolvimento. 
+                    Organize, acesse e gerencie seus projetos em um só lugar.
+                </p>
+            </section>
+
+            <!-- Statistics Section -->
+            <section class="stats-section">
+                <div class="stats-container">
+                    <div class="stat-block">
+                        <div class="stat-value" id="totalApps">18</div>
+                        <div class="stat-label">Aplicações</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-block">
+                        <div class="stat-value" id="activeApps">6</div>
+                        <div class="stat-label">Ativas</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-block">
+                        <div class="stat-value" id="completedApps">6</div>
+                        <div class="stat-label">Concluídas</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-block">
+                        <div class="stat-value" id="availableSlots">20</div>
+                        <div class="stat-label">Slots Disponíveis</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Applications Grid -->
+            <section class="apps-section">
+                <div class="section-header">
+                    <h2 class="section-title">Suas Aplicações</h2>
+                    <div class="section-actions">
+                        <button class="btn-filter active" data-filter="all">Todos</button>
+                        <button class="btn-filter" data-filter="active">Ativos</button>
+                        <button class="btn-filter" data-filter="completed">Concluídos</button>
+                    </div>
+                </div>
+
+				<div class="modules-grid">
+					<!-- Módulos existentes -->
+					<a href="modules/knowledge_hub/index.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-network-wired"></i>
+						</div>
+						<h3 class="card-title">Knowledge Hub</h3>
+						<p class="card-desc">Centro de conhecimento unificado com documentação, tutoriais e recursos organizados para aprendizado contínuo.</p>
+						<span class="card-status status-ready">PRONTO</span>
+						<div class="card-link">
+							Abrir módulo <i class="fas fa-external-link-alt"></i>
+						</div>
+					</a>
+
+					<a href="modules/knowledge_assistant/index.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-robot"></i>
+						</div>
+						<h3 class="card-title">Knowledge Assistant</h3>
+						<p class="card-desc">Assistente inteligente com IA para busca contextual, respostas instantâneas e curadoria de conteúdo técnico.</p>
+						<span class="card-status status-ready">PRONTO</span>
+						<div class="card-link">
+							Abrir módulo <i class="fas fa-external-link-alt"></i>
+						</div>
+					</a>
+					
+					<a href="modules/editor-markdown.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-file-alt"></i>
+						</div>
+						<h3 class="card-title">Editor de Markdown</h3>
+						<p class="card-desc">Editor avançado para criação e formatação de documentos Markdown com suporte a sintaxe científica.</p>
+						<span class="card-status status-ready">PRONTO</span>
+						<div class="card-link">
+							Abrir módulo <i class="fas fa-external-link-alt"></i>
+						</div>
+					</a>
+
+					<a href="modules/formulas-interativas.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-square-root-alt"></i>
+						</div>
+						<h3 class="card-title">Fórmulas Interativas</h3>
+						<p class="card-desc">Calculadora científica avançada com gráficos, funções personalizáveis e visualização de cálculos passo a passo.</p>
+						<span class="card-status status-ready">PRONTO</span>
+						<div class="card-link">
+							Abrir módulo <i class="fas fa-external-link-alt"></i>
+						</div>
+					</a>
+					
+					<a href="modules/conversor-formatos.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-exchange-alt"></i>
+						</div>
+						<h3 class="card-title">Conversor de Formatos</h3>
+						<p class="card-desc">Ferramenta avançada para conversão entre múltiplos formatos de arquivo, código e dados com suporte a transformações em lote.</p>
+						<span class="card-status status-ready">PRONTO</span>
+						<div class="card-link">
+							Abrir módulo <i class="fas fa-external-link-alt"></i>
+						</div>
+					</a>
+
+					<a href="modules/simuladores-financeiros.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-coins"></i>
+						</div>
+						<h3 class="card-title">Simuladores Financeiros</h3>
+						<p class="card-desc">Ferramenta para análise de carteiras, risco-retorno e estratégias de alocação de ativos.</p>
+						<span class="card-status status-ready">PRONTO</span>
+						<div class="card-link">
+							Abrir módulo <i class="fas fa-external-link-alt"></i>
+						</div>
+					</a>
+
+					<a href="modules/simulador-nuclear.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-radiation"></i>
+						</div>
+						<h3 class="card-title">Simulador Nuclear</h3>
+						<p class="card-desc">Simulações realistas de reações nucleares, decaimento radioativo e fenômenos atômicos com visualização 3D.</p>
+						<span class="card-status status-ready">PRONTO</span>
+						<div class="card-link">
+							Abrir módulo <i class="fas fa-external-link-alt"></i>
+						</div>
+					</a>
+
+					<a href="modules/simulador-quimico.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-flask"></i>
+						</div>
+						<h3 class="card-title">Simulador Químico</h3>
+						<p class="card-desc">Laboratório virtual para experimentos químicos com reagentes simulados, reações controladas e análise de resultados.</p>
+						<span class="card-status status-ready">PRONTO</span>
+						<div class="card-link">
+							Abrir módulo <i class="fas fa-external-link-alt"></i>
+						</div>
+					</a>
+
+					<!-- Novos módulos planejados -->
+					<a href="modules/aplication.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-tools"></i>
+						</div>
+						<h3 class="card-title">HTML Builder</h3>
+						<p class="card-desc">Construtor visual de interfaces web com arrastar e soltar, geração de código limpo e preview em tempo real.</p>
+						<span class="card-status status-dev">EM DESENVOLVIMENTO</span>
+						<div class="card-link">
+							Em breve <i class="fas fa-clock"></i>
+						</div>
+					</a>
+
+					<a href="modules/dev_quiz/index.html" target="_blank" class="module-card">
+						<div class="card-icon">
+							<i class="fas fa-gamepad"></i>
+						</div>
+						<h3 class="card-title">Dev Quiz</h3>
+						<p class="card-desc">Plataforma interativa de desafios de programação com quizzes dinâmicos, competições e ranking para desenvolvedores.</p>
+						<span class="card-status status-dev">EM DESENVOLVIMENTO</span>
+						<div class="card-link">
+							Em breve <i class="fas fa-clock"></i>
+						</div>
+					</a>
+
+					<div class="module-card" onclick="showComingSoon()">
+						<div class="card-icon">
+							<i class="fas fa-leaf"></i>
+						</div>
+						<h3 class="card-title">Simulador Orgânico</h3>
+						<p class="card-desc">Modelagem de compostos orgânicos, reações bioquímicas e estruturas moleculares complexas.</p>
+						<span class="card-status status-dev">EM DESENVOLVIMENTO</span>
+						<div class="card-link">
+							Em breve <i class="fas fa-clock"></i>
+						</div>
+					</div>
+
+					<div class="module-card" onclick="showComingSoon()">
+						<div class="card-icon">
+							<i class="fas fa-atom"></i>
+						</div>
+						<h3 class="card-title">Simulador Atômico</h3>
+						<p class="card-desc">Modelagem interativa de estruturas atômicas, orbitais eletrônicos e ligações químicas em tempo real.</p>
+						<span class="card-status status-dev">EM DESENVOLVIMENTO</span>
+						<div class="card-link">
+							Em breve <i class="fas fa-clock"></i>
+						</div>
+					</div>
+
+					<div class="module-card" onclick="showComingSoon()">
+						<div class="card-icon">
+							<i class="fas fa-weight-hanging"></i>
+						</div>
+						<h3 class="card-title">Simulador Físico</h3>
+						<p class="card-desc">Ambiente para simulação de fenômenos físicos, mecânica clássica, fusão e fissão nucleares e colisão de partículas.</p>
+						<span class="card-status status-dev">EM DESENVOLVIMENTO</span>
+						<div class="card-link">
+							Em breve <i class="fas fa-clock"></i>
+						</div>
+					</div>
+
+					<div class="module-card" onclick="showComingSoon()">
+						<div class="card-icon">
+							<i class="fas fa-thermometer-full"></i>
+						</div>
+						<h3 class="card-title">Simulador Termodinâmico</h3>
+						<p class="card-desc">Simulações de sistemas térmicos, transferência de calor, ciclos termodinâmicos e máquinas térmicas.</p>
+						<span class="card-status status-dev">EM DESENVOLVIMENTO</span>
+						<div class="card-link">
+							Em breve <i class="fas fa-clock"></i>
+						</div>
+					</div>
+
+					<div class="module-card" onclick="showComingSoon()">
+						<div class="card-icon">
+							<i class="fas fa-dna"></i>
+						</div>
+						<h3 class="card-title">Simulador Biológico</h3>
+						<p class="card-desc">Plataforma interativa para simulação de ecossistemas, processos celulares e dinâmica populacional com modelos biológicos realistas..</p>
+						<span class="card-status status-dev">EM DESENVOLVIMENTO</span>
+						<div class="card-link">
+							Em breve <i class="fas fa-clock"></i>
+						</div>
+					</div>
+
+					<div class="module-card" onclick="showComingSoon()">
+						<div class="card-icon">
+							<i class="fas fa-user-astronaut"></i>
+						</div>
+						<h3 class="card-title">Simulador Cósmico</h3>
+						<p class="card-desc">Exploração do universo com simulações de sistemas solares, formação estelar e dinâmica gravitacional.</p>
+						<span class="card-status status-dev">EM DESENVOLVIMENTO</span>
+						<div class="card-link">
+							Em breve <i class="fas fa-clock"></i>
+						</div>
+					</div>
+
+				</div>
+
+                <!-- Placeholder for future applications -->
+                <div class="future-apps-section">
+                    <h3 class="future-title">Espaço para Futuras Aplicações</h3>
+                    <div class="future-grid" id="futureGrid">
+                        <!-- Future app placeholders -->
+						<div class="module-card" onclick="showComingSoon()">
+							<div class="card-icon">
+								<i class="fas fa-code"></i>
+							</div>
+							<h3 class="card-title">Editor de Código</h3>
+							<p class="card-desc">Ambiente de desenvolvimento integrado com suporte a múltiplas linguagens de programação.</p>
+							<span class="card-status status-planning">PLANEJAMENTO</span>
+							<div class="card-link">
+								Em breve <i class="fas fa-clock"></i>
+							</div>
+						</div>		
+						
+						<div class="module-card" onclick="showComingSoon()">
+							<div class="card-icon">
+								<i class="fas fa-chart-bar"></i>
+							</div>
+							<h3 class="card-title">Análise de Dados</h3>
+							<p class="card-desc">Ferramentas avançadas para análise estatística e visualização de dados científicos.</p>
+							<span class="card-status status-planning">PLANEJAMENTO</span>
+							<div class="card-link">
+								Em breve <i class="fas fa-clock"></i>
+							</div>
+						</div>
+						
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Application Viewer Modal -->
+    <div class="modal-overlay" id="appModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Abrir Aplicação</h3>
+                <button class="modal-close" id="modalClose">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="app-info" id="appInfo">
+                    <!-- App information will be populated here -->
+                </div>
+                <div class="app-preview" id="appPreview">
+                    <!-- App preview/image will be shown here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modalCancel">Cancelar</button>
+                <button class="btn-primary" id="modalOpen">Abrir Aplicação</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer">
+        <!-- Toast messages will appear here -->
+    </div>
+	
+	<footer>
+		<p>Workspace Platform &copy; 2025 - Desenvolvido para integração de projetos científicos</p>
+	</footer>
+	<script src="./index/script.js"></script>
+</body>
+</html>

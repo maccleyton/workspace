@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Nuclear</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* === CSS VARIABLES (Design System) === */
+        :root {
+            /* Color System - Nuclear Theme */
+            --color-primary-100: #E8F4F8;
+            --color-primary-500: #00BF93; /* Verde ciano workspace */
+            --color-primary-700: #00A085;
+            
+            --color-nuclear-100: #FEF2F2;
+            --color-nuclear-500: #DC2626; /* Vermelho nuclear */
+            --color-nuclear-700: #B91C1C;
+            
+            --color-bg-page: #0A0A0A;
+            --color-bg-surface: #141414;
+            --color-bg-surface-hover: rgba(22, 22, 22, 0.5);
+            
+            --color-border-default: #3f3f46;
+            --color-border-focus: #00BF93;
+            --color-border-light: #262626;
+            
+            --color-text-primary: #E4E4E7;
+            --color-text-secondary: #A1A1AA;
+            --color-text-high-contrast: #FFFFFF;
+            
+            --color-success: #22C55E;
+            --color-warning: #FBBF24;
+            --color-error: #F43F5E;
+            
+            /* Element-specific colors */
+            --color-alpha: #DC2626;     /* Alfa - Vermelho */
+            --color-beta: #16A34A;      /* Beta - Verde */
+            --color-gamma: #0284C7;     /* Gama - Azul */
+            --color-cesium: #F59E0B;    /* Césio - Laranja */
+            
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size-h1: 48px;
+            --font-size-h2: 24px;
+            --font-size-h3: 16px;
+            --font-size-body: 16px;
+            --font-size-body-sm: 14px;
+            
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Spacing (8px Grid) */
+            --space-xs: 8px;
+            --space-sm: 12px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+            --space-xxxl: 64px;
+            
+            /* Layout */
+            --layout-max-width: 1440px;
+            --radius-sm: 8px;
+            --border-width: 1px;
+            
+            /* Animations */
+            --transition-fast: 150ms ease-out;
+            --transition-normal: 200ms ease-out;
+        }
+
+        /* === GLOBAL STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-family);
+            background: var(--color-bg-page);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--color-bg-surface) 0%, #1a1a1a 100%);
+            border-bottom: var(--border-width) solid var(--color-border-light);
+            padding: var(--space-xl) var(--space-xxl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+            letter-spacing: -0.5%;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .nuclear-icon {
+            font-size: 36px;
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-lg);
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: var(--font-size-body);
+            color: var(--color-text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* === MAIN LAYOUT === */
+        .app-main {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            padding: var(--space-xxl);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-xl);
+        }
+
+        /* === TAB CONTENT === */
+        .tab-section {
+            background: var(--color-bg-surface);
+            border: var(--border-width) solid var(--color-border-light);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xl);
+        }
+
+        .section-title {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-lg);
+            letter-spacing: -1%;
+        }
+
+        /* === NUCLEAR SPECIFIC LAYOUT === */
+        .nuclear-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-top: var(--space-lg);
+        }
+
+        @media (max-width: 1024px) {
+            .nuclear-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+        }
+
+        /* === ELEMENT SELECTOR === */
+        .element-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--space-sm);
+            max-height: 300px;
+            overflow-y: auto;
+            padding: var(--space-sm);
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .element-btn {
+            background: var(--color-bg-surface);
+            border: var(--border-width) solid var(--color-border-default);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md) var(--space-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .element-btn:hover {
+            border-color: var(--color-border-focus);
+            transform: translateY(-2px);
+        }
+
+        .element-btn.active {
+            border-color: var(--color-primary-500);
+            background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
+            color: var(--color-text-high-contrast);
+        }
+
+        .decay-badge {
+            position: absolute;
+            top: var(--space-xs);
+            right: var(--space-xs);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .decay-alpha { background: var(--color-alpha); }
+        .decay-beta { background: var(--color-beta); }
+        .decay-gamma { background: var(--color-gamma); }
+
+        .element-symbol {
+            font-size: 18px;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 4px;
+        }
+
+        .element-name {
+            font-size: 12px;
+            opacity: 0.9;
+            line-height: 1.3;
+        }
+
+        .element-half-life {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        /* === FORM CONTROLS === */
+        .form-grid {
+            display: grid;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .form-label {
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+        }
+
+        .slider-container {
+            margin: var(--space-md) 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-sm);
+            align-items: center;
+        }
+
+        .slider-value {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary-500);
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .form-input {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-default);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-body);
+            transition: all var(--transition-normal);
+            min-height: 48px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: var(--color-bg-page);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary-500);
+            cursor: pointer;
+            border: 2px solid var(--color-text-high-contrast);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary-500);
+            cursor: pointer;
+            border: 2px solid var(--color-text-high-contrast);
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            padding: var(--space-md) var(--space-xl);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-700);
+            transform: scale(1.03);
+        }
+
+        .btn-nuclear {
+            background: var(--color-nuclear-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-nuclear:hover {
+            background: var(--color-nuclear-700);
+            transform: scale(1.03);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border: var(--border-width) solid var(--color-border-default);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-surface-hover);
+            border-color: var(--color-border-focus);
+        }
+
+        .btn-success {
+            background: var(--color-success);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-success:hover {
+            background: #16A34A;
+            transform: scale(1.03);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        /* === CHARTS === */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: var(--space-lg);
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-light);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md);
+        }
+
+        .chart-container-3d {
+            position: relative;
+            height: 300px;
+            margin-bottom: var(--space-lg);
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-light);
+            border-radius: var(--radius-sm);
+        }
+
+        .chart-toggle {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+            justify-content: center;
+        }
+
+        .btn-toggle {
+            padding: var(--space-sm) var(--space-md);
+            border: var(--border-width) solid var(--color-border-default);
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-body-sm);
+        }
+
+        .btn-toggle.active {
+            background: var(--color-primary-500);
+            border-color: var(--color-primary-700);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-toggle:hover {
+            transform: translateY(-2px);
+        }
+
+        /* === NUCLEAR EQUATION === */
+        .equation-container {
+            background: var(--color-bg-page);
+            padding: var(--space-lg);
+            border-radius: var(--radius-sm);
+            margin: var(--space-lg) 0;
+            text-align: center;
+            border-left: 4px solid var(--color-primary-500);
+        }
+
+        .equation-title {
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .equation-content {
+            font-size: var(--font-size-body);
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        /* === STATS GRID === */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        .stat-card {
+            background: var(--color-bg-page);
+            padding: var(--space-lg);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            border-top: 3px solid var(--color-primary-500);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-body-sm);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+            margin: var(--space-xs) 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        /* === PARTICLE ANIMATION === */
+        .particle-animation {
+            height: 120px;
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            margin: var(--space-lg) 0;
+            position: relative;
+            overflow: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .particle-alpha { background: var(--color-alpha); }
+        .particle-beta { background: var(--color-beta); }
+        .particle-gamma { background: var(--color-gamma); }
+
+        /* === DECAY INFO === */
+        .decay-info {
+            display: flex;
+            justify-content: space-around;
+            margin-top: var(--space-md);
+            padding: var(--space-md);
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            gap: var(--space-sm);
+        }
+
+        .decay-type {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            flex: 1;
+        }
+
+        .decay-type span {
+            font-size: var(--font-size-body-sm);
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .decay-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* === ATOM CANVAS === */
+        #atomCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-sm);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1024px) {
+            .app-main {
+                padding: var(--space-lg);
+            }
+            
+            .form-grid {
+                gap: var(--space-lg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: var(--font-size-h2);
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-sm);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .decay-info {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+        }
+
+        /* === UTILITIES === */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-success {
+            color: var(--color-success);
+        }
+
+        .text-error {
+            color: var(--color-error);
+        }
+
+        .text-warning {
+            color: var(--color-warning);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="header-content">
+            <div>
+                <h1 class="app-title">
+                    <span class="nuclear-icon">☢️</span>
+                    MÓDULO NUCLEAR
+                </h1>
+                <p class="subtitle">Simulação de Decaimento Radioativo - 15 Elementos</p>
+            </div>
+            <div class="header-actions">
+                <!-- Reserved for future actions -->
+            </div>
+        </div>
+    </div>
+
+    <div class="app-main">
+        <div class="app-grid">
+            <div class="tab-section">
+                <h2 class="section-title">Simulação de Decaimento Nuclear</h2>
+                
+                <div class="nuclear-grid">
+                    <!-- Painel de Controle -->
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">📊 Elementos Radioativos</label>
+                            <div class="element-grid" id="elementGrid">
+                                <!-- Elementos serão inseridos via JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">⚙️ Quantidade Inicial (N₀)</label>
+                                <div class="slider-container">
+                                    <div class="slider-label">
+                                        <span>Átomos:</span>
+                                        <span class="slider-value" id="initialAmountValue">1000</span>
+                                    </div>
+                                    <input type="range" id="initialAmount" min="100" max="100000" value="1000" step="100" class="form-input">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">⏱️ Tempo de Observação</label>
+                                <div class="slider-container">
+                                    <div class="slider-label">
+                                        <span>Unidade:</span>
+                                        <span class="slider-value" id="timeValue">1000 anos</span>
+                                    </div>
+                                    <input type="range" id="timeRange" min="100" max="100000" value="1000" step="100" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="decay-info">
+                            <div class="decay-type">
+                                <div class="decay-color" style="background: var(--color-alpha);"></div>
+                                <span>Decaimento Alfa (α)</span>
+                            </div>
+                            <div class="decay-type">
+                                <div class="decay-color" style="background: var(--color-beta);"></div>
+                                <span>Decaimento Beta (β)</span>
+                            </div>
+                            <div class="decay-type">
+                                <div class="decay-color" style="background: var(--color-gamma);"></div>
+                                <span>Radiação Gama (γ)</span>
+                            </div>
+                        </div>
+
+                        <div class="particle-animation" id="particleCanvas">
+                            <!-- Partículas serão geradas aqui via JavaScript -->
+                        </div>
+
+                        <div class="controls-grid">
+                            <button class="btn btn-nuclear" onclick="startSimulation()">▶️ Iniciar</button>
+                            <button class="btn btn-secondary" onclick="stopSimulation()">⏹️ Parar</button>
+                            <button class="btn btn-success" onclick="exportData()">📊 Exportar</button>
+                        </div>
+                    </div>
+
+                    <!-- Painel de Visualização -->
+                    <div>
+                        <div class="chart-toggle">
+                            <button class="btn-toggle active" onclick="switchView('2d')">📊 Vista 2D</button>
+                            <button class="btn-toggle" onclick="switchView('3d')">🔄 Vista 3D</button>
+                        </div>
+                        
+                        <div class="chart-container" id="chart2d">
+                            <canvas id="decayChart"></canvas>
+                        </div>
+                        <div class="chart-container-3d" id="chart3d" style="display: none;">
+                            <canvas id="atomCanvas"></canvas>
+                        </div>
+
+                        <div class="equation-container">
+                            <h4 class="equation-title">Lei do Decaimento Radioativo</h4>
+                            <div class="equation-content">
+                                $$N(t) = N_0 \cdot e^{-\lambda t}$$
+                                <br><br>
+                                Onde:<br>
+                                \(N(t)\) = Quantidade no tempo t<br>
+                                \(N_0\) = Quantidade inicial<br>
+                                \(\lambda\) = Constante de decaimento<br>
+                                \(t\) = Tempo decorrido
+                            </div>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Meia-vida</div>
+                                <div class="stat-value" id="halfLifeValue">4.5B anos</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Constante λ</div>
+                                <div class="stat-value" id="lambdaValue">1.55e-10</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Atividade</div>
+                                <div class="stat-value" id="activityValue">0 Bq</div>
+                            </div>
+                        </div>
+
+                        <div class="equation-container">
+                            <h4 class="equation-title">Equação do Decaimento Atual</h4>
+                            <div class="equation-content" id="currentEquation">$$N(t) = 1000 \cdot e^{-1.55 \times 10^{-10} t}$$</div>
+                            <div id="decayChain" style="margin-top: var(--space-md);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados expandidos dos elementos radioativos - CÉSIO-137 INCLUÍDO
+        const elements = {
+            uranium238: {
+                name: "Urânio-238",
+                symbol: "U-238",
+                halfLife: 4.468e9, // anos
+                lambda: 1.551e-10,
+                decayType: "alpha",
+                color: '#DC2626',
+                decayProduct: "Th-234",
+                uses: "Combustível nuclear, datação geológica"
+            },
+            uranium235: {
+                name: "Urânio-235",
+                symbol: "U-235",
+                halfLife: 7.038e8,
+                lambda: 9.849e-10,
+                decayType: "alpha",
+                color: '#EF4444',
+                decayProduct: "Th-231",
+                uses: "Armas nucleares, reatores"
+            },
+            plutonium239: {
+                name: "Plutônio-239",
+                symbol: "Pu-239",
+                halfLife: 2.411e4,
+                lambda: 2.874e-5,
+                decayType: "alpha",
+                color: '#F87171',
+                decayProduct: "U-235",
+                uses: "Armas nucleares, reatores"
+            },
+            plutonium238: {
+                name: "Plutônio-238",
+                symbol: "Pu-238",
+                halfLife: 87.7,
+                lambda: 2.507e-3,
+                decayType: "alpha",
+                color: '#FCA5A5',
+                decayProduct: "U-234",
+                uses: "Geradores termoelétricos"
+            },
+            carbon14: {
+                name: "Carbono-14",
+                symbol: "C-14",
+                halfLife: 5730,
+                lambda: 1.209e-4,
+                decayType: "beta",
+                color: '#16A34A',
+                decayProduct: "N-14",
+                uses: "Datação por carbono"
+            },
+            radium226: {
+                name: "Rádio-226",
+                symbol: "Ra-226",
+                halfLife: 1600,
+                lambda: 1.373e-3,
+                decayType: "alpha",
+                color: '#FB923C',
+                decayProduct: "Rn-222",
+                uses: "Medicina, relógios luminosos"
+            },
+            thorium232: {
+                name: "Tório-232",
+                symbol: "Th-232",
+                halfLife: 1.405e10,
+                lambda: 1.563e-11,
+                decayType: "alpha",
+                color: '#FDBA74',
+                decayProduct: "Ra-228",
+                uses: "Combustível nuclear"
+            },
+            potassium40: {
+                name: "Potássio-40",
+                symbol: "K-40",
+                halfLife: 1.251e9,
+                lambda: 1.554e-10,
+                decayType: "beta",
+                color: '#4ADE80',
+                decayProduct: "Ca-40",
+                uses: "Datação geológica"
+            },
+            strontium90: {
+                name: "Estrôncio-90",
+                symbol: "Sr-90",
+                halfLife: 28.8,
+                lambda: 7.639e-2,
+                decayType: "beta",
+                color: '#86EFAC',
+                decayProduct: "Y-90",
+                uses: "Geradores de calor"
+            },
+            iodine131: {
+                name: "Iodo-131",
+                symbol: "I-131",
+                halfLife: 8.02/365.25, // anos
+                lambda: 3.075e1,
+                decayType: "beta",
+                color: '#BBF7D0',
+                decayProduct: "Xe-131",
+                uses: "Medicina nuclear"
+            },
+            cobalt60: {
+                name: "Cobalto-60",
+                symbol: "Co-60",
+                halfLife: 5.27,
+                lambda: 4.168e-1,
+                decayType: "beta",
+                color: '#5EEAD4',
+                decayProduct: "Ni-60",
+                uses: "Radioterapia, esterilização"
+            },
+            americium241: {
+                name: "Amerício-241",
+                symbol: "Am-241",
+                halfLife: 432.2,
+                lambda: 6.392e-4,
+                decayType: "alpha",
+                color: '#FBCFE8',
+                decayProduct: "Np-237",
+                uses: "Detetores de fumaça"
+            },
+            tritium: {
+                name: "Trítio (H-3)",
+                symbol: "H-3",
+                halfLife: 12.32,
+                lambda: 1.782e-1,
+                decayType: "beta",
+                color: '#7DD3FC',
+                decayProduct: "He-3",
+                uses: "Marcadores biológicos"
+            },
+            technetium99m: {
+                name: "Tecnécio-99m",
+                symbol: "Tc-99m",
+                halfLife: 6.01/365.25, // anos
+                lambda: 4.194e2,
+                decayType: "gamma",
+                color: '#00BF93',
+                decayProduct: "Tc-99",
+                uses: "Medicina nuclear"
+            },
+            // CÉSIO-137
+            cesium137: {
+                name: "Césio-137",
+                symbol: "Cs-137",
+                halfLife: 30.17,
+                lambda: 7.309e-2,
+                decayType: "beta",
+                color: '#F59E0B',
+                decayProduct: "Ba-137m",
+                uses: "Radioterapia, calibração de equipamentos"
+            }
+        };
+
+        let currentElement = 'uranium238';
+        let simulationChart = null;
+        let animationId = null;
+        let is3DViewActive = false;
+        let atomAnimationId = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeElementGrid();
+            initializeChart();
+            setupEventListeners();
+            updateDisplay();
+        });
+
+        function initializeElementGrid() {
+            const grid = document.getElementById('elementGrid');
+            grid.innerHTML = '';
+
+            Object.keys(elements).forEach(key => {
+                const element = elements[key];
+                const btn = document.createElement('div');
+                btn.className = `element-btn ${key === currentElement ? 'active' : ''}`;
+                btn.dataset.element = key;
+                
+                btn.innerHTML = `
+                    <div class="decay-badge decay-${element.decayType}"></div>
+                    <div class="element-symbol">${element.symbol}</div>
+                    <div class="element-name">${element.name.split('-')[0]}</div>
+                    <div class="element-half-life">${formatHalfLife(element.halfLife)}</div>
+                `;
+
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.element-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentElement = this.dataset.element;
+                    updateDisplay();
+                    if (is3DViewActive) {
+                        init3DView();
+                    }
+                });
+
+                grid.appendChild(btn);
+            });
+        }
+
+        function setupEventListeners() {
+            // Sliders
+            document.getElementById('initialAmount').addEventListener('input', updateDisplay);
+            document.getElementById('timeRange').addEventListener('input', updateDisplay);
+        }
+
+        function updateDisplay() {
+            const element = elements[currentElement];
+            
+            // Atualizar valores dos sliders
+            document.getElementById('initialAmountValue').textContent = 
+                document.getElementById('initialAmount').value;
+            
+            const timeValue = document.getElementById('timeRange').value;
+            const elementTimeUnit = element.halfLife < 1 ? 'dias' : 'anos';
+            document.getElementById('timeValue').textContent = 
+                timeValue + ' ' + elementTimeUnit;
+
+            // Atualizar estatísticas
+            document.getElementById('halfLifeValue').textContent = formatHalfLife(element.halfLife);
+            document.getElementById('lambdaValue').textContent = element.lambda.toExponential(2);
+            document.getElementById('activityValue').textContent = calculateActivity() + ' Bq';
+
+            // Atualizar equação
+            document.getElementById('currentEquation').innerHTML = 
+                `$$N(t) = ${document.getElementById('initialAmount').value} \\cdot e^{-${element.lambda.toExponential(2)} t}$$`;
+
+            // Atualizar cadeia de decaimento
+            document.getElementById('decayChain').innerHTML = `
+                <strong>Produto de Decaimento:</strong> ${element.decayProduct}<br>
+                <strong>Aplicações:</strong> ${element.uses}
+            `;
+            
+            // Processar MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function formatHalfLife(timeInYears) {
+            if (timeInYears >= 1e9) return (timeInYears / 1e9).toFixed(2) + 'B anos';
+            if (timeInYears >= 1e6) return (timeInYears / 1e6).toFixed(2) + 'M anos';
+            if (timeInYears >= 1e3) return (timeInYears / 1e3).toFixed(1) + 'k anos';
+            if (timeInYears >= 1) return timeInYears.toFixed(1) + ' anos';
+            
+            // Converter para dias se menos de 1 ano
+            const days = timeInYears * 365.25;
+            if (days >= 1) return days.toFixed(0) + ' dias';
+            
+            // Converter para horas se menos de 1 dia
+            const hours = days * 24;
+            return hours.toFixed(0) + ' horas';
+        }
+
+        function calculateActivity() {
+            const N0 = parseInt(document.getElementById('initialAmount').value);
+            const element = elements[currentElement];
+            const activity = N0 * element.lambda * 3.154e7; // Converter para becquerels
+            return activity.toExponential(2);
+        }
+
+        function initializeChart() {
+            const ctx = document.getElementById('decayChart').getContext('2d');
+            simulationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Átomos Restantes',
+                        data: [],
+                        borderColor: '#00BF93',
+                        backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Decaimento Radioativo ao Longo do Tempo',
+                            color: '#E4E4E7',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: '#E4E4E7' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Tempo',
+                                color: '#E4E4E7'
+                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#E4E4E7' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Átomos Restantes',
+                                color: '#E4E4E7'
+                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#E4E4E7' },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function startSimulation() {
+            const N0 = parseInt(document.getElementById('initialAmount').value);
+            const totalTime = parseInt(document.getElementById('timeRange').value);
+            const element = elements[currentElement];
+            const lambda = element.lambda;
+
+            // Limpar dados anteriores
+            simulationChart.data.labels = [];
+            simulationChart.data.datasets[0].data = [];
+            simulationChart.data.datasets[0].borderColor = element.color;
+            simulationChart.data.datasets[0].backgroundColor = element.color + '20';
+
+            // Gerar dados de decaimento
+            const timeSteps = 100;
+            for (let i = 0; i <= timeSteps; i++) {
+                const t = (i / timeSteps) * totalTime;
+                const N = N0 * Math.exp(-lambda * t);
+                
+                simulationChart.data.labels.push(t.toFixed(0));
+                simulationChart.data.datasets[0].data.push(N);
+            }
+
+            simulationChart.update();
+            startParticleAnimation();
+        }
+
+        function startParticleAnimation() {
+            const canvas = document.getElementById('particleCanvas');
+            canvas.innerHTML = '';
+            
+            const element = elements[currentElement];
+            const particleCount = Math.min(50, parseInt(document.getElementById('initialAmount').value) / 20);
+
+            for (let i = 0; i < particleCount; i++) {
+                createParticle(canvas, element.decayType, element.color);
+            }
+        }
+
+        function createParticle(container, type, color) {
+            const particle = document.createElement('div');
+            particle.className = `particle particle-${type}`;
+            particle.style.background = color;
+            
+            // Posição inicial aleatória
+            const startX = Math.random() * container.offsetWidth;
+            const startY = Math.random() * container.offsetHeight;
+            
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+            
+            container.appendChild(particle);
+
+            // Animação baseada no tipo de decaimento
+            const duration = type === 'alpha' ? 2000 : type === 'beta' ? 1500 : 1000;
+            const distance = type === 'alpha' ? 50 : type === 'beta' ? 80 : 30;
+
+            const animation = particle.animate([
+                { 
+                    opacity: 1,
+                    transform: 'scale(1)',
+                    offset: 0 
+                },
+                { 
+                    opacity: 0.8,
+                    transform: `scale(1.5) translate(${Math.random() * distance - distance/2}px, ${Math.random() * distance - distance/2}px)`,
+                    offset: 0.5 
+                },
+                { 
+                    opacity: 0,
+                    transform: 'scale(0)',
+                    offset: 1 
+                }
+            ], {
+                duration: duration + Math.random() * 2000,
+                iterations: Infinity
+            });
+
+            // Reiniciar animação periodicamente
+            setInterval(() => {
+                particle.style.left = Math.random() * container.offsetWidth + 'px';
+                particle.style.top = Math.random() * container.offsetHeight + 'px';
+            }, 3000);
+        }
+
+        function stopSimulation() {
+            if (simulationChart) {
+                simulationChart.data.labels = [];
+                simulationChart.data.datasets[0].data = [];
+                simulationChart.update();
+            }
+            
+            const canvas = document.getElementById('particleCanvas');
+            canvas.innerHTML = '';
+            
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            if (atomAnimationId) {
+                cancelAnimationFrame(atomAnimationId);
+            }
+        }
+
+        function switchView(viewType) {
+            const chart2d = document.getElementById('chart2d');
+            const chart3d = document.getElementById('chart3d');
+            const buttons = document.querySelectorAll('.btn-toggle');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (viewType === '2d') {
+                chart2d.style.display = 'block';
+                chart3d.style.display = 'none';
+                document.querySelector('.btn-toggle:nth-child(1)').classList.add('active');
+                is3DViewActive = false;
+                
+                if (atomAnimationId) {
+                    cancelAnimationFrame(atomAnimationId);
+                }
+            } else {
+                chart2d.style.display = 'none';
+                chart3d.style.display = 'block';
+                document.querySelector('.btn-toggle:nth-child(2)').classList.add('active');
+                is3DViewActive = true;
+                init3DView();
+            }
+        }
+
+        function init3DView() {
+            const canvas = document.getElementById('atomCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Configurar canvas
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            if (atomAnimationId) {
+                cancelAnimationFrame(atomAnimationId);
+            }
+            
+            drawAtomicDecay(ctx, canvas.width, canvas.height);
+        }
+
+        function drawAtomicDecay(ctx, width, height) {
+            // Limpar canvas com a cor de fundo dos cards
+            ctx.fillStyle = '#0A0A0A'; // Cor equivalente a var(--color-bg-page)
+            ctx.fillRect(0, 0, width, height);
+            
+            const element = elements[currentElement];
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const time = Date.now() * 0.001;
+            
+            // Desenhar núcleo atômico
+            ctx.fillStyle = element.color;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Adicionar detalhes ao núcleo
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            for (let i = 0; i < 8; i++) {
+                const angle = time + i * Math.PI / 4;
+                const x = centerX + Math.cos(angle) * 15;
+                const y = centerY + Math.sin(angle) * 10;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Elétrons/orbitas
+            const electronCount = Math.min(8, Math.max(3, Math.floor(element.halfLife / 1e6) + 3));
+            
+            for (let orbit = 0; orbit < 3; orbit++) {
+                const radius = 60 + orbit * 40;
+                const electronsInOrbit = Math.min(electronCount - orbit * 3, 3);
+                
+                // Desenhar órbita
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Desenhar elétrons
+                for (let i = 0; i < electronsInOrbit; i++) {
+                    const angle = time * 2 + (i * Math.PI * 2 / electronsInOrbit) + orbit;
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
+                    
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = element.color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            // Partículas de decaimento
+            const decayParticles = Math.min(5, Math.floor(parseInt(document.getElementById('initialAmount').value) / 200));
+            
+            for (let i = 0; i < decayParticles; i++) {
+                const particleAngle = time * 3 + i * Math.PI * 2 / decayParticles;
+                const distance = 100 + Math.sin(time * 2 + i) * 30;
+                const x = centerX + Math.cos(particleAngle) * distance;
+                const y = centerY + Math.sin(particleAngle) * distance;
+                
+                // Tipo de partícula baseado no decaimento
+                let particleColor;
+                let particleSize;
+                
+                if (element.decayType === 'alpha') {
+                    particleColor = '#DC2626';
+                    particleSize = 8;
+                } else if (element.decayType === 'beta') {
+                    particleColor = '#16A34A';
+                    particleSize = 5;
+                } else {
+                    particleColor = '#0284C7';
+                    particleSize = 12;
+                }
+                
+                ctx.fillStyle = particleColor;
+                ctx.beginPath();
+                ctx.arc(x, y, particleSize, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Cauda da partícula
+                ctx.strokeStyle = particleColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(
+                    x - Math.cos(particleAngle) * 20,
+                    y - Math.sin(particleAngle) * 20
+                );
+                ctx.stroke();
+            }
+            
+            // Texto informativo
+            ctx.fillStyle = '#E4E4E7';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Decaimento ${element.decayType.toUpperCase()} - ${element.name}`, centerX, 30);
+            ctx.font = '12px Arial';
+            ctx.fillText(`Meia-vida: ${formatHalfLife(element.halfLife)}`, centerX, height - 20);
+            
+            // Continuar animação
+            atomAnimationId = requestAnimationFrame(() => drawAtomicDecay(ctx, width, height));
+        }
+
+        function exportData() {
+            const element = elements[currentElement];
+            const data = {
+                elemento: element.name,
+                simbolo: element.symbol,
+                meiaVida: element.halfLife + ' anos',
+                constanteDecaimento: element.lambda,
+                tipoDecaimento: element.decayType,
+                produtoDecaimento: element.decayProduct,
+                aplicacoes: element.uses,
+                dados: simulationChart.data.datasets[0].data
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `decaimento_${currentElement}_${new Date().getTime()}.json`;
+            link.click();
+            
+            alert('Dados exportados com sucesso!');
+        }
+
+        // Configurar MathJax
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+</body>
+</html>

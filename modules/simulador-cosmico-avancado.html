@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MÓDULO CÓSMICO</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === CSS VARIABLES (Design System Nuclear) === */
+        :root {
+            /* Color System */
+            --color-primary-100: #E8F4F8;
+            --color-primary-500: #00BF93; /* Verde ciano workspace */
+            --color-primary-700: #00A085;
+            
+            --color-nuclear-100: #FEF2F2;
+            --color-nuclear-500: #DC2626; /* Vermelho nuclear */
+            --color-nuclear-700: #B91C1C;
+            
+            --color-bg-page: #0A0A0A;
+            --color-bg-surface: #141414;
+            --color-bg-surface-hover: rgba(22, 22, 22, 0.5);
+            
+            --color-border-default: #3f3f46;
+            --color-border-focus: #00BF93;
+            --color-border-light: #262626;
+            
+            --color-text-primary: #E4E4E7;
+            --color-text-secondary: #A1A1AA;
+            --color-text-high-contrast: #FFFFFF;
+            
+            --color-success: #22C55E;
+            --color-warning: #FBBF24;
+            --color-error: #F43F5E;
+            
+            /* Cosmic-specific colors */
+            --color-star: #FBBF24;      /* Amarelo para estrelas */
+            --color-planet: #3B82F6;    /* Azul para planetas */
+            --color-blackhole: #8B5CF6; /* Roxo para buracos negros */
+            --color-nebula: #EC4899;    /* Rosa para nebulosas */
+            --color-supernova: #F97316; /* Laranja para supernovas */
+            --color-comet: #10B981;     /* Verde para cometas */
+
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size-h1: 48px;
+            --font-size-h2: 24px;
+            --font-size-h3: 16px;
+            --font-size-body: 16px;
+            --font-size-body-sm: 14px;
+            
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Spacing (8px Grid) */
+            --space-xs: 8px;
+            --space-sm: 12px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+            --space-xxxl: 64px;
+            
+            /* Layout */
+            --layout-max-width: 1440px;
+            --radius-sm: 8px;
+            --border-width: 1px;
+            
+            /* Animations */
+            --transition-fast: 150ms ease-out;
+            --transition-normal: 200ms ease-out;
+        }
+
+        /* === GLOBAL STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-family);
+            background: var(--color-bg-page);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--color-bg-surface) 0%, #1a1a1a 100%);
+            border-bottom: var(--border-width) solid var(--color-border-light);
+            padding: var(--space-xl) var(--space-xxl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+            letter-spacing: -0.5%;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .cosmic-icon {
+            font-size: 36px;
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-lg);
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: var(--font-size-body);
+            color: var(--color-text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* === MAIN LAYOUT === */
+        .app-main {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            padding: var(--space-xxl);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-xl);
+        }
+
+        /* === TAB SYSTEM === */
+        .tabs {
+            display: flex;
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            overflow: hidden;
+            margin-bottom: 0;
+            border: var(--border-width) solid var(--color-border-light);
+            border-bottom: none;
+        }
+
+        .tab {
+            flex: 1;
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border-bottom: 3px solid transparent;
+            font-size: var(--font-size-body-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            background: var(--color-bg-surface);
+        }
+
+        .tab:hover {
+            background: var(--color-bg-surface-hover);
+            color: var(--color-text-primary);
+        }
+
+        .tab.active {
+            background: var(--color-bg-surface);
+            border-bottom: 3px solid var(--color-primary-500);
+            color: var(--color-text-primary);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--color-bg-surface);
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            min-height: 600px;
+            width: 100%;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+            border-top: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* === SECTION STYLES === */
+        .section-title {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-lg);
+            letter-spacing: -1%;
+        }
+
+        .control-group {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            width: 100%;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .control-group h3 {
+            color: var(--color-primary-500);
+            margin-bottom: var(--space-md);
+            border-bottom: 2px solid var(--color-primary-500);
+            padding-bottom: var(--space-sm);
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* === COSMIC SIMULATOR LAYOUT === */
+        .cosmic-simulator {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: var(--space-lg);
+            height: 70vh;
+        }
+
+        .nav-panel {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            border: var(--border-width) solid var(--color-border-light);
+            overflow-y: auto;
+        }
+
+        .visualization-panel {
+            position: relative;
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .control-panel {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            border: var(--border-width) solid var(--color-border-light);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === NAVIGATION SECTIONS === */
+        .nav-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .nav-section h4 {
+            color: var(--color-primary-500);
+            margin-bottom: var(--space-md);
+            border-bottom: 2px solid var(--color-primary-500);
+            padding-bottom: var(--space-sm);
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-normal);
+            flex: 1;
+            font-size: var(--font-size-body-sm);
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-700);
+            transform: scale(1.03);
+        }
+
+        .nav-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: var(--border-width) solid var(--color-border-default);
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-size: var(--font-size-body-sm);
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--color-border-focus);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: var(--color-primary-500);
+            border-color: var(--color-primary-700);
+            color: var(--color-text-high-contrast);
+        }
+
+        /* Cosmic-specific buttons */
+        .btn-star {
+            background: var(--color-star);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-planet {
+            background: var(--color-planet);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-blackhole {
+            background: var(--color-blackhole);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-nebula {
+            background: var(--color-nebula);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-supernova {
+            background: var(--color-supernova);
+            color: var(--color-text-high-contrast);
+        }
+
+        /* === CELESTIAL LIST === */
+        .celestial-list {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: var(--space-lg);
+            border: var(--border-width) solid var(--color-border-default);
+            border-radius: var(--radius-sm);
+            padding: var(--space-sm);
+        }
+
+        .celestial-item {
+            padding: var(--space-sm);
+            margin: var(--space-xs) 0;
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border-left: 4px solid var(--color-primary-500);
+            font-size: var(--font-size-body-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .celestial-item:hover {
+            background: var(--color-bg-surface-hover);
+        }
+
+        .celestial-item.active {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        /* === SLIDERS === */
+        .slider-container {
+            margin: var(--space-md) 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-sm);
+            font-size: var(--font-size-body-sm);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--color-bg-surface);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--color-primary-500);
+            cursor: pointer;
+        }
+
+        /* === PROPERTY GRID === */
+        .property-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+
+        .property-item {
+            background: var(--color-bg-surface);
+            padding: var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-body-sm);
+        }
+
+        .property-value {
+            color: var(--color-primary-500);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* === VIEWER CONTROLS === */
+        .viewer-controls {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .viewer-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: var(--border-width) solid var(--color-border-default);
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-size: var(--font-size-body-sm);
+        }
+
+        .viewer-btn:hover {
+            border-color: var(--color-border-focus);
+            transform: translateY(-2px);
+        }
+
+        .viewer-btn.active {
+            background: var(--color-primary-500);
+            border-color: var(--color-primary-700);
+            color: var(--color-text-high-contrast);
+        }
+
+        /* === FOOTER === */
+        .footer {
+            background: var(--color-bg-surface);
+            padding: var(--space-lg);
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-size-body-sm);
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .simulation-info {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-value {
+            color: var(--color-primary-500);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-body);
+        }
+
+        .info-label {
+            font-size: var(--font-size-body-sm);
+            opacity: 0.8;
+        }
+
+        /* === MODAL === */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--color-bg-surface);
+            padding: var(--space-xl);
+            border-radius: var(--radius-sm);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        .catalog-item {
+            background: var(--color-bg-page);
+            padding: var(--space-lg);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all var(--transition-normal);
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .catalog-item:hover {
+            border-color: var(--color-primary-500);
+            transform: translateY(-2px);
+        }
+
+        .close {
+            float: right;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--color-primary-500);
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 1024px) {
+            .cosmic-simulator {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+                height: auto;
+            }
+            
+            .app-title {
+                font-size: var(--font-size-h2);
+            }
+            
+            .cosmic-icon {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-main {
+                padding: var(--space-lg);
+            }
+            
+            .app-header {
+                padding: var(--space-lg);
+            }
+            
+            .tab {
+                padding: var(--space-sm);
+                font-size: var(--font-size-body-sm);
+            }
+            
+            .nav-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+            
+            .property-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .simulation-info {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="header-content">
+            <div>
+                <h1 class="app-title">
+                    <span class="cosmic-icon">🌌</span>
+                    MÓDULO CÓSMICO
+                </h1>
+                <p class="subtitle">Simulação Completa de Sistemas Estelares, Buracos Negros e Eventos Cósmicos</p>
+            </div>
+            <div class="header-actions">
+                <!-- Reserved for future actions -->
+            </div>
+        </div>
+    </div>
+
+    <div class="app-main">
+        <div class="app-grid">
+            <div class="tabs">
+                <div class="tab active" data-tab="solar-system">🪐 Sistema Solar</div>
+                <div class="tab" data-tab="cosmic-builder">🔭 Construtor Cósmico</div>
+                <div class="tab" data-tab="blackholes">🕳️ Buracos Negros</div>
+                <div class="tab" data-tab="cosmic-events">💥 Eventos Cósmicos</div>
+            </div>
+
+            <!-- ABA: Sistema Solar -->
+            <div class="tab-content active" id="solar-system">
+                <div class="control-group">
+                    <h3>Simulação do Sistema Solar</h3>
+                    
+                    <div class="cosmic-simulator">
+                        <!-- Painel de Navegação -->
+                        <div class="nav-panel">
+                            <div class="nav-section">
+                                <h4>🎯 Modos de Simulação</h4>
+                                <div class="nav-buttons">
+                                    <button class="nav-btn active" data-mode="solar">Sistema Solar</button>
+                                    <button class="nav-btn" data-mode="builder">Construtor</button>
+                                    <button class="nav-btn" data-mode="events">Eventos Cósmicos</button>
+                                    <button class="nav-btn" data-mode="blackhole">Buracos Negros</button>
+                                </div>
+                            </div>
+
+                            <div class="nav-section">
+                                <h4>🔧 Ferramentas</h4>
+                                <div class="nav-buttons">
+                                    <button class="nav-btn" onclick="openCatalog('stars')">⭐ Estrelas</button>
+                                    <button class="nav-btn" onclick="openCatalog('planets')">🪐 Planetas</button>
+                                    <button class="nav-btn" onclick="openCatalog('nebulae')">🌫️ Nebulosas</button>
+                                    <button class="nav-btn" onclick="openCatalog('blackholes')">🕳️ Buracos Negros</button>
+                                    <button class="nav-btn" onclick="addRandomSystem()">🎲 Sistema Aleatório</button>
+                                    <button class="nav-btn" onclick="resetSimulation()">🗑️ Limpar Tudo</button>
+                                </div>
+                            </div>
+
+                            <div class="nav-section">
+                                <h4>👁️ Visualização</h4>
+                                <div class="nav-buttons">
+                                    <button class="nav-btn" data-view="normal">Normal</button>
+                                    <button class="nav-btn" data-view="gravitational">Campo Gravitacional</button>
+                                    <button class="nav-btn" data-view="temperature">Mapa de Temperatura</button>
+                                    <button class="nav-btn" data-view="spectral">Espectro Eletromagnético</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visualização Principal -->
+                        <div class="visualization-panel">
+                            <div id="cosmicCanvas3D"></div>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" onclick="toggleOrbits()">🔄 Órbitas</button>
+                                <button class="viewer-btn" onclick="toggleLabels()">🏷️ Rótulos</button>
+                                <button class="viewer-btn" onclick="togglePause()">⏸️ Pausar</button>
+                            </div>
+                        </div>
+
+                        <!-- Painel de Controle -->
+                        <div class="control-panel">
+                            <div class="nav-section">
+                                <h4>🪐 Corpos Celestes</h4>
+                                <div class="celestial-list" id="celestialList">
+                                    <!-- Lista de corpos será preenchida via JS -->
+                                </div>
+                            </div>
+
+                            <div class="nav-section">
+                                <h4>⚙️ Propriedades Físicas</h4>
+                                <div class="slider-container">
+                                    <div class="slider-label">
+                                        <span>Massa:</span>
+                                        <span id="massValue">1.989×10³⁰ kg</span>
+                                    </div>
+                                    <input type="range" id="massSlider" min="1e20" max="1e32" value="1.989e30" step="1e20">
+                                </div>
+
+                                <div class="slider-container">
+                                    <div class="slider-label">
+                                        <span>Raio:</span>
+                                        <span id="radiusValue">696,340 km</span>
+                                    </div>
+                                    <input type="range" id="radiusSlider" min="100" max="1000000" value="696340" step="100">
+                                </div>
+
+                                <div class="slider-container">
+                                    <div class="slider-label">
+                                        <span>Temperatura:</span>
+                                        <span id="tempValue">5,778 K</span>
+                                    </div>
+                                    <input type="range" id="tempSlider" min="0" max="50000" value="5778" step="10">
+                                </div>
+
+                                <div class="property-grid">
+                                    <div class="property-item">
+                                        <div>Velocidade Orbital:</div>
+                                        <div class="property-value" id="orbitalSpeed">29.8 km/s</div>
+                                    </div>
+                                    <div class="property-item">
+                                        <div>Período Orbital:</div>
+                                        <div class="property-value" id="orbitalPeriod">365.25 dias</div>
+                                    </div>
+                                    <div class="property-item">
+                                        <div>Gravidade Superficial:</div>
+                                        <div class="property-value" id="surfaceGravity">9.8 m/s²</div>
+                                    </div>
+                                    <div class="property-item">
+                                        <div>Idade:</div>
+                                        <div class="property-value" id="ageValue">4.6B anos</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="nav-section">
+                                <h4>🎭 Características</h4>
+                                <div class="property-grid">
+                                    <div class="property-item">
+                                        <div>Tipo:</div>
+                                        <div class="property-value" id="typeValue">Estrela (G2V)</div>
+                                    </div>
+                                    <div class="property-item">
+                                        <div>Composição:</div>
+                                        <div class="property-value" id="compositionValue">74.9% H, 23.8% He</div>
+                                    </div>
+                                    <div class="property-item">
+                                        <div>Luminosidade:</div>
+                                        <div class="property-value" id="luminosityValue">1 L☉</div>
+                                    </div>
+                                    <div class="property-item">
+                                        <div>Estado:</div>
+                                        <div class="property-value" id="stateValue">Estável</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons" style="margin-top: auto; display: flex; gap: var(--space-sm);">
+                                <button class="btn btn-primary" onclick="applyChanges()">💾 Aplicar Alterações</button>
+                                <button class="btn btn-danger" onclick="deleteCelestial()">🗑️ Remover Corpo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rodapé com Informações -->
+                <div class="footer">
+                    <div class="simulation-info">
+                        <div class="info-item">
+                            <div class="info-value" id="timeElapsed">0 anos</div>
+                            <div class="info-label">Tempo Simulado</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-value" id="bodiesCount">0</div>
+                            <div class="info-label">Corpos Ativos</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-value" id="energyTotal">0 J</div>
+                            <div class="info-label">Energia Total</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-value" id="collisionsCount">0</div>
+                            <div class="info-label">Colisões</div>
+                        </div>
+                    </div>
+                    <div class="action-buttons" style="display: flex; gap: var(--space-sm);">
+                        <button class="btn btn-primary" onclick="exportSystem()">📤 Exportar Sistema</button>
+                        <button class="btn btn-primary" onclick="importSystem()">📥 Importar Sistema</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outras abas (simplificadas para exemplo) -->
+            <div class="tab-content" id="cosmic-builder">
+                <div class="control-group">
+                    <h3>🔭 Construtor de Sistemas Cósmicos</h3>
+                    <p style="color: var(--color-text-secondary); text-align: center; padding: var(--space-xl);">
+                        Construtor cósmico em desenvolvimento. Use a aba "Sistema Solar" para simulações.
+                    </p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="blackholes">
+                <div class="control-group">
+                    <h3>🕳️ Simulação de Buracos Negros</h3>
+                    <p style="color: var(--color-text-secondary); text-align: center; padding: var(--space-xl);">
+                        Simulação de buracos negros em desenvolvimento. Use a aba "Sistema Solar" para simulações.
+                    </p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="cosmic-events">
+                <div class="control-group">
+                    <h3>💥 Eventos Cósmicos</h3>
+                    <p style="color: var(--color-text-secondary); text-align: center; padding: var(--space-xl);">
+                        Simulação de eventos cósmicos em desenvolvimento. Use a aba "Sistema Solar" para simulações.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do Catálogo -->
+    <div id="catalogModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="catalogTitle">Catálogo de Estrelas</h2>
+            <div class="catalog-grid" id="catalogGrid">
+                <!-- Itens do catálogo serão preenchidos via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== SISTEMA PRINCIPAL =====
+        let scene, camera, renderer, controls;
+        let celestialBodies = [];
+        let selectedBody = null;
+        let simulationRunning = true;
+        let simulationTime = 0;
+        let G = 6.674e-11;
+
+        // Catálogo completo de objetos cósmicos
+        const cosmicCatalog = {
+            stars: [
+                { name: "Anã Vermelha", type: "star", mass: 0.1e30, radius: 100000, temp: 3000, color: 0xff4500, luminosity: 0.01, description: "Estrela pequena e fria, vida longa" },
+                { name: "Anã Marrom", type: "star", mass: 0.01e30, radius: 50000, temp: 1500, color: 0x8b4513, luminosity: 0.0001, description: "Estrela falha, entre planeta e estrela" },
+                { name: "Estrela Amarela", type: "star", mass: 1e30, radius: 696340, temp: 5778, color: 0xffff00, luminosity: 1, description: "Estrela de sequência principal como o Sol" },
+                { name: "Gigante Azul", type: "star", mass: 18e30, radius: 10000000, temp: 30000, color: 0x4169e1, luminosity: 20000, description: "Estrela massiva, vida curta e quente" },
+                { name: "Gigante Vermelha", type: "star", mass: 1e30, radius: 100000000, temp: 3500, color: 0xff6347, luminosity: 1000, description: "Estrela em fase final de vida" }
+            ],
+            planets: [
+                { name: "Planeta Rochoso", type: "planet", mass: 1e24, radius: 6000, temp: 300, color: 0x8b4513, atmosphere: "Fina", description: "Mundo terrestre com superfície sólida" },
+                { name: "Planeta Gasoso", type: "planet", mass: 100e24, radius: 50000, temp: 150, color: 0xffd700, atmosphere: "Espessa", description: "Gigante gasoso sem superfície sólida" },
+                { name: "Super-Terra", type: "planet", mass: 5e24, radius: 10000, temp: 280, color: 0x32cd32, atmosphere: "Moderada", description: "Planeta rochoso massivo" },
+                { name: "Planeta Oceano", type: "planet", mass: 2e24, radius: 8000, temp: 290, color: 0x1e90ff, atmosphere: "Úmida", description: "Mundo coberto por oceanos" }
+            ],
+            blackholes: [
+                { name: "Buraco Negro Estelar", type: "blackhole", mass: 5e30, radius: 8.85, temp: 0.00000006, color: 0x000000, luminosity: 0, description: "Buraco negro de massa estelar" },
+                { name: "Buraco Negro Supermassivo", type: "blackhole", mass: 1e36, radius: 1.48e9, temp: 1e-14, color: 0x2f4f4f, luminosity: 0, description: "Buraco negro galáctico central" }
+            ]
+        };
+
+        // Inicialização do Three.js
+        function initThreeJS() {
+            // Cena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1a);
+
+            // Câmera
+            camera = new THREE.PerspectiveCamera(75, 
+                document.getElementById('cosmicCanvas3D').offsetWidth / 
+                document.getElementById('cosmicCanvas3D').offsetHeight, 
+                0.1, 1000000);
+            camera.position.set(0, 50, 100);
+
+            // Renderizador
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(document.getElementById('cosmicCanvas3D').offsetWidth, 
+                            document.getElementById('cosmicCanvas3D').offsetHeight);
+            renderer.shadowMap.enabled = true;
+            document.getElementById('cosmicCanvas3D').appendChild(renderer.domElement);
+
+            // Controles
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 10;
+            controls.maxDistance = 10000;
+
+            // Iluminação
+            const ambientLight = new THREE.AmbientLight(0x333333);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(100, 100, 50);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Estrelas de fundo
+            createStarField();
+
+            // Sistema solar inicial
+            createSolarSystem();
+
+            // Iniciar animação
+            animate();
+        }
+
+        function createStarField() {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsCount = 5000;
+            const positions = new Float32Array(starsCount * 3);
+            const colors = new Float32Array(starsCount * 3);
+
+            for (let i = 0; i < starsCount * 3; i += 3) {
+                // Posições aleatórias em uma esfera grande
+                const radius = 5000 + Math.random() * 15000;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+
+                positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                positions[i + 2] = radius * Math.cos(phi);
+
+                // Cores aleatórias com tendência para azul/branco
+                const color = new THREE.Color();
+                color.setHSL(0.6 + Math.random() * 0.2, 0.3, 0.7 + Math.random() * 0.3);
+                colors[i] = color.r;
+                colors[i + 1] = color.g;
+                colors[i + 2] = color.b;
+            }
+
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            starsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const starsMaterial = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                sizeAttenuation: true
+            });
+
+            const starField = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(starField);
+        }
+
+        // Classe para corpos celestes
+        class CelestialBody {
+            constructor(data, position, velocity) {
+                this.name = data.name;
+                this.type = data.type;
+                this.mass = data.mass;
+                this.radius = data.radius;
+                this.temperature = data.temp;
+                this.color = data.color;
+                this.luminosity = data.luminosity || 0;
+                this.description = data.description;
+                this.atmosphere = data.atmosphere || "Nenhuma";
+                
+                this.position = position || new THREE.Vector3(0, 0, 0);
+                this.velocity = velocity || new THREE.Vector3(0, 0, 0);
+                this.force = new THREE.Vector3(0, 0, 0);
+                this.trail = [];
+                this.maxTrailLength = 200;
+                this.age = 0;
+                this.isSelected = false;
+
+                this.createMesh();
+            }
+
+            createMesh() {
+                let geometry, material;
+
+                switch(this.type) {
+                    case 'star':
+                        geometry = new THREE.SphereGeometry(this.radius / 100000, 32, 32);
+                        material = new THREE.MeshPhongMaterial({ 
+                            color: this.color,
+                            emissive: this.color,
+                            emissiveIntensity: 0.5
+                        });
+                        break;
+                    case 'blackhole':
+                        geometry = new THREE.SphereGeometry(this.radius / 1000, 32, 32);
+                        material = new THREE.MeshBasicMaterial({ 
+                            color: 0x000000,
+                            transparent: true,
+                            opacity: 0.8
+                        });
+                        break;
+                    default:
+                        geometry = new THREE.SphereGeometry(this.radius / 50000, 32, 32);
+                        material = new THREE.MeshPhongMaterial({ 
+                            color: this.color,
+                            shininess: 30
+                        });
+                }
+
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.copy(this.position);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+
+                // Adicionar aura para estrelas
+                if (this.type === 'star') {
+                    const glowGeometry = new THREE.SphereGeometry(this.radius / 80000, 32, 32);
+                    const glowMaterial = new THREE.MeshBasicMaterial({
+                        color: this.color,
+                        transparent: true,
+                        opacity: 0.3,
+                        side: THREE.BackSide
+                    });
+                    this.glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                    this.mesh.add(this.glow);
+                }
+
+                scene.add(this.mesh);
+            }
+
+            updatePhysics(deltaTime) {
+                // Resetar força
+                this.force.set(0, 0, 0);
+
+                // Calcular forças gravitacionais de todos os outros corpos
+                celestialBodies.forEach(otherBody => {
+                    if (otherBody !== this) {
+                        const direction = new THREE.Vector3().subVectors(otherBody.position, this.position);
+                        const distance = direction.length();
+                        
+                        if (distance > 0) {
+                            const forceMagnitude = G * this.mass * otherBody.mass / (distance * distance);
+                            direction.normalize();
+                            this.force.add(direction.multiplyScalar(forceMagnitude));
+                        }
+                    }
+                });
+
+                // Integração Verlet para maior precisão
+                const acceleration = this.force.divideScalar(this.mass);
+                this.velocity.add(acceleration.multiplyScalar(deltaTime));
+                this.position.add(this.velocity.clone().multiplyScalar(deltaTime));
+
+                // Atualizar mesh
+                this.mesh.position.copy(this.position);
+
+                // Atualizar trilha
+                this.updateTrail();
+            }
+
+            updateTrail() {
+                this.trail.push(this.position.clone());
+                if (this.trail.length > this.maxTrailLength) {
+                    this.trail.shift();
+                }
+            }
+
+            select() {
+                this.isSelected = true;
+                this.mesh.material.emissive = new THREE.Color(0x4444ff);
+                this.mesh.material.emissiveIntensity = 0.3;
+                this.updateControlPanel();
+            }
+
+            deselect() {
+                this.isSelected = false;
+                this.mesh.material.emissive = new THREE.Color(0x000000);
+                this.mesh.material.emissiveIntensity = 0;
+            }
+
+            updateControlPanel() {
+                document.getElementById('massValue').textContent = formatMass(this.mass);
+                document.getElementById('radiusValue').textContent = formatDistance(this.radius);
+                document.getElementById('tempValue').textContent = formatTemperature(this.temperature);
+                document.getElementById('typeValue').textContent = this.type;
+                document.getElementById('compositionValue').textContent = this.getComposition();
+                document.getElementById('luminosityValue').textContent = formatLuminosity(this.luminosity);
+                document.getElementById('stateValue').textContent = this.getStability();
+
+                // Atualizar sliders
+                document.getElementById('massSlider').value = this.mass;
+                document.getElementById('radiusSlider').value = this.radius;
+                document.getElementById('tempSlider').value = this.temperature;
+            }
+
+            getComposition() {
+                const compositions = {
+                    'star': '74.9% H, 23.8% He, 1.3% Metais',
+                    'planet': 'Silicatos, Metais, Gases',
+                    'blackhole': 'Singularidade, Horizonte de Eventos'
+                };
+                return compositions[this.type] || 'Composição Desconhecida';
+            }
+
+            getStability() {
+                const velocity = this.velocity.length();
+                if (velocity > 1000) return 'Órbita Hiperbólica';
+                if (velocity > 100) return 'Órbita Estável';
+                return 'Órbita Circular';
+            }
+        }
+
+        // Sistema Solar de Exemplo
+        function createSolarSystem() {
+            celestialBodies = [];
+
+            // Sol
+            const sunData = cosmicCatalog.stars[2]; // Estrela Amarela
+            const sun = new CelestialBody(sunData, new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
+            celestialBodies.push(sun);
+
+            // Planetas com órbitas realistas
+            const planets = [
+                { data: cosmicCatalog.planets[0], distance: 50, speed: 8, name: "Mercúrio" },
+                { data: cosmicCatalog.planets[0], distance: 70, speed: 7, name: "Vênus" },
+                { data: cosmicCatalog.planets[0], distance: 100, speed: 6, name: "Terra" },
+                { data: cosmicCatalog.planets[0], distance: 150, speed: 5, name: "Marte" },
+                { data: cosmicCatalog.planets[1], distance: 250, speed: 4, name: "Júpiter" },
+                { data: cosmicCatalog.planets[1], distance: 350, speed: 3, name: "Saturno" }
+            ];
+
+            planets.forEach((planet, index) => {
+                const angle = (index / planets.length) * Math.PI * 2;
+                const position = new THREE.Vector3(
+                    Math.cos(angle) * planet.distance,
+                    (Math.random() - 0.5) * 10,
+                    Math.sin(angle) * planet.distance
+                );
+
+                const tangent = new THREE.Vector3(-Math.sin(angle), 0, Math.cos(angle));
+                const velocity = tangent.multiplyScalar(planet.speed);
+
+                const planetBody = new CelestialBody(
+                    { ...planet.data, name: planet.name },
+                    position,
+                    velocity
+                );
+                celestialBodies.push(planetBody);
+            });
+
+            updateCelestialList();
+            selectedBody = sun;
+            sun.select();
+        }
+
+        // Funções de Interface
+        function updateCelestialList() {
+            const list = document.getElementById('celestialList');
+            list.innerHTML = '';
+            
+            celestialBodies.forEach((body, index) => {
+                const item = document.createElement('div');
+                item.className = `celestial-item ${body.isSelected ? 'active' : ''}`;
+                item.textContent = `${getBodyIcon(body.type)} ${body.name}`;
+                item.onclick = () => selectBody(body);
+                list.appendChild(item);
+            });
+
+            document.getElementById('bodiesCount').textContent = celestialBodies.length;
+        }
+
+        function getBodyIcon(type) {
+            const icons = {
+                'star': '⭐',
+                'planet': '🪐',
+                'blackhole': '🕳️'
+            };
+            return icons[type] || '🌌';
+        }
+
+        function selectBody(body) {
+            if (selectedBody) selectedBody.deselect();
+            selectedBody = body;
+            body.select();
+            updateCelestialList();
+            
+            // Focar na câmera
+            controls.target.copy(body.position);
+            camera.position.copy(body.position.clone().add(new THREE.Vector3(body.radius * 2, body.radius * 2, body.radius * 2)));
+        }
+
+        // Catálogo Modal
+        function openCatalog(type) {
+            const modal = document.getElementById('catalogModal');
+            const title = document.getElementById('catalogTitle');
+            const grid = document.getElementById('catalogGrid');
+            
+            const catalogTitles = {
+                'stars': 'Catálogo de Estrelas',
+                'planets': 'Catálogo de Planetas',
+                'blackholes': 'Catálogo de Buracos Negros',
+                'nebulae': 'Catálogo de Nebulosas'
+            };
+
+            title.textContent = catalogTitles[type] || 'Catálogo Cósmico';
+            grid.innerHTML = '';
+
+            cosmicCatalog[type].forEach(item => {
+                const catalogItem = document.createElement('div');
+                catalogItem.className = 'catalog-item';
+                catalogItem.innerHTML = `
+                    <div style="font-size: 2em; margin-bottom: 8px;">${getBodyIcon(item.type)}</div>
+                    <strong>${item.name}</strong>
+                    <div style="font-size: 0.8em; opacity: 0.8; margin-top: 5px;">${item.description}</div>
+                `;
+                catalogItem.onclick = () => addToSimulation(item);
+                grid.appendChild(catalogItem);
+            });
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('catalogModal').style.display = 'none';
+        }
+
+        function addToSimulation(item) {
+            const position = new THREE.Vector3(
+                (Math.random() - 0.5) * 200,
+                (Math.random() - 0.5) * 50,
+                (Math.random() - 0.5) * 200
+            );
+
+            const velocity = new THREE.Vector3(
+                (Math.random() - 0.5) * 2,
+                (Math.random() - 0.5) * 0.5,
+                (Math.random() - 0.5) * 2
+            );
+
+            const body = new CelestialBody(item, position, velocity);
+            celestialBodies.push(body);
+            updateCelestialList();
+            closeModal();
+        }
+
+        // Funções de Formatação
+        function formatMass(kg) {
+            if (kg >= 1e30) return (kg / 1.989e30).toFixed(2) + ' M☉';
+            if (kg >= 1e24) return (kg / 5.972e24).toFixed(2) + ' M⊕';
+            return kg.toExponential(2) + ' kg';
+        }
+
+        function formatDistance(km) {
+            if (km >= 1e9) return (km / 1.496e8).toFixed(2) + ' AU';
+            if (km >= 1e6) return (km / 1e6).toFixed(1) + ' Mkm';
+            if (km >= 1e3) return (km / 1e3).toFixed(1) + ' kkm';
+            return km.toFixed(0) + ' km';
+        }
+
+        function formatTemperature(kelvin) {
+            if (kelvin >= 1e6) return (kelvin / 1e6).toFixed(1) + ' MK';
+            if (kelvin >= 1e3) return (kelvin / 1e3).toFixed(0) + ' kK';
+            return kelvin.toFixed(0) + ' K';
+        }
+
+        function formatLuminosity(lum) {
+            if (lum >= 1e6) return (lum / 1e6).toFixed(1) + ' ML☉';
+            if (lum >= 1e3) return (lum / 1e3).toFixed(1) + ' kL☉';
+            if (lum >= 1) return lum.toFixed(2) + ' L☉';
+            return lum.toExponential(2) + ' L☉';
+        }
+
+        // Animação Principal
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (simulationRunning) {
+                const deltaTime = 86400; // 1 dia em segundos
+                
+                celestialBodies.forEach(body => {
+                    body.updatePhysics(deltaTime);
+                });
+
+                simulationTime += deltaTime / 3.154e7; // Converter para anos
+                updateStatistics();
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function updateStatistics() {
+            document.getElementById('timeElapsed').textContent = simulationTime.toFixed(2) + ' anos';
+            
+            let totalEnergy = 0;
+            celestialBodies.forEach(body => {
+                const kinetic = 0.5 * body.mass * body.velocity.lengthSq();
+                totalEnergy += kinetic;
+            });
+            
+            document.getElementById('energyTotal').textContent = totalEnergy.toExponential(2) + ' J';
+        }
+
+        // Funções de Controle
+        function applyChanges() {
+            if (!selectedBody) return;
+            
+            selectedBody.mass = parseFloat(document.getElementById('massSlider').value);
+            selectedBody.radius = parseFloat(document.getElementById('radiusSlider').value);
+            selectedBody.temperature = parseFloat(document.getElementById('tempSlider').value);
+            
+            selectedBody.updateControlPanel();
+        }
+
+        function resetSimulation() {
+            celestialBodies.forEach(body => scene.remove(body.mesh));
+            celestialBodies = [];
+            createSolarSystem();
+        }
+
+        function togglePause() {
+            simulationRunning = !simulationRunning;
+            document.querySelector('[onclick="togglePause()"]').textContent = 
+                simulationRunning ? '⏸️ Pausar' : '▶️ Continuar';
+        }
+
+        // Sistema de Abas
+        function initializeTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    
+                    // Atualizar botões ativos
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // Inicialização
+        window.addEventListener('load', () => {
+            initThreeJS();
+            initializeTabs();
+            
+            // Configurar event listeners dos sliders
+            document.getElementById('massSlider').addEventListener('input', function() {
+                document.getElementById('massValue').textContent = formatMass(this.value);
+            });
+            
+            document.getElementById('radiusSlider').addEventListener('input', function() {
+                document.getElementById('radiusValue').textContent = formatDistance(this.value);
+            });
+            
+            document.getElementById('tempSlider').addEventListener('input', function() {
+                document.getElementById('tempValue').textContent = formatTemperature(this.value);
+            });
+
+            // Configurar navegação por modos
+            document.querySelectorAll('.nav-btn[data-mode]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-btn[data-mode]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    // Implementar mudança de modo aqui
+                });
+            });
+        });
+
+        // Redimensionamento
+        window.addEventListener('resize', () => {
+            camera.aspect = document.getElementById('cosmicCanvas3D').offsetWidth / 
+                           document.getElementById('cosmicCanvas3D').offsetHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(document.getElementById('cosmicCanvas3D').offsetWidth, 
+                           document.getElementById('cosmicCanvas3D').offsetHeight);
+        });
+
+        // Funções placeholder para botões não implementados
+        function toggleOrbits() {
+            alert('Funcionalidade de órbitas em desenvolvimento');
+        }
+
+        function toggleLabels() {
+            alert('Funcionalidade de rótulos em desenvolvimento');
+        }
+
+        function deleteCelestial() {
+            if (!selectedBody) return;
+            if (confirm(`Remover ${selectedBody.name}?`)) {
+                scene.remove(selectedBody.mesh);
+                celestialBodies = celestialBodies.filter(body => body !== selectedBody);
+                selectedBody = null;
+                updateCelestialList();
+            }
+        }
+
+        function exportSystem() {
+            alert('Funcionalidade de exportação em desenvolvimento');
+        }
+
+        function importSystem() {
+            alert('Funcionalidade de importação em desenvolvimento');
+        }
+
+        function addRandomSystem() {
+            alert('Funcionalidade de sistema aleatório em desenvolvimento');
+        }
+    </script>
+</body>
+</html>

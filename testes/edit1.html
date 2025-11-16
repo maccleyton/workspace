@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Editar Documento • Hub Markdown</title>
+  <style>
+    :root{
+      --bg: #0f0f12;
+      --panel: #15161a;
+      --muted: #8b8f98;
+      --text: #e9e9ef;
+      --accent: #4f7cff;
+      --border: #2a2c34;
+      --toc: 280px;
+      --mono: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      --sans: system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu, Cantarell,"Noto Sans","Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol",sans-serif;
+    }
+    html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    /* Layout de 3 colunas: TOC | Editor | Preview */
+    .layout{
+      display:grid;
+      grid-template-columns: var(--toc) 1fr 1fr;
+      grid-template-rows: 100vh;
+      width:100vw;height:100vh;overflow:hidden;
+    }
+    aside#toc{
+      background:var(--panel);
+      border-right:1px solid var(--border);
+      padding:10px 8px; overflow:auto;
+    }
+    .doc-toc { font-size: 0.92rem; line-height: 1.35; user-select: none; }
+    .doc-toc .level-1 { margin-left: 0 }
+    .doc-toc .level-2 { margin-left: 8px }
+    .doc-toc .level-3 { margin-left: 16px }
+    .doc-toc .level-4 { margin-left: 24px }
+    .doc-toc .level-5 { margin-left: 32px }
+    .doc-toc .level-6 { margin-left: 40px }
+    .doc-toc a { cursor:pointer; display:block; padding:4px 6px; border-radius:6px; color:var(--text); text-decoration:none; }
+    .doc-toc a:hover{ background:#1f2026 }
+    section.work{display:flex;flex-direction:column; height:100vh;}
+    .toolbar{
+      display:flex; gap:6px; align-items:center;
+      padding:10px; background:var(--panel); border-bottom:1px solid var(--border);
+      position:sticky; top:0; z-index:3;
+    }
+    .toolbar .spacer{flex:1}
+    .toolbar button{
+      background:#1d1f25; color:var(--text); border:1px solid var(--border);
+      padding:6px 10px; border-radius:6px; cursor:pointer; font-size:0.92rem;
+    }
+    .toolbar button:hover{ background:#232630; }
+    .panes{display:grid; grid-template-columns: 1fr 1fr; height:100%; }
+    textarea.editor{
+      background:#0d0f13;color:#e6e6ee;border:none;border-right:1px solid var(--border);
+      font-family:var(--mono); font-size:15px; line-height:1.45; padding:14px; outline:none; resize:none;
+      tab-size:2;
+    }
+    .preview{
+      background:#0c0d11;color:#e6e6ee; overflow:auto; padding:18px; font-size:16px; line-height:1.6;
+    }
+    .preview h1,.preview h2,.preview h3,.preview h4,.preview h5,.preview h6{ margin: 1.1em 0 0.6em }
+    .preview pre{ background:#0b0d12; border:1px solid #1e2230; border-radius:8px; padding:12px; overflow:auto }
+    .preview code{ background:#151821; padding:1px 4px; border-radius:4px }
+    .preview blockquote{ border-left:3px solid #3a3f52; margin:0.8em 0; padding:0.1em 0 0.1em 10px; color:#cdd1db }
+    .preview hr{ border:none; height:1px; background:#222532; margin:18px 0 }
+    /* Preserva espaços à esquerda em p e li para recuo visual de parágrafo/lista */
+    .preview p, .preview li { white-space: pre-wrap; overflow-wrap:anywhere; }
+    /* Listas */
+    .preview ul, .preview ol { padding-left: 1.2em; margin: 0.4em 0; }
+    .preview li { margin: 0.2em 0; }
+    /* Responsivo */
+    @media (max-width: 980px){
+      .layout{ grid-template-columns: 1fr; grid-auto-rows:auto; }
+      aside#toc, .panes{ height:auto; }
+      .panes{ grid-template-columns: 1fr; }
+      textarea.editor{ border-right:none; border-bottom:1px solid var(--border) }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside id="toc">
+      <div class="doc-toc" id="toc-content">Navegação do Documento</div>
+    </aside>
+    <section class="work">
+      <div class="toolbar">
+        <button data-ins="# ">H1</button>
+        <button data-ins="## ">H2</button>
+        <button data-ins="### ">H3</button>
+        <button data-wrap="**">B</button>
+        <button data-wrap="*">I</button>
+        <button data-wrap="~~">S</button>
+        <button data-fence="```
+        <button data-wrap="$">π</button>
+        <div class="spacer"></div>
+        <button id="btn-save">Salvar</button>
+      </div>
+      <div class="panes">
+        <textarea id="md-editor" class="editor" spellcheck="false" placeholder="# Título
+
+Algum texto inicial.
+
+- Item 1
+  - Subitem
+    - Sub-subitem
+
+1. Primeiro
+  1. Subprimeiro
+    1. Sub-subprimeiro
+"></textarea>
+        <div id="md-preview" class="preview"></div>
+      </div>
+    </section>
+  </div>
+
+<script>
+/* ========= Núcleo Markdown com listas aninhadas e preservação de blocos ========= */
+const MarkdownCore = (() => {
+  function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+  const CODE_PH = (i)=>`@@CODEBLOCK_${i}@@`;
+
+  function extractCodeFences(src){
+    const blocks=[]; let out='', i=0, pos=0;
+    const re=/```([\s\S]*?)```
+    let m;
+    while ((m=re.exec(src))){
+      out += src.slice(pos, m.index) + CODE_PH(i);
+      blocks.push(m);[1]
+      pos = m.index + m.length;
+      i++;
+    }
+    out += src.slice(pos);
+    return { out, blocks };
+  }
+  function restoreCodeFences(src, blocks){
+    return src.replace(/@@CODEBLOCK_(\d+)@@/g, (_,k)=>{
+      const code = blocks[+k] ?? '';
+      return `<pre><code>${escapeHtml(code)}</code></pre>`;
+    });
+  }
+  function slugify(t){
+    return t.toLowerCase().trim()
+      .replace(/[`~!@#$%^&*()+=$$$${}|\\;:'",.<>/?]/g,'')
+      .replace(/\s+/g,'-').replace(/-+/g,'-');
+  }
+
+  // Analisa listas aninhadas por indentação (2 espaços por nível)
+  function parseNestedLists(md) {
+    const lines = md.replace(/\r\n?/g, '\n').split('\n');
+    const out = [];
+    const stack = []; // [{type:'ul'|'ol', indent:number}]
+    const bulletRE = /^(\s*)([-*+])\s+(.*)$/;
+    const orderedRE = /^(\s*)(\d+)\.\s+(.*)$/;
+
+    const openList = (type, indent) => { out.push(`<${type}>`); stack.push({type, indent}); };
+    const closeOne = () => { const s = stack.pop(); out.push(`</${s.type}>`); };
+    const closeUntil = (indent) => { while (stack.length && stack[stack.length-1].indent >= indent) closeOne(); };
+
+    for (let i=0;i<lines.length;i++) {
+      const line = lines[i];
+      const mB = line.match(bulletRE);
+      const mO = line.match(orderedRE);
+
+      if (mB || mO) {
+        const indent = ((mB || mO)[1] || '').replace(/\t/g, '  ').length;
+        const type = mB ? 'ul' : 'ol';
+        const text = (mB ? mB : mO).trim();[3]
+
+        if (!stack.length) openList(type, indent);
+        else {
+          const top = stack[stack.length-1];
+          if (indent > top.indent) openList(type, indent);
+          else if (indent < top.indent) closeUntil(indent);
+          else if (top.type !== type) { closeOne(); openList(type, indent); }
+        }
+        out.push(`<li>${text}</li>`);
+      } else {
+        // fecha listas ao encontrar linha vazia ou outro bloco
+        if (stack.length && (line.trim()==='' || /^[#>]/.test(line))) {
+          while (stack.length) closeOne();
+        }
+        out.push(line);
+      }
+    }
+    while (stack.length) closeOne();
+    return out.join('\n');
+  }
+
+  function mdToHtml(md){
+    // 0) isola blocos de código
+    const ex = extractCodeFences(md);
+
+    // 1) listas aninhadas
+    let s = parseNestedLists(ex.out);
+
+    // 2) headings com ids
+    s = s.replace(/^###### (.*)$/gm,(m,t)=>`<h6 id="${slugify(t)}">${t}</h6>`)
+         .replace(/^##### (.*)$/gm,(m,t)=>`<h5 id="${slugify(t)}">${t}</h5>`)
+         .replace(/^#### (.*)$/gm,(m,t)=>`<h4 id="${slugify(t)}">${t}</h4>`)
+         .replace(/^### (.*)$/gm,(m,t)=>`<h3 id="${slugify(t)}">${t}</h3>`)
+         .replace(/^## (.*)$/gm,(m,t)=>`<h2 id="${slugify(t)}">${t}</h2>`)
+         .replace(/^# (.*)$/gm,(m,t)=>`<h1 id="${slugify(t)}">${t}</h1>`);
+
+    // 3) inline code
+    s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // 4) blockquote
+    s = s.replace(/^\> (.*)$/gm,'<blockquote>$1</blockquote>');
+
+    // 5) hr
+    s = s.replace(/^\s*[-*_]{3,}\s*$/gm,'<hr/>');
+
+    // 6) parágrafos (evita envolver tags bloco)
+    s = s.replace(/(^|\n)([^<\n][^\n]*)/g,(m,br,ln)=>{
+      if (/^\s*$/.test(ln)) return m;
+      if (/^\s*<\/?(h\d|ul|ol|li|pre|blockquote|hr)/.test(ln)) return m;
+      return `${br}<p>${ln}</p>`;
+    });
+
+    // 7) restaura blocos de código
+    s = restoreCodeFences(s, ex.blocks);
+    return s;
+  }
+
+  function buildTOCFromHTML(root){
+    const nodes = Array.from(root.querySelectorAll('h1,h2,h3,h4,h5,h6'));
+    const toc = nodes.map(h => {
+      if (!h.id) h.id = slugify(h.textContent);
+      return { id:h.id, text:h.textContent.trim(), level: parseInt(h.tagName.substring(1),10) };
+    });
+    return toc;
+  }
+  function tocHTML(toc){
+    if (!toc.length) return '<div>Nenhum título encontrado</div>';
+    return toc.map(it => `<div class="level-${it.level}"><a data-id="${it.id}">${it.text}</a></div>`).join('');
+  }
+
+  return { mdToHtml, buildTOCFromHTML, tocHTML, slugify };
+})();
+
+/* ========= Estado e referências ========= */
+const $editor  = document.getElementById('md-editor');
+const $preview = document.getElementById('md-preview');
+const $tocBox  = document.getElementById('toc-content');
+const $btnSave = document.getElementById('btn-save');
+
+let currentDoc = { id:null, parentId:null, title:'Sem título', content:'' };
+let headingMapEditor = []; // {id, start}
+
+/* ========= Renderização, TOC e sincronização ========= */
+function updatePreviewAndTOC(){
+  const md = $editor.value;
+  const html = MarkdownCore.mdToHtml(md);
+  $preview.innerHTML = html;
+  const toc = MarkdownCore.buildTOCFromHTML($preview);
+  $tocBox.innerHTML = MarkdownCore.tocHTML(toc);
+  mapHeadingsToEditorPositions(md, toc);
+  bindTOCClicks();
+}
+function mapHeadingsToEditorPositions(md, toc){
+  headingMapEditor = toc.map(h => {
+    const rx = new RegExp(`^#{${h.level}}\\s+${escapeRegExp(h.text)}\\s*$`, 'm');
+    const m = md.match(rx);
+    return { id:h.id, start: m ? m.index : 0 };
+  });
+}
+function bindTOCClicks(){
+  $tocBox.querySelectorAll('a[data-id]').forEach(a=>{
+    a.onclick = () => {
+      const id = a.getAttribute('data-id');
+      // Preview
+      const h = $preview.querySelector(`#${CSS.escape(id)}`);
+      if (h) h.scrollIntoView({behavior:'smooth', block:'start'});
+      // Editor (posiciona caret no início da linha do heading)
+      const map = headingMapEditor.find(x=>x.id===id);
+      if (map){
+        $editor.focus();
+        $editor.setSelectionRange(map.start, map.start);
+        const lines = $editor.value.substring(0, map.start).split('\n').length;
+        scrollTextareaToLine($editor, Math.max(0, lines-3));
+      }
+    };
+  });
+}
+function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[$$\$$/g, '\\$&'); }
+function scrollTextareaToLine(textarea, line){
+  const lh = parseFloat(getComputedStyle(textarea).lineHeight)||20;
+  textarea.scrollTop = line * lh;
+}
+// Sincronização de rolagem por proporção
+$editor.addEventListener('scroll', () => {
+  const ratio = $editor.scrollTop / (($editor.scrollHeight - $editor.clientHeight) || 1);
+  $preview.scrollTop = ratio * ($preview.scrollHeight - $preview.clientHeight);
+});
+$preview.addEventListener('scroll', () => {
+  const ratio = $preview.scrollTop / (($preview.scrollHeight - $preview.clientHeight) || 1);
+  $editor.scrollTop = ratio * ($editor.scrollHeight - $editor.clientHeight);
+});
+
+/* ========= Toolbar simples ========= */
+document.querySelectorAll('.toolbar button[data-ins]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const ins = btn.getAttribute('data-ins');
+    const {selectionStart:s, selectionEnd:e, value:v} = $editor;
+    const startLine = v.lastIndexOf('\n', s-1) + 1;
+    $editor.setRangeText(ins, startLine, startLine, 'end');
+    $editor.focus();
+    updatePreviewAndTOC();
+  });
+});
+document.querySelectorAll('.toolbar button[data-wrap]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const wrap = btn.getAttribute('data-wrap');
+    wrapSelection(wrap);
+    updatePreviewAndTOC();
+  });
+});
+document.querySelectorAll('.toolbar button[data-fence]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    fenceSelection(btn.getAttribute('data-fence'));
+    updatePreviewAndTOC();
+  });
+});
+function wrapSelection(token){
+  const {selectionStart:s, selectionEnd:e, value:v} = $editor;
+  const selected = v.slice(s,e);
+  $editor.setRangeText(`${token}${selected}${token}`, s, e, 'select');
+  $editor.focus();
+}
+function fenceSelection(f){
+  const {selectionStart:s, selectionEnd:e, value:v} = $editor;
+  const selected = v.slice(s,e);
+  const fenced = selected.includes('\n') ? `${f}\n${selected}\n${f}` : `${f}${selected}${f}`;
+  $editor.setRangeText(fenced, s, e, 'select');
+  $editor.focus();
+}
+
+/* ========= Recuo por Tab/Shift+Tab mesmo fora de listas ========= */
+const INDENT = '  '; // 2 espaços
+$editor.addEventListener('keydown', (e)=>{
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const { selectionStart, selectionEnd, value } = $editor;
+    const startLine = value.lastIndexOf('\n', selectionStart - 1) + 1;
+    const endLine = value.indexOf('\n', selectionEnd);
+    const end = endLine === -1 ? value.length : endLine;
+    const block = value.slice(startLine, end);
+    const lines = block.split('\n');
+
+    const isOutdent = e.shiftKey;
+    const newLines = lines.map(line => {
+      if (isOutdent) return line.startsWith(INDENT) ? line.slice(INDENT.length) : line.replace(/^ /, '');
+      return INDENT + line;
+    });
+
+    const newBlock = newLines.join('\n');
+    $editor.setRangeText(newBlock, startLine, end, 'end');
+
+    const delta = newBlock.length - block.length;
+    $editor.selectionStart = selectionStart + (isOutdent ? -Math.min(INDENT.length, selectionStart - startLine) : INDENT.length);
+    $editor.selectionEnd = selectionEnd + delta;
+    updatePreviewAndTOC();
+  }
+});
+
+/* ========= Persistência com index.html ========= */
+function genId(){ return 'd_'+Math.random().toString(36).slice(2,10); }
+function inferTitleFromFirstH1(){
+  const m = $editor.value.match(/^#\s+(.+)$/m);
+  return m ? m.trim() : 'Sem título';[1]
+}
+function saveToIndex(){
+  const payload = {
+    type: 'saveDocument',
+    doc: {
+      id: currentDoc.id || genId(),
+      parentId: currentDoc.parentId || null,
+      title: currentDoc.title || inferTitleFromFirstH1(),
+      content: $editor.value,
+      updatedAt: Date.now()
+    }
+  };
+  currentDoc = payload.doc;
+  try { window.parent && window.parent.postMessage(payload, '*'); } catch(e){}
+  localStorage.setItem('mdhub:pendedSave', JSON.stringify(payload));
+  $btnSave.textContent = 'Salvo ✔'; setTimeout(()=> $btnSave.textContent='Salvar', 1200);
+}
+$btnSave.addEventListener('click', saveToIndex);
+
+// Recebe doc do index
+window.addEventListener('message', ev=>{
+  const data = ev.data||{};
+  if (data.type === 'loadDocument' && data.doc){
+    currentDoc = data.doc;
+    $editor.value = currentDoc.content || '';
+    updatePreviewAndTOC();
+  }
+});
+
+// Boot: tenta abrir último doc
+(function boot(){
+  const draft = localStorage.getItem('mdhub:openDoc');
+  if (draft){
+    try { const doc = JSON.parse(draft); if (doc && doc.content !== undefined){ currentDoc = doc; $editor.value = doc.content; } } catch(e){}
+  }
+  updatePreviewAndTOC();
+})();
+</script>
+</body>
+</html>

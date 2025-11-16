@@ -1588,8 +1588,8 @@ $$
                 wrapper.appendChild(label);
             });
         }
-
-        // Update preview and stats
+		
+		// Update preview and stats
         function updatePreview() {
             let markdownText = editor.value;
             
@@ -1597,32 +1597,59 @@ $$
             const scrollPos = preview.scrollTop;
             const scrollPercentage = preview.scrollHeight > 0 ? scrollPos / preview.scrollHeight : 0;
             
-            // Preprocessar para proteger pipes em código inline
-            // Usar entidade HTML para pipes dentro de backticks
+            // Processar linha por linha para proteger pipes em código inline apenas em linhas de tabela
             const lines = markdownText.split('\n');
             const processedLines = lines.map(line => {
-                // Verificar se a linha contém potencial sintaxe de tabela
-                const hasTableSyntax = /\|.*\|/.test(line);
+                // Detectar se é uma linha de tabela (contém | fora de backticks)
+                // Contar pipes fora de código
+                let inCode = false;
+                let pipeCount = 0;
                 
-                if (hasTableSyntax) {
-                    // Proteger apenas pipes dentro de backticks nesta linha
-                    return line.replace(/`([^`]*)`/g, (match, code) => {
-                        // Substituir pipes por entidade HTML
-                        const escaped = code.replace(/\|/g, '&#124;');
-                        return `\`${escaped}\``;  
-                    });
+                for (let i = 0; i < line.length; i++) {
+                    if (line[i] === '`') {
+                        inCode = !inCode;
+                    } else if (line[i] === '|' && !inCode) {
+                        pipeCount++;
+                    }
                 }
+                
+                // Se tem pelo menos 1 pipe fora de código, é provável que seja tabela
+                if (pipeCount > 0) {
+                    // Proteger pipes dentro de código usando barra invertida
+                    let result = '';
+                    let inBacktick = false;
+                    
+                    for (let i = 0; i < line.length; i++) {
+                        if (line[i] === '`') {
+                            inBacktick = !inBacktick;
+                            result += line[i];
+                        } else if (line[i] === '|' && inBacktick) {
+                            // Usar barra invertida para escapar pipe dentro de código
+                            result += '\\|';
+                        } else {
+                            result += line[i];
+                        }
+                    }
+                    
+                    return result;
+                }
+                
                 return line;
             });
             
             markdownText = processedLines.join('\n');
             
+            // Configurar marked.js
             marked.setOptions({
                 breaks: true,
                 gfm: true
             });
             
-            preview.innerHTML = marked.parse(markdownText);
+            // Parse do markdown
+            let html = marked.parse(markdownText);
+            
+            preview.innerHTML = html;
+            
             updateStats();
             updateNavigation();
 
@@ -1645,7 +1672,7 @@ $$
                 hljs.highlightBlock(block);
             });
         }
-
+		
         function updateStats() {
             const text = editor.value;
             const words = text.trim() ? text.trim().split(/\s+/).length : 0;
