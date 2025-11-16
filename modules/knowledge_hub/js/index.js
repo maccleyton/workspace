@@ -255,7 +255,7 @@ function renderMarkdownInline(text) {
 // UPLOAD DE ARQUIVO
 // ========================================================
 function openUploadModal() {
-    document.getElementById("uploadModal").classList.add("active");
+    document.getElementById('uploadModal').classList.add('active');
 }
 
 function closeUploadModal() {
