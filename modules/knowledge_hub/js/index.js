@@ -337,6 +337,8 @@ if (uploadArea) {
     });
 }
 
+
+
 // Expor funções usadas pelo HTML para o escopo global
 window.openUploadModal = openUploadModal;
 window.closeUploadModal = closeUploadModal;
@@ -348,3 +350,4 @@ window.editDocument = editDocument;
 window.manageDocument = manageDocument;
 window.deleteDocument = deleteDocument;
 window.handleFileUpload = handleFileUpload;
+
