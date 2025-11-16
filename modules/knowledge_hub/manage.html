@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knowledge Hub - Manager</title>
+
     <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
     <link rel="stylesheet" href="./css/manage.css">
-   
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <h1>Gerenciar Vínculos</h1>
         <a href="index.html" class="back-btn">
-            <span>←</span>
-            <span>Voltar ao Hub</span>
+            <span>Voltar</span>
         </a>
     </header>
 
     <!-- Container -->
     <div class="container">
+
         <!-- Document Info -->
         <div class="doc-info">
             <div class="doc-title" id="docTitle">Carregando...</div>
@@ -30,7 +30,9 @@
         <div class="section">
             <div class="section-header">
                 <div class="section-title">📚 Documentos Vinculados</div>
-                <button class="btn" onclick="openAddChildModal()">
+
+                <!-- Removido onclick -->
+                <button class="btn" id="btnOpenModal">
                     <span>Adicionar Filho</span>
                 </button>
             </div>
@@ -47,15 +49,19 @@
     <!-- Add Child Modal -->
     <div class="modal" id="addChildModal">
         <div class="modal-content">
+
+            <!-- Header -->
             <div class="modal-header">
                 <div class="modal-title">➕ Adicionar Documento Filho</div>
-                <button class="close-btn" onclick="closeAddChildModal()">✕</button>
+
+                <!-- Removido onclick -->
+                <button class="close-btn" id="btnCloseModal">✕</button>
             </div>
 
             <!-- Tabs -->
             <div class="tabs">
-                <div class="tab active" onclick="switchTab('existing')">Vincular Existente</div>
-                <div class="tab" onclick="switchTab('upload')">Upload Novo</div>
+                <div class="tab active" id="tabExistingBtn">Vincular Existente</div>
+                <div class="tab" id="tabUploadBtn">Upload Novo</div>
             </div>
 
             <!-- Tab: Existing Documents -->
@@ -63,6 +69,7 @@
                 <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
                     Selecione um documento existente para vincular como filho:
                 </p>
+
                 <div id="existingDocsGrid" class="documents-grid">
                     <div class="empty-state">
                         <div class="empty-text">Carregando documentos...</div>
@@ -75,25 +82,33 @@
                 <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
                     Faça upload de um arquivo Markdown para criar um novo documento filho:
                 </p>
-                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+
+                <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">📁</div>
                     <div class="upload-text">
                         Clique ou arraste um arquivo Markdown (.md)<br>
                         <small style="color: #6b7280;">Tamanho máximo: 5MB</small>
                     </div>
                 </div>
-                <input type="file" id="fileInput" accept=".md" onchange="handleFileUpload(event)">
+
+                <input type="file" id="fileInput" accept=".md">
             </div>
 
             <!-- Footer -->
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeAddChildModal()">Cancelar</button>
-                <button class="btn" onclick="confirmAddChild()" id="confirmBtn" style="display: none;">
+                <button class="btn btn-secondary" id="btnCancel">Cancelar</button>
+
+                <!-- Removido onclick -->
+                <button class="btn" id="btnConfirm" style="display: none;">
                     <span>Adicionar</span>
                 </button>
             </div>
+
         </div>
     </div>
-	<script type="module" src="./js/manage.js"></script>
+
+    <!-- JS -->
+    <script type="module" src="./js/hub-api.js"></script>
+    <script type="module" src="./js/manage.js"></script>
 </body>
 </html>

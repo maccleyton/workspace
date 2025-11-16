@@ -4,76 +4,64 @@
 import { getDoc, listDocs, linkDoc, unlinkDoc, createDoc } from "./hub-api.js";
 
 // ======================================================
-// ==================== ESTADO ==========================
+// ==================== ESTADO ===========================
 // ======================================================
 let parentId = null;
 let parentDoc = null;
 let allDocs = [];
-let selectedChildId = null; // documento escolhido para vínculo
-let uploadedFile = null; // upload por arquivo
+let selectedChildId = null;
+let uploadedFile = null;
 
 // ======================================================
-// ===================== INICIALIZAÇÃO ===================
+// ==================== INIT =============================
 // ======================================================
-window.addEventListener("DOMContentLoaded", initManage);
+window.addEventListener("DOMContentLoaded", () => {
+    initManage();
+    bindUIEvents();
+});
 
 async function initManage() {
-    parentId = getDocumentIdFromURL();
-    if (!parentId) {
-        alert("Nenhum ID encontrado na URL.");
-        return;
-    }
+    parentId = getIdFromURL();
+    if (!parentId) return alert("Nenhum ID encontrado.");
 
-    await loadParentDocument();
+    await loadParent();
     await loadAllDocs();
-    renderParentData();
+
+    renderParent();
     renderChildren();
-    renderExistingDocs();
+    renderDocGrid();
 }
 
 // ======================================================
-// ===================== BUSCAR ID =======================
+// ===================== URL ID ==========================
 // ======================================================
-function getDocumentIdFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("id");
+function getIdFromURL() {
+    const p = new URLSearchParams(location.search);
+    return p.get("id");
 }
 
 // ======================================================
-// =============== CARREGAR DOCUMENTO PAI ================
+// ================== LOAD DATA ==========================
 // ======================================================
-async function loadParentDocument() {
-    try {
-        parentDoc = await getDoc(parentId);
-    } catch (err) {
-        console.error(err);
-        alert("Erro ao carregar o documento.");
-    }
+async function loadParent() {
+    parentDoc = await getDoc(parentId).catch(err => console.error(err));
 }
 
-// ======================================================
-// =============== CARREGAR TODOS DOCUMENTOS =============
-// ======================================================
 async function loadAllDocs() {
-    try {
-        allDocs = await listDocs();
-    } catch (err) {
-        console.error(err);
-        alert("Erro ao carregar documentos.");
-    }
+    allDocs = await listDocs().catch(err => console.error(err));
 }
 
 // ======================================================
-// =============== RENDERIZAR DADOS DO PAI ===============
+// =================== RENDER PARENT =====================
 // ======================================================
-function renderParentData() {
+function renderParent() {
     document.getElementById("docTitle").textContent = parentDoc.title;
     document.getElementById("docMeta").textContent =
         "Atualizado: " + new Date(parentDoc.updated_at).toLocaleString("pt-BR");
 }
 
 // ======================================================
-// ============ RENDERIZAR FILHOS DO DOCUMENTO ===========
+// =================== CHILDREN ==========================
 // ======================================================
 function renderChildren() {
     const list = document.getElementById("childrenList");
@@ -82,15 +70,16 @@ function renderChildren() {
     const children = allDocs.filter(d => d.parent_id === parentId);
 
     if (children.length === 0) {
-        list.innerHTML = `<p class="empty-text">Nenhum documento filho vinculado.</p>`;
-        return;
+        return list.innerHTML = `
+            <p class="empty-text">Nenhum documento filho vinculado.</p>
+        `;
     }
 
     children.forEach(child => {
-        const item = document.createElement("div");
-        item.className = "child-item";
+        const el = document.createElement("div");
+        el.className = "child-item";
 
-        item.innerHTML = `
+        el.innerHTML = `
             <div>
                 <strong>${child.title}</strong><br>
                 <small>${new Date(child.updated_at).toLocaleString("pt-BR")}</small>
@@ -98,34 +87,25 @@ function renderChildren() {
             <button class="remove-child-btn">Remover</button>
         `;
 
-        item.querySelector(".remove-child-btn").onclick = () =>
-            handleUnlink(child.id);
+        el.querySelector("button").addEventListener("click", () => removeLink(child.id));
 
-        list.appendChild(item);
+        list.appendChild(el);
     });
 }
 
-// ======================================================
-// ============== REMOVER VÍNCULO PAI → FILHO ============
-// ======================================================
-async function handleUnlink(id) {
+async function removeLink(id) {
     if (!confirm("Remover este vínculo?")) return;
 
-    try {
-        await unlinkDoc(id);
-        await loadAllDocs();
-        renderChildren();
-        renderExistingDocs();
-    } catch (err) {
-        console.error(err);
-        alert("Erro ao remover vínculo.");
-    }
+    await unlinkDoc(id).catch(err => alert("Erro ao remover vínculo."));
+    await loadAllDocs();
+    renderChildren();
+    renderDocGrid();
 }
 
 // ======================================================
-// ============== RENDERIZAR LISTA DE DOCUMENTOS =========
+// ================== DOC GRID ===========================
 // ======================================================
-function renderExistingDocs() {
+function renderDocGrid() {
     const grid = document.getElementById("existingDocsGrid");
     grid.innerHTML = "";
 
@@ -141,132 +121,113 @@ function renderExistingDocs() {
             <div class="doc-meta">${new Date(doc.updated_at).toLocaleString("pt-BR")}</div>
         `;
 
-        card.onclick = () => selectExistingDoc(doc.id);
+        card.addEventListener("click", () => selectDoc(doc.id));
 
         grid.appendChild(card);
     });
 }
 
-// ======================================================
-// ============= SELECIONAR DOC EXISTENTE ===============
-// ======================================================
-function selectExistingDoc(id) {
+function selectDoc(id) {
     selectedChildId = id;
 
     document.querySelectorAll(".existing-doc-card")
-        .forEach(card => card.classList.remove("selected"));
+        .forEach(el => el.classList.remove("selected"));
 
     const card = document.querySelector(`.existing-doc-card[data-id="${id}"]`);
     if (card) card.classList.add("selected");
 }
 
 // ======================================================
-// ================== ABRIR / FECHAR MODAL ===============
+// =================== MODAL FUNÇÕES =====================
 // ======================================================
-function openAddChildModal() {
+function openAddModal() {
     selectedChildId = null;
     uploadedFile = null;
 
-    document.getElementById("existingDocsGrid")
-        .querySelectorAll(".selected")
+    document.getElementById("fileInput").value = "";
+    document.querySelectorAll(".existing-doc-card")
         .forEach(el => el.classList.remove("selected"));
 
-    document.getElementById("fileInput").value = "";
-
-    document.getElementById("existingDocsTab").style.display = "block";
-    document.getElementById("uploadTab").style.display = "none";
-
-    document.getElementById("tabExisting").classList.add("active");
-    document.getElementById("tabUpload").classList.remove("active");
+    switchTab("existing");
 
     document.getElementById("addChildModal").style.display = "flex";
 }
 
-function closeAddChildModal() {
+function closeAddModal() {
     document.getElementById("addChildModal").style.display = "none";
 }
 
 // ======================================================
-// ============== TROCAR ENTRE TABS =====================
+// ===================== TABS ============================
 // ======================================================
 function switchTab(tab) {
-    if (tab === "existing") {
-        document.getElementById("existingDocsTab").style.display = "block";
-        document.getElementById("uploadTab").style.display = "none";
-
-        document.getElementById("tabExisting").classList.add("active");
-        document.getElementById("tabUpload").classList.remove("active");
-    } else {
-        document.getElementById("existingDocsTab").style.display = "none";
-        document.getElementById("uploadTab").style.display = "block";
-
-        document.getElementById("tabExisting").classList.remove("active");
-        document.getElementById("tabUpload").classList.add("active");
-    }
+    document.getElementById("tabExisting").classList.toggle("active", tab === "existing");
+    document.getElementById("tabUpload").classList.toggle("active", tab === "upload");
 }
 
 // ======================================================
-// ================ UPLOAD DE NOVO DOC ===================
+// =================== UPLOAD ============================
 // ======================================================
-function handleFileUpload(event) {
-    uploadedFile = event.target.files[0] || null;
+function handleFile(ev) {
+    uploadedFile = ev.target.files[0] || null;
 }
 
 // ======================================================
-// ================= CONFIRMAR AÇÃO ======================
+// ================== CONFIRM ADD ========================
 // ======================================================
-async function confirmAddChild() {
-    // Opção 1 → documento existente selecionado
+async function confirmAdd() {
+    // A) Documento existente
     if (selectedChildId) {
-        try {
-            await linkDoc(selectedChildId, parentId);
-            await loadAllDocs();
-            renderChildren();
-            renderExistingDocs();
-            closeAddChildModal();
-            return;
-        } catch (err) {
-            console.error(err);
-            alert("Erro ao vincular documento.");
-        }
+        await linkDoc(selectedChildId, parentId).catch(_ => alert("Erro."));
+        await loadAllDocs();
+        renderChildren();
+        renderDocGrid();
+        closeAddModal();
+        return;
     }
 
-    // Opção 2 → upload de novo documento
+    // B) Upload
     if (uploadedFile) {
-        try {
-            const content = await uploadedFile.text();
-            const title = extractH1(content) || uploadedFile.name;
+        const content = await uploadedFile.text();
+        const title = extractH1(content) || uploadedFile.name;
 
-            const newDoc = await createDoc({ title, content });
-            await linkDoc(newDoc.id, parentId);
+        const newDoc = await createDoc({ title, content });
+        await linkDoc(newDoc.id, parentId);
 
-            await loadAllDocs();
-            renderChildren();
-            renderExistingDocs();
-            closeAddChildModal();
-            return;
-        } catch (err) {
-            console.error(err);
-            alert("Erro ao criar documento.");
-        }
+        await loadAllDocs();
+        renderChildren();
+        renderDocGrid();
+        closeAddModal();
+        return;
     }
 
-    alert("Selecione um documento ou envie um arquivo.");
+    alert("Escolha um documento ou envie um arquivo.");
 }
 
-// ======================================================
-// ======== UTIL: extrair título do markdown ============
-// ======================================================
 function extractH1(md) {
-    const match = md.match(/^#\s+(.+)/m);
-    return match ? match[1].trim() : null;
+    const m = md.match(/^#\s+(.+)/m);
+    return m ? m[1].trim() : null;
 }
 
 // ======================================================
-// =========== EXPOSE FUNCTIONS FOR HTML =================
+// ================== EVENT BINDING ======================
 // ======================================================
-window.openAddChildModal = openAddChildModal;
-window.closeAddChildModal = closeAddChildModal;
-window.switchTab = switchTab;
-window.handleFileUpload = handleFileUpload;
-window.confirmAddChild = confirmAddChild;
+function bindUIEvents() {
+    document.querySelector(".section-header .btn")
+        .addEventListener("click", openAddModal);
+
+    document.querySelector(".close-btn")
+        .addEventListener("click", closeAddModal);
+
+    document.getElementById("tabExisting").previousElementSibling
+        .addEventListener("click", () => switchTab("existing"));
+
+    document.getElementById("tabUpload").previousElementSibling
+        .addEventListener("click", () => switchTab("upload"));
+
+    document.getElementById("fileInput")
+        .addEventListener("change", handleFile);
+
+    document.getElementById("confirmBtn")
+        .addEventListener("click", confirmAdd);
+}

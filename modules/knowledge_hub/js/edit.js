@@ -532,4 +532,173 @@ window.openSettings = openSettings;
 window.closeSettings = closeSettings;
 window.applySettings = applySettings;
 window.resetSettings = resetSettings;
-window.toggleTOC = toggleTOC;
+window.toggleTOC = toggleTOC;// ======================================================
+// IMPORTAÇÃO DA API
+// ======================================================
+import { getDoc, updateDoc } from "./hub-api.js";
+
+// ======================================================
+// ESTADO
+// ======================================================
+let docId = null;
+let currentDoc = null;
+
+// ======================================================
+// BOOTSTRAP
+// ======================================================
+window.addEventListener("DOMContentLoaded", initEditor);
+
+async function initEditor() {
+    docId = getId();
+    if (!docId) {
+        alert("Documento não encontrado.");
+        return;
+    }
+
+    await loadDoc();
+    setupEvents();
+    renderMarkdown();
+}
+
+// ======================================================
+// UTIL
+// ======================================================
+function getId() {
+    return new URLSearchParams(window.location.search).get("id");
+}
+
+// ======================================================
+// LOAD DOC FROM BACKEND
+// ======================================================
+async function loadDoc() {
+    currentDoc = await getDoc(docId);
+
+    document.getElementById("docTitle").value = currentDoc.title || "";
+    document.getElementById("editor").value = currentDoc.content || "";
+}
+
+// ======================================================
+// EVENTOS
+// ======================================================
+function setupEvents() {
+
+    const editor = document.getElementById("editor");
+    const titleInput = document.getElementById("docTitle");
+
+    editor.addEventListener("input", renderMarkdown);
+    titleInput.addEventListener("input", renderMarkdown);
+
+    // Botões
+    document.getElementById("saveBtn").addEventListener("click", saveDoc);
+    document.getElementById("exportBtn").addEventListener("click", exportMarkdown);
+    document.getElementById("backToHubBtn").addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
+
+    // Sincronizar Scroll
+    editor.addEventListener("scroll", () => {
+        preview.scrollTop =
+            editor.scrollTop *
+            ((preview.scrollHeight - preview.clientHeight) /
+                (editor.scrollHeight - editor.clientHeight));
+    });
+}
+
+// ======================================================
+// SALVAR
+// ======================================================
+async function saveDoc() {
+    const title = document.getElementById("docTitle").value.trim();
+    const content = document.getElementById("editor").value;
+
+    await updateDoc(docId, { title, content });
+
+    const s = document.getElementById("saveStatus");
+    s.textContent = "✔ Salvo";
+    setTimeout(() => (s.textContent = ""), 2000);
+}
+
+// ======================================================
+// EXPORTAR
+// ======================================================
+function exportMarkdown() {
+    const content = document.getElementById("editor").value;
+    const blob = new Blob([content], { type: "text/markdown" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "documento.md";
+    a.click();
+}
+
+// ======================================================
+// RENDERIZAÇÃO DE MARKDOWN + TÍTULO
+// ======================================================
+function renderMarkdown() {
+    const editor = document.getElementById("editor");
+    const preview = document.getElementById("preview");
+    const toc = document.getElementById("tocContent");
+
+    let text = editor.value;
+
+    // ========== TÍTULO RENDERIZADO ==========
+    const titleInput = document.getElementById("docTitle");
+    const titlePreview = document.getElementById("titlePreview");
+
+    if (titleInput.value.trim()) {
+        titlePreview.innerHTML = marked.parseInline(titleInput.value.trim());
+    } else {
+        titlePreview.innerHTML = "";
+    }
+
+    // ========== RENDER DO CORPO ==========
+    preview.innerHTML = marked.parse(text);
+
+    // ========== MATHJAX ==========
+    if (window.MathJax) {
+        MathJax.typesetPromise([preview]);
+    }
+
+    // ========== ATUALIZAR TOC ==========
+    updateTOC();
+    updateStats();
+}
+
+// ======================================================
+// TOC
+// ======================================================
+function updateTOC() {
+    const preview = document.getElementById("preview");
+    const toc = document.getElementById("tocContent");
+
+    const headers = preview.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+    toc.innerHTML = "";
+
+    headers.forEach((h, i) => {
+        h.id = "h" + i;
+
+        const item = document.createElement("div");
+        item.className = "toc-item level-" + h.tagName.toLowerCase();
+        item.textContent = h.textContent;
+
+        item.onclick = () => h.scrollIntoView({ behavior: "smooth" });
+        toc.appendChild(item);
+    });
+
+    if (headers.length === 0) {
+        toc.innerHTML = `<div class="empty-toc">Nenhum título...</div>`;
+    }
+}
+
+// ======================================================
+// ESTATÍSTICAS
+// ======================================================
+function updateStats() {
+    const text = document.getElementById("editor").value;
+
+    document.getElementById("charCount").textContent =
+        `${text.length} caracteres`;
+
+    document.getElementById("wordCount").textContent =
+        `${text.trim() ? text.trim().split(/\s+/).length : 0} palavras`;
+}
