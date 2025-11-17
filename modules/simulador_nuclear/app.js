@@ -417,6 +417,78 @@ const elementOrder = [
 	'polonium210','beryllium7','sodium22'
 ];
 
+// ====== SISTEMA DE BUSCA ======
+function initSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const elements = document.querySelectorAll('.element-item');
+        let hasResults = false;
+        
+        elements.forEach(element => {
+            const symbol = element.querySelector('.element-symbol').textContent.toLowerCase();
+            const name = element.querySelector('.element-name').textContent.toLowerCase();
+            const halfLife = element.querySelector('.element-half-life').textContent.toLowerCase();
+            
+            const matches = symbol.includes(searchTerm) || 
+                          name.includes(searchTerm) || 
+                          halfLife.includes(searchTerm);
+            
+            if (matches) {
+                element.style.display = 'flex';
+                hasResults = true;
+            } else {
+                element.style.display = 'none';
+            }
+        });
+        
+        // Feedback visual quando não há resultados
+        const elementsList = document.getElementById('elementsList');
+        if (!hasResults && searchTerm.length > 0) {
+            if (!document.getElementById('noResults')) {
+                const noResults = document.createElement('div');
+                noResults.id = 'noResults';
+                noResults.className = 'no-results-message';
+                noResults.textContent = `Nenhum elemento encontrado para "${searchTerm}"`;
+                elementsList.appendChild(noResults);
+            }
+        } else {
+            const noResults = document.getElementById('noResults');
+            if (noResults) noResults.remove();
+        }
+    });
+    
+    // Limpar busca ao clicar no X (se adicionar um)
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
+            searchInput.blur();
+        }
+    });
+}
+
+// Estilo para mensagem de "sem resultados"
+const noResultsStyle = `
+.no-results-message {
+    text-align: center;
+    padding: var(--space-lg);
+    color: var(--text-tertiary);
+    font-size: var(--font-sm);
+    font-style: italic;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-sm);
+    margin: var(--space-sm) 0;
+}
+`;
+
+// Adicione os estilos dinamicamente
+const styleSheet = document.createElement('style');
+styleSheet.textContent = noResultsStyle;
+document.head.appendChild(styleSheet);
+
 let currentElementId = 'uranium238';
 let chart = null;
 
@@ -437,6 +509,7 @@ let structureAnimationId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 	initElementsList();
+	initSearch(); // ← ADICIONE ESTA LINHA
 	initChart();
 	setupInputs();
 	updateAllDisplays();
