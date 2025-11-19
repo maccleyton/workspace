@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistente Pessoal IA</title>
+    <title>Assistente IA</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -27,119 +28,57 @@
             </div>
             
             <div class="sidebar-footer">
-                Assistente IA v1.0 - Integrado com API<br>
-                Conectado ao Gemini • Pronto para usar
+                Assistente IA v1.0<br>
+                Backend integrado
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Área de mensagens -->
         <main class="main-content">
             <div class="chat-header">
                 <div class="chat-title">💬 Chat Geral</div>
                 <div class="header-buttons">
-                    <button class="header-btn" id="clearBtn" title="Limpar conversa">🗑️</button>
-                    <button class="header-btn" id="helpBtn" title="Ajuda">❓</button>
+                    <button class="header-btn" id="clearBtn">🗑️</button>
+                    <button class="header-btn" id="helpBtn">❓</button>
                 </div>
             </div>
 
             <div class="chat-container" id="chatContainer">
                 <div class="welcome-message">
-                    <h2>👋 Olá! Sou o Knowledge Assistant</h2>
-                    <p>Sou seu companheiro para estudos, projetos e pesquisas. Posso ajudar você com física, programação, filosofia e muito mais. Como posso ajudá-lo hoje?</p>
+                    <h2>👋 Olá! Eu sou o Knowledge Assistant</h2>
+                    <p>Pronto para ajudar com estudos, códigos e ideias.</p>
                 </div>
             </div>
 
             <div class="input-area">
                 <div class="input-wrapper">
-                    <textarea 
-                        id="userInput" 
-                        placeholder="Digite sua mensagem ou comando..."
-                        rows="2"
-                    ></textarea>
+                    <textarea id="userInput" placeholder="Digite sua mensagem..." rows="2"></textarea>
                     <div class="button-group">
-                        <button id="voiceBtn" title="Falar">🎤</button>
+                        <button id="voiceBtn">🎤</button>
                         <button id="sendBtn">📤</button>
                     </div>
                 </div>
             </div>
-            
         </main>
 
-        <!-- Annotations Sidebar -->
+        <!-- Sidebar de anotações -->
         <aside class="annotations-sidebar">
             <div class="annotations-header">
                 <h3>Anotações</h3>
             </div>
-            <div class="annotations-content">
-                <!-- Anotações serão carregadas aqui -->
-            </div>
+            <div class="annotations-content"></div>
             <div class="annotations-footer">
                 <button class="new-annotation-btn">+ Nova Anotação</button>
             </div>
         </aside>
     </div>
 
-    <!-- Seus scripts originais -->
+    <!-- Scripts -->
     <script src="js/storage.js"></script>
     <script src="js/api.js"></script>
     <script src="js/speech.js"></script>
     <script src="js/assistant.js"></script>
-    
-    <!-- Novo sistema de anotações -->
     <script src="js/annotations.js"></script>
-    
-    <!-- App principal integrado -->
-    <script>
-        // Inicializar o sistema de anotações
-        const annotationsManager = new AnnotationsManager();
-        
-        // Adicionar comando de anotações ao seu sistema existente
-        const originalProcessCommand = window.processCommand;
-        
-        window.processCommand = async function(message) {
-            const msg = message.toLowerCase().trim();
-            
-            // Comando de anotações
-            if (msg.startsWith('anotar ') || msg === 'anotar') {
-                const noteText = message.replace('anotar', '').trim();
-                if (noteText) {
-                    annotationsManager.createAnnotation('Anotação Rápida', noteText);
-                    return '📝 Anotação criada com sucesso!';
-                } else {
-                    return '📝 Use: "anotar [seu texto]" para criar uma anotação rápida';
-                }
-            }
-            
-            // Comando ver anotações
-            if (msg === 'anotações' || msg === 'ver anotações') {
-                const count = annotationsManager.annotations.length;
-                return `📝 Você tem ${count} anotações. Use o painel lateral para visualizá-las.`;
-            }
-            
-            // Processar outros comandos normalmente
-            if (originalProcessCommand) {
-                return await originalProcessCommand(message);
-            }
-            
-            return null;
-        };
-        
-        // Integrar com o sistema de chat existente
-        document.addEventListener('DOMContentLoaded', function() {
-            // Adicionar funcionalidade aos botões da sidebar
-            document.querySelectorAll('.sidebar-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Atualizar título do chat
-                    const chatTitle = document.querySelector('.chat-title');
-                    if (chatTitle) {
-                        chatTitle.textContent = this.textContent;
-                    }
-                });
-            });
-        });
-    </script>
+
 </body>
 </html>

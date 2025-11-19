@@ -1,73 +1,74 @@
-// ===============================
-// Knowledge Hub - API Centralizada
-// ===============================
+// hub-api.js
+const API_BASE = "http://localhost:3000"; // ajuste se hospedar online
 
-// 🔥 URL do backend no Render
-export const API_BASE = "https://workspace-backend-p5xx.onrender.com";
+// === DOCUMENTOS ===
 
-// -------------------------------
-// Função genérica de requisição
-// -------------------------------
-async function apiRequest(path, method = "GET", body = null) {
-    const options = {
-        method,
-        headers: { "Content-Type": "application/json" }
-    };
-
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
-
-    try {
-        const response = await fetch(`${API_BASE}${path}`, options);
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
-        }
-
-        return await response.json();
-    } catch (err) {
-        console.error("🚨 API ERROR:", err);
-        throw err;
-    }
+// Lista todos os documentos
+export async function getDocuments() {
+  const res = await fetch(`${API_BASE}/documents`);
+  if (!res.ok) throw new Error("Erro ao listar documentos");
+  return res.json();
 }
 
-// -------------------------------
-// Documentos
-// -------------------------------
-
-// Listar documentos
-export async function listDocs() {
-    return apiRequest("/api/docs", "GET");
+// Busca documento por ID
+export async function getDocument(id) {
+  const res = await fetch(`${API_BASE}/documents/${id}`);
+  if (!res.ok) throw new Error("Erro ao carregar documento");
+  return res.json();
 }
 
-// Obter documento por ID
-export async function getDoc(id) {
-    return apiRequest(`/api/docs/${id}`, "GET");
+// Cria novo documento
+export async function createDocument(title, content) {
+  const res = await fetch(`${API_BASE}/documents`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, content }),
+  });
+  if (!res.ok) throw new Error("Erro ao criar documento");
+  return res.json();
 }
 
-// Criar novo documento
-export async function createDoc(data) {
-    return apiRequest("/api/docs", "POST", data);
+// Atualiza documento existente
+export async function updateDocument(id, title, content) {
+  const res = await fetch(`${API_BASE}/documents/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, content }),
+  });
+  if (!res.ok) throw new Error("Erro ao atualizar documento");
+  return res.json();
 }
 
-// Atualizar documento existente
-export async function updateDoc(id, data) {
-    return apiRequest(`/api/docs/${id}`, "PUT", data);
+// Remove documento
+export async function deleteDocument(id) {
+  const res = await fetch(`${API_BASE}/documents/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Erro ao excluir documento");
+  return res.json();
 }
 
-// Deletar documento
-export async function deleteDoc(id) {
-    return apiRequest(`/api/docs/${id}`, "DELETE");
+// === LINKS (VÍNCULOS) ===
+
+// Cria vínculo pai/filho
+export async function createLink(parentId, childId) {
+  const res = await fetch(`${API_BASE}/links`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ parent_id: parentId, child_id: childId }),
+  });
+  if (!res.ok) throw new Error("Erro ao criar vínculo");
+  return res.json();
 }
 
-// Criar vínculo pai → filho
-export async function linkDoc(id, parentId) {
-    return apiRequest(`/api/docs/${id}/link`, "PUT", { parent_id: parentId });
+// Lista vínculos de um documento
+export async function getLinks(docId) {
+  const res = await fetch(`${API_BASE}/links/${docId}`);
+  if (!res.ok) throw new Error("Erro ao listar vínculos");
+  return res.json();
 }
 
-// Remover vínculo
-export async function unlinkDoc(id) {
-    return apiRequest(`/api/docs/${id}/unlink`, "PUT");
+// Remove vínculo
+export async function deleteLink(linkId) {
+  const res = await fetch(`${API_BASE}/links/${linkId}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Erro ao remover vínculo");
+  return res.json();
 }
