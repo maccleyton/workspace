@@ -74,7 +74,7 @@
             <div class="panel-card">
                 <div class="section-header">
                     <i class="fa-solid fa-info-circle"></i>
-                    <div class="section-title">Informações do Elemento</div>
+                    <div class="section-title">Informações</div>
                 </div>
             </div>
 
@@ -155,7 +155,7 @@
                             <div class="info-slot-value" id="infoDiscovered">1766</div>
                         </div>
                     </div>
-                </div>
+				</div>
 
                 <!-- Propriedades Estruturais -->
                 <div class="info-card">
@@ -180,8 +180,8 @@
                 </div>
             </div>
         </section>
-                    
-        <!-- COLUNA DIREITA - VISUALIZAÇÃO 3D E SIMULADOR -->
+					
+        <!-- COLUNA DIREITA - VISUALIZAÇÃO 3D -->
         <section class="right-panel card">
             <div class="right-card">
                 <div class="tabs-row">
@@ -193,10 +193,6 @@
                         <button class="tab-btn" onclick="switchTab('structure', this)">
                             <i class="fa-solid fa-cube"></i>
                             Estrutura
-                        </button>
-                        <button class="tab-btn" onclick="switchTab('reactions', this)">
-                            <i class="fa-solid fa-flask"></i>
-                            Reações
                         </button>
                     </div>
                 </div>
@@ -236,90 +232,6 @@
                         </div>
                         <div style="font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6;">
                             <p id="structureDescription">Selecione um elemento para visualizar sua estrutura atômica detalhada.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA: SIMULADOR DE REAÇÕES -->
-                <div id="tab-reactions" class="tab-content">
-                    <div class="reaction-simulator-container">
-                        <!-- Layout lado a lado -->
-                        <div class="reaction-layout">
-                            <!-- Canvas na esquerda -->
-                            <div class="reaction-canvas-section">
-                                <div class="reaction-canvas-container">
-                                    <canvas id="reactionCanvas"></canvas>
-                                </div>
-                            </div>
-                            
-                            <!-- Controles na direita -->
-                            <div class="reaction-controls-section">
-                                <!-- Exemplos Rápidos -->
-                                <div class="quick-examples">
-                                    <div class="section-header" style="margin: var(--space-md) 0;">
-                                        <i class="fa-solid fa-vial"></i>
-                                        <div class="section-title">Exemplos Rápidos</div>
-                                    </div>
-                                    <div class="example-buttons">
-                                        <button class="example-btn" onclick="ReactionSimulator.loadExample('neutralization')">
-                                            Neutralização
-                                        </button>
-                                        <button class="example-btn" onclick="ReactionSimulator.loadExample('carbonate')">
-                                            Ácido + Carbonato
-                                        </button>
-                                        <button class="example-btn" onclick="ReactionSimulator.loadExample('metal')">
-                                            Metal + Ácido
-                                        </button>
-                                        <button class="example-btn" onclick="ReactionSimulator.loadExample('precipitation')">
-                                            Precipitação
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Controles da Reação -->
-                                <div class="reaction-controls">
-                                    <button class="btn btn-primary" onclick="ReactionSimulator.balanceEquation()">
-                                        <i class="fa-solid fa-scale-balanced"></i>
-                                        Balancear
-                                    </button>
-                                    <button class="btn btn-success" onclick="ReactionSimulator.simulateReaction()">
-                                        <i class="fa-solid fa-play"></i>
-                                        Simular
-                                    </button>
-                                </div>
-								
-                                <!-- Seletor de Reagentes -->
-                                <div class="reagent-selector">
-                                    <div class="reagent-dropdown">
-                                        <div class="reagent-input" id="reactant1Display" onclick="ReactionSimulator.toggleDropdown('reactant1')">
-                                            Selecione o Reagente 1
-                                        </div>
-                                        <div class="dropdown-content" id="reactant1Dropdown">
-                                            <!-- Opções serão preenchidas via JavaScript -->
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="reagent-dropdown">
-                                        <div class="reagent-input" id="reactant2Display" onclick="ReactionSimulator.toggleDropdown('reactant2')">
-                                            Selecione o Reagente 2
-                                        </div>
-                                        <div class="dropdown-content" id="reactant2Dropdown">
-                                            <!-- Opções serão preenchidas via JavaScript -->
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Equação da Reação -->
-                                <div class="reaction-equation" id="reactionEquation">
-                                    ? + ? → ?
-                                </div>
-
-                                <!-- Resultado da Reação -->
-                                <div class="reaction-result" id="reactionResult" style="display: none;">
-                                    <!-- Resultado da reação aparecerá aqui -->
-                                </div>
-
-                            </div>
                         </div>
                     </div>
                 </div>
