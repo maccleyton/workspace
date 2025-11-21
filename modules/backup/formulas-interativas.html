@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fórmulas Interativas</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-page: #0A0A0A;
+            --bg-surface: #141414;
+            --bg-surface-hover: #1A1A1A;
+            --text-primary: #E4E4E7;
+            --text-secondary: #A1A1AA;
+            --text-tertiary: #52525B;
+            --border-default: #27272A;
+            --border-interactive: #3F3F46;
+            --primary: #019875;
+            --primary-hover: #02b48a;
+            --accent: #3B82F6;
+            
+            /* Configurações customizáveis */
+            --h1-color: #019875;
+            --h1-bg: transparent;
+            --h2-color: #019875;
+            --h2-bg: transparent;
+            --h3-color: #019875;
+            --h3-bg: transparent;
+            --h4-color: #019875;
+            --h4-bg: transparent;
+            --h5-color: #019875;
+            --h5-bg: transparent;
+            --h6-color: #019875;
+            --h6-bg: transparent;
+            
+            --p-size: 16px;
+            --font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            --spacing-vertical: 1.6;
+            --spacing-horizontal: 0.5;
+            --word-spacing: 0.5;
+            --margins: 20px;
+            --text-align: left;
+            
+            --code-inline-color: #00ff88;
+            --code-inline-bg: rgba(0, 255, 136, 0.1);
+            --code-block-color: #ffffff;
+            --code-block-bg: #1a1a1a;
+            --code-block-border: var(--primary);
+            
+            --latex-block-color: #1a1a2e;
+            --latex-block-bg: #e3f2fd;
+            --latex-block-border: var(--primary);
+            --latex-inline-color: #1a1a2e;
+            --latex-inline-bg: rgba(227, 242, 253, 0.3);
+            
+            --table-header-bg: #019875;
+            --border-quote: var(--primary);
+            --quote-color: var(--text-primary);
+            --quote-bg: rgba(1, 152, 117, 0.05);
+            --quote-size: 16px;
+            
+            --hr-color: #00ff88;
+            --hr-thickness: 2px;
+            --hr-style: solid;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-page);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Menu Bar */
+        .top-menu {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-default);
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .menu-title {
+            font-weight: 600;
+            font-size: 18px;
+            background: linear-gradient(to right, var(--primary), var(--primary-hover));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+
+        .menu-item:hover {
+            background: var(--bg-surface-hover);
+            color: var(--text-primary);
+        }
+
+        .menu-item.active {
+            background: var(--bg-surface-hover);
+            color: var(--primary);
+        }
+
+        .menu-item.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .menu-item.primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .menu-item.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .menu-item.success:hover {
+            background: #218838;
+        }
+
+        .menu-item.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .menu-item.danger:hover {
+            background: #c82333;
+        }
+
+        .menu-item.info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .menu-item.info:hover {
+            background: #138496;
+        }
+
+        /* Main Container with Sidebar */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Navigation Sidebar */
+        .nav-sidebar {
+            width: 300px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-default);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            border-right: none;
+        }
+
+        .nav-sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-default);
+            background: var(--bg-surface-hover);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-toggle-btn:hover {
+            background: var(--bg-surface);
+            color: var(--primary);
+        }
+
+        .nav-sidebar.collapsed .nav-sidebar-header,
+        .nav-sidebar.collapsed .nav-sidebar-content {
+            display: none;
+        }
+
+        /* Toggle button when sidebar is collapsed */
+        .nav-toggle-external {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-left: none;
+            border-radius: 0 6px 6px 0;
+            padding: 12px 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: none;
+        }
+
+        .main-container:has(.nav-sidebar.collapsed) .nav-toggle-external {
+            display: block;
+        }
+
+        .nav-toggle-external:hover {
+            background: var(--bg-surface-hover);
+            color: var(--primary);
+        }
+
+        .nav-sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .category-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 10px 0;
+            padding: 0 10px;
+        }
+
+        .category-btn {
+            background: var(--bg-page);
+            border: 1px solid var(--border-default);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .category-btn:hover {
+            background: var(--bg-surface-hover);
+            color: var(--text-primary);
+            border-color: var(--primary);
+        }
+
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .category-btn.all {
+            background: var(--bg-page);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nav-heading {
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: var(--bg-page);
+            border: 1px solid var(--border-default);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: block;
+            text-align: left;
+            width: 100%;
+        }
+
+        .nav-heading:hover {
+            background: var(--bg-surface-hover);
+            color: var(--text-primary);
+            border-color: var(--primary);
+        }
+
+        .nav-heading.level-1 { 
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .nav-heading.level-2 { 
+            padding-left: 20px;
+            font-size: 13px;
+        }
+        .nav-heading.level-3 { 
+            padding-left: 30px;
+            font-size: 12px;
+        }
+
+        .nav-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 12px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 15px 15px 0 15px;
+        }
+
+        .search {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            outline: none;
+            transition: border .2s;
+            font-size: 14px;
+        }
+
+        .search:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
+        }
+
+        /* Formula Cards - COM TAMANHO AUMENTADO */
+        .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 0 10px 10px 10px;
+        }
+
+        .card {
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            background: var(--bg-page);
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--primary-hover));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            background: var(--bg-surface-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+
+        .card.active {
+            outline: 2px solid var(--primary);
+            background: var(--bg-surface-hover);
+        }
+
+        .card.active::before {
+            transform: scaleX(1);
+        }
+
+        .card .name {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .card .category {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        /* PREVIEW DO LATEX AUMENTADO */
+        .card .preview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 12px !important; /* Aumentado */
+            color: var(--text-secondary);
+            font-size: 14px !important; /* Aumentado */
+            overflow: hidden;
+            min-height: 48px !important; /* Aumentado */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card .preview .katex {
+            font-size: 1.3em !important; /* 30% maior */
+            transform: scale(1.1);
+            transform-origin: center;
+        }
+
+        /* Main Content */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Calculator Panel */
+        .calculator {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .calc-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .formula-display {
+            background: var(--bg-page);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .formula-display.empty {
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+
+        .inputs-grid {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .input-group input {
+            padding: 10px 12px;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            outline: none;
+            transition: border .2s;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(1, 152, 117, 0.2);
+        }
+
+        /* ESTILO PARA INPUT DE LISTA DE DADOS */
+        .lista-input-container {
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            padding: 10px;
+            background: var(--bg-page);
+            margin-bottom: 15px;
+        }
+
+        .lista-itens {
+            margin: 10px 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .lista-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px;
+            margin: 2px 0;
+            background: var(--bg-surface-hover);
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .lista-item button {
+            background: var(--bg-page);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .lista-item button:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Botões da Lista com estilo da Toolbar */
+        .lista-botoes-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: white;
+            text-align: center;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideIn .3s ease;
+        }
+
+        .result-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 6px;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: 700;
+            word-break: break-all;
+        }
+
+        .result-unit {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .steps-box {
+            background: var(--bg-page);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .steps-box.show {
+            display: block;
+        }
+
+        .steps-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .steps-content {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .step {
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--bg-surface);
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-default);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-interactive);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-sidebar {
+                display: none;
+            }
+            
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .content-area {
+                padding: 10px;
+            }
+        }
+
+        /* KaTeX customization */
+        .katex {
+            color: var(--text-primary) !important;
+            font-size: 1.1em !important;
+        }
+
+        .katex-display {
+            text-align: center !important;
+            margin: 1em 0 !important;
+        }
+
+        .formula-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            overflow: hidden;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .formula-preview .katex {
+            color: var(--text-secondary) !important;
+            font-size: 0.9em !important;
+        }
+
+        /* Modal para gráfico */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .graph-overlay {
+            backdrop-filter: blur(5px);
+        }
+
+        .graph-modal {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Menu -->
+    <div class="top-menu">
+        <div class="menu-title">Fórmulas Interativas</div>
+        <div class="menu-item" onclick="loadFormulaBank()">
+            <i class="fas fa-database"></i> Banco de Fórmulas
+        </div>
+        <div class="menu-item" onclick="clearCalculator()">
+            <i class="fas fa-trash"></i> Limpar
+        </div>
+        <div class="menu-item" onclick="calculate()">
+            <i class="fas fa-play"></i> Calcular
+        </div>
+        <div class="menu-item" onclick="exportResult()">
+            <i class="fas fa-download"></i> Exportar
+        </div>
+        <div class="menu-item" onclick="generateGraph()">
+            <i class="fas fa-chart-line"></i> Gerar Gráficos
+        </div>
+        <div class="menu-item" id="toGoBackBtn">
+            <i class="fas fa-chevron-left"></i> Voltar
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Navigation Sidebar -->
+        <div class="nav-sidebar" id="navSidebar">
+            <div class="nav-sidebar-header">
+                <div class="nav-sidebar-title">
+                    <i class="fas fa-list"></i> Fórmulas
+                </div>
+                <button class="nav-toggle-btn" onclick="toggleNavSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="nav-sidebar-content">
+                <div class="search-container">
+                    <input type="text" class="search" placeholder="Buscar fórmula..." id="searchInput" oninput="filterFormulas()">
+                </div>
+                <div class="category-filters" id="categoryFilters">
+                    <!-- Category filters will be populated here -->
+                </div>
+                <div class="cards" id="formulaCards">
+                    <!-- Formula cards will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Toggle button when sidebar is collapsed -->
+        <button class="nav-toggle-external" onclick="toggleNavSidebar()">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Calculator Panel -->
+            <div class="calculator">
+                <div class="calc-header">
+                    <i class="fas fa-calculator"></i>
+                    <span id="formulaTitle">Selecione uma fórmula</span>
+                </div>
+
+                <div class="formula-display empty" id="formulaDisplay">
+                    <div style="color: var(--text-tertiary); text-align: center;">
+                        <i class="fas fa-hand-point-left"></i> Escolha uma fórmula da lista ao lado
+                    </div>
+                </div>
+
+                <div class="inputs-grid" id="inputsGrid"></div>
+
+                <div class="result-box" id="resultBox">
+                    <div class="result-label">Resultado</div>
+                    <div class="result-value" id="resultValue">0</div>
+                    <div class="result-unit" id="resultUnit"></div>
+                </div>
+
+                <div class="steps-box" id="stepsBox">
+                    <div class="steps-title">
+                        <i class="fas fa-list-ol"></i> Passos da Resolução
+                    </div>
+                    <div class="steps-content" id="stepsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-info">
+            <span id="formulaCount">0 fórmulas</span>
+            <span id="selectedFormula">Nenhuma fórmula selecionada</span>
+        </div>
+        <div class="status-info">
+            <span>Fórmulas Interativas v1.0</span>
+        </div>
+    </div>
+
+    <script>
+        // Formula data - COM CORREÇÕES DE PERCENTUAL
+        const formulas = [
+            // MATEMÁTICA
+            {
+                id: 'bhaskara',
+                name: 'Fórmula de Bháskara',
+                category: 'Matemática',
+                latex: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+                vars: [
+                    {symbol: 'a', name: 'Coeficiente a', unit: ''},
+                    {symbol: 'b', name: 'Coeficiente b', unit: ''},
+                    {symbol: 'c', name: 'Coeficiente c', unit: ''}
+                ],
+                result: {symbol: 'x', unit: ''},
+                calc: function(a, b, c) {
+                    const discriminante = b*b - 4*a*c;
+                    if (discriminante < 0) return 'Sem raízes reais';
+                    const x1 = (-b + Math.sqrt(discriminante)) / (2*a);
+                    const x2 = (-b - Math.sqrt(discriminante)) / (2*a);
+                    return `x₁ = ${formatarNumeroBrasil(x1)}, x₂ = ${formatarNumeroBrasil(x2)}`;
+                },
+                steps: function(a, b, c) {
+                    const discriminante = b*b - 4*a*c;
+                    const x1 = (-b + Math.sqrt(discriminante)) / (2*a);
+                    const x2 = (-b - Math.sqrt(discriminante)) / (2*a);
+                    return [
+                        `Dados: a = ${a}, b = ${b}, c = ${c}`,
+                        `Calculando Δ = b² - 4ac`,
+                        `Δ = ${b}² - 4×${a}×${c} = ${discriminante}`,
+                        `Aplicando x = (-b ± √Δ)/(2a)`,
+                        `x = (${-b} ± √${discriminante})/(2×${a})`,
+                        discriminante >= 0 ? 
+                            `x₁ = ${formatarNumeroBrasil(x1)}, x₂ = ${formatarNumeroBrasil(x2)}` : 
+                            'Δ < 0: Não existem raízes reais'
+                    ];
+                }
+            },
+            {
+                id: 'area_triangulo',
+                name: 'Área do Triângulo',
+                category: 'Matemática',
+                latex: 'A = \\frac{b \\cdot h}{2}',
+                vars: [
+                    {symbol: 'b', name: 'Base', unit: 'm'},
+                    {symbol: 'h', name: 'Altura', unit: 'm'}
+                ],
+                result: {symbol: 'A', unit: 'm²'},
+                calc: (b, h) => (b * h) / 2,
+                steps: (b, h) => [
+                    `Dados: b = ${b} m, h = ${h} m`,
+                    `Aplicando A = (b × h) / 2`,
+                    `A = (${b} × ${h}) / 2`,
+                    `A = ${formatarNumeroBrasil((b * h) / 2)} m²`
+                ]
+            },
+            {
+                id: 'area_circulo',
+                name: 'Área do Círculo',
+                category: 'Matemática',
+                latex: 'A = \\pi r^2',
+                vars: [
+                    {symbol: 'r', name: 'Raio', unit: 'm'}
+                ],
+                result: {symbol: 'A', unit: 'm²'},
+                calc: (r) => Math.PI * r * r,
+                steps: (r) => [
+                    `Dados: r = ${r} m`,
+                    `Aplicando A = πr²`,
+                    `A = π × ${r}²`,
+                    `A = ${formatarNumeroBrasil(Math.PI * r * r)} m²`
+                ]
+            },
+            {
+                id: 'teorema_pitagoras',
+                name: 'Teorema de Pitágoras',
+                category: 'Matemática',
+                latex: 'a^2 = b^2 + c^2',
+                vars: [
+                    {symbol: 'b', name: 'Cateto 1', unit: 'm'},
+                    {symbol: 'c', name: 'Cateto 2', unit: 'm'}
+                ],
+                result: {symbol: 'a', unit: 'm'},
+                calc: (b, c) => Math.sqrt(b*b + c*c),
+                steps: (b, c) => [
+                    `Dados: b = ${b} m, c = ${c} m`,
+                    `Aplicando a² = b² + c²`,
+                    `a² = ${b}² + ${c}² = ${b*b} + ${c*c}`,
+                    `a² = ${b*b + c*c}`,
+                    `a = √${b*b + c*c} = ${formatarNumeroBrasil(Math.sqrt(b*b + c*c))} m`
+                ]
+            },
+            {
+                id: 'progressao_aritmetica',
+                name: 'Termo Geral da PA',
+                category: 'Matemática',
+                latex: 'a_n = a_1 + (n-1)r',
+                vars: [
+                    {symbol: 'a1', name: 'Primeiro termo', unit: ''},
+                    {symbol: 'n', name: 'Posição', unit: ''},
+                    {symbol: 'r', name: 'Razão', unit: ''}
+                ],
+                result: {symbol: 'a_n', unit: ''},
+                calc: (a1, n, r) => a1 + (n-1)*r,
+                steps: (a1, n, r) => [
+                    `Dados: a₁ = ${a1}, n = ${n}, r = ${r}`,
+                    `Aplicando aₙ = a₁ + (n-1)r`,
+                    `aₙ = ${a1} + (${n}-1)×${r}`,
+                    `aₙ = ${a1} + ${(n-1)*r}`,
+                    `aₙ = ${a1 + (n-1)*r}`
+                ]
+            },
+            {
+                id: 'progressao_geometrica',
+                name: 'Termo Geral da PG',
+                category: 'Matemática',
+                latex: 'a_n = a_1 \\cdot q^{n-1}',
+                vars: [
+                    {symbol: 'a1', name: 'Primeiro termo', unit: ''},
+                    {symbol: 'n', name: 'Posição', unit: ''},
+                    {symbol: 'q', name: 'Razão', unit: ''}
+                ],
+                result: {symbol: 'a_n', unit: ''},
+                calc: (a1, n, q) => a1 * Math.pow(q, n-1),
+                steps: (a1, n, q) => [
+                    `Dados: a₁ = ${a1}, n = ${n}, q = ${q}`,
+                    `Aplicando aₙ = a₁ × q^(n-1)`,
+                    `aₙ = ${a1} × ${q}^(${n}-1)`,
+                    `aₙ = ${a1} × ${q}^${n-1}`,
+                    `aₙ = ${(a1 * Math.pow(q, n-1)).toFixed(2)}`
+                ]
+            },
+            {
+                id: 'media_aritmetica',
+                name: 'Média Aritmética',
+                category: 'Matemática',
+                latex: '\\bar{x} = \\frac{\\sum x}{n}',
+                vars: [
+                    {symbol: 'valores', name: 'Valores', unit: 'lista'}
+                ],
+                result: {symbol: 'x̄', unit: ''},
+                calc: function(...args) {
+                    const lista = window.dadosDasListas['valores'] || [];
+                    if (lista.length === 0) throw new Error('Nenhum valor adicionado');
+                    const soma = lista.reduce((a, b) => a + b, 0);
+                    return soma / lista.length;
+                },
+                steps: function(...args) {
+                    const lista = window.dadosDasListas['valores'] || [];
+                    if (lista.length === 0) return ['Adicione valores para calcular'];
+                    const soma = lista.reduce((a, b) => a + b, 0);
+                    const media = soma / lista.length;
+                    return [
+                        `Valores: ${lista.map(v => formatarNumeroBrasil(v)).join(', ')}`,
+                        `Soma: Σx = ${formatarNumeroBrasil(soma)}`,
+                        `Quantidade: n = ${lista.length}`,
+                        `x̄ = Σx/n = ${formatarNumeroBrasil(soma)}/${lista.length}`,
+                        `x̄ = ${media.toFixed(2)}`
+                    ];
+                }
+            },
+
+            // FÍSICA - Cinemática
+            {
+                id: 'velocidade_media',
+                name: 'Velocidade Média',
+                category: 'Física',
+                latex: 'v = \\frac{\\Delta s}{\\Delta t}',
+                vars: [
+                    {symbol: 's', name: 'Deslocamento', unit: 'm'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 'v', unit: 'm/s'},
+                calc: (s, t) => s / t,
+                steps: (s, t) => [
+                    `Dados: Δs = ${s} m, Δt = ${t} s`,
+                    `Aplicando v = Δs / Δt`,
+                    `v = ${s} / ${t}`,
+                    `v = ${formatarNumeroBrasil(s/t)} m/s`
+                ]
+            },
+            {
+                id: 'aceleracao',
+                name: 'Aceleração',
+                category: 'Física',
+                latex: 'a = \\frac{\\Delta v}{\\Delta t}',
+                vars: [
+                    {symbol: 'v', name: 'Variação da velocidade', unit: 'm/s'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 'a', unit: 'm/s²'},
+                calc: (v, t) => v / t,
+                steps: (v, t) => [
+                    `Dados: Δv = ${v} m/s, Δt = ${t} s`,
+                    `Aplicando a = Δv / Δt`,
+                    `a = ${v} / ${t}`,
+                    `a = ${(v/t).toFixed(2)} m/s²`
+                ]
+            },
+            {
+                id: 'mruv_posicao',
+                name: 'Posição no MRUV',
+                category: 'Física',
+                latex: 's = s_0 + v_0t + \\frac{1}{2}at^2',
+                vars: [
+                    {symbol: 's0', name: 'Posição inicial', unit: 'm'},
+                    {symbol: 'v0', name: 'Velocidade inicial', unit: 'm/s'},
+                    {symbol: 'a', name: 'Aceleração', unit: 'm/s²'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 's', unit: 'm'},
+                calc: (s0, v0, a, t) => s0 + v0*t + 0.5*a*t*t,
+                steps: (s0, v0, a, t) => [
+                    `Dados: s₀ = ${s0} m, v₀ = ${v0} m/s, a = ${a} m/s², t = ${t} s`,
+                    `Aplicando s = s₀ + v₀t + ½at²`,
+                    `s = ${s0} + ${v0}×${t} + ½×${a}×${t}²`,
+                    `s = ${s0} + ${v0*t} + ${0.5*a*t*t}`,
+                    `s = ${(s0 + v0*t + 0.5*a*t*t).toFixed(2)} m`
+                ]
+            },
+            {
+                id: 'torricelli',
+                name: 'Equação de Torricelli',
+                category: 'Física',
+                latex: 'v^2 = v_0^2 + 2a\\Delta s',
+                vars: [
+                    {symbol: 'v0', name: 'Velocidade inicial', unit: 'm/s'},
+                    {symbol: 'a', name: 'Aceleração', unit: 'm/s²'},
+                    {symbol: 's', name: 'Deslocamento', unit: 'm'}
+                ],
+                result: {symbol: 'v', unit: 'm/s'},
+                calc: (v0, a, s) => Math.sqrt(v0*v0 + 2*a*s),
+                steps: (v0, a, s) => [
+                    `Dados: v₀ = ${v0} m/s, a = ${a} m/s², Δs = ${s} m`,
+                    `Aplicando v² = v₀² + 2aΔs`,
+                    `v² = ${v0}² + 2×${a}×${s}`,
+                    `v² = ${v0*v0} + ${2*a*s}`,
+                    `v² = ${v0*v0 + 2*a*s}`,
+                    `v = √${v0*v0 + 2*a*s} = ${formatarNumeroBrasil(Math.sqrt(v0*v0 + 2*a*s))} m/s`
+                ]
+            },
+            {
+                id: 'queda_livre',
+                name: 'Queda Livre (altura)',
+                category: 'Física',
+                latex: 'h = \\frac{1}{2}gt^2',
+                vars: [
+                    {symbol: 'g', name: 'Gravidade', unit: 'm/s²'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 'h', unit: 'm'},
+                calc: (g, t) => 0.5 * g * t * t,
+                steps: (g, t) => [
+                    `Dados: g = ${g} m/s², t = ${t} s`,
+                    `Aplicando h = ½gt²`,
+                    `h = ½×${g}×${t}²`,
+                    `h = ${0.5*g*t*t} m`
+                ]
+            },
+
+            // FÍSICA - Dinâmica
+            {
+                id: 'segunda_lei_newton',
+                name: '2ª Lei de Newton',
+                category: 'Física',
+                latex: 'F = ma',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'kg'},
+                    {symbol: 'a', name: 'Aceleração', unit: 'm/s²'}
+                ],
+                result: {symbol: 'F', unit: 'N'},
+                calc: (m, a) => m * a,
+                steps: (m, a) => [
+                    `Dados: m = ${m} kg, a = ${a} m/s²`,
+                    `Aplicando F = ma`,
+                    `F = ${m} × ${a}`,
+                    `F = ${(m * a).toFixed(2)} N`
+                ]
+            },
+            {
+                id: 'peso',
+                name: 'Peso',
+                category: 'Física',
+                latex: 'P = mg',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'kg'},
+                    {symbol: 'g', name: 'Gravidade', unit: 'm/s²'}
+                ],
+                result: {symbol: 'P', unit: 'N'},
+                calc: (m, g) => m * g,
+                steps: (m, g) => [
+                    `Dados: m = ${m} kg, g = ${g} m/s²`,
+                    `Aplicando P = mg`,
+                    `P = ${m} × ${g}`,
+                    `P = ${(m * g).toFixed(2)} N`
+                ]
+            },
+            {
+                id: 'energia_cinetica',
+                name: 'Energia Cinética',
+                category: 'Física',
+                latex: 'E_c = \\frac{1}{2}mv^2',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'kg'},
+                    {symbol: 'v', name: 'Velocidade', unit: 'm/s'}
+                ],
+                result: {symbol: 'E_c', unit: 'J'},
+                calc: (m, v) => 0.5 * m * v * v,
+                steps: (m, v) => [
+                    `Dados: m = ${m} kg, v = ${v} m/s`,
+                    `Aplicando E_c = ½mv²`,
+                    `E_c = ½ × ${m} × ${v}²`,
+                    `E_c = ${formatarNumeroBrasil(0.5 * m * v * v)} J`
+                ]
+            },
+            {
+                id: 'trabalho',
+                name: 'Trabalho',
+                category: 'Física',
+                latex: 'W = F \\cdot d \\cdot \\cos \\theta',
+                vars: [
+                    {symbol: 'F', name: 'Força', unit: 'N'},
+                    {symbol: 'd', name: 'Distância', unit: 'm'},
+                    {symbol: 'theta', name: 'Ângulo', unit: '°'}
+                ],
+                result: {symbol: 'W', unit: 'J'},
+                calc: (F, d, theta) => F * d * Math.cos(theta * Math.PI / 180),
+                steps: (F, d, theta) => [
+                    `Dados: F = ${F} N, d = ${d} m, θ = ${theta}°`,
+                    `Aplicando W = F×d×cos(θ)`,
+                    `W = ${F} × ${d} × cos(${theta}°)`,
+                    `W = ${F*d} × ${Math.cos(theta * Math.PI / 180).toFixed(3)}`,
+                    `W = ${(F * d * Math.cos(theta * Math.PI / 180)).toFixed(2)} J`
+                ]
+            },
+            {
+                id: 'potencia',
+                name: 'Potência',
+                category: 'Física',
+                latex: 'P = \\frac{W}{t}',
+                vars: [
+                    {symbol: 'W', name: 'Trabalho', unit: 'J'},
+                    {symbol: 't', name: 'Tempo', unit: 's'}
+                ],
+                result: {symbol: 'P', unit: 'W'},
+                calc: (W, t) => W / t,
+                steps: (W, t) => [
+                    `Dados: W = ${W} J, t = ${t} s`,
+                    `Aplicando P = W/t`,
+                    `P = ${W}/${t}`,
+                    `P = ${(W/t).toFixed(2)} W`
+                ]
+            },
+
+            // FÍSICA - Hidrostática e Gases
+            {
+                id: 'pressao',
+                name: 'Pressão',
+                category: 'Física',
+                latex: 'P = \\frac{F}{A}',
+                vars: [
+                    {symbol: 'F', name: 'Força', unit: 'N'},
+                    {symbol: 'A', name: 'Área', unit: 'm²'}
+                ],
+                result: {symbol: 'P', unit: 'Pa'},
+                calc: (F, A) => F / A,
+                steps: (F, A) => [
+                    `Dados: F = ${F} N, A = ${A} m²`,
+                    `Aplicando P = F/A`,
+                    `P = ${F}/${A}`,
+                    `P = ${(F/A).toFixed(2)} Pa`
+                ]
+            },
+            {
+                id: 'pressao_hidrostatica',
+                name: 'Pressão Hidrostática',
+                category: 'Física',
+                latex: 'P = \\rho g h',
+                vars: [
+                    {symbol: 'rho', name: 'Densidade', unit: 'kg/m³'},
+                    {symbol: 'g', name: 'Gravidade', unit: 'm/s²'},
+                    {symbol: 'h', name: 'Profundidade', unit: 'm'}
+                ],
+                result: {symbol: 'P', unit: 'Pa'},
+                calc: (rho, g, h) => rho * g * h,
+                steps: (rho, g, h) => [
+                    `Dados: ρ = ${rho} kg/m³, g = ${g} m/s², h = ${h} m`,
+                    `Aplicando P = ρgh`,
+                    `P = ${rho} × ${g} × ${h}`,
+                    `P = ${(rho * g * h).toFixed(2)} Pa`
+                ]
+            },
+            {
+                id: 'clapeyron',
+                name: 'Equação de Clapeyron',
+                category: 'Física',
+                latex: 'PV = nRT',
+                vars: [
+                    {symbol: 'P', name: 'Pressão', unit: 'Pa'},
+                    {symbol: 'V', name: 'Volume', unit: 'm³'},
+                    {symbol: 'n', name: 'Mols', unit: 'mol'},
+                    {symbol: 'T', name: 'Temperatura', unit: 'K'}
+                ],
+                result: {symbol: 'R', unit: 'J/(mol·K)'},
+                calc: (P, V, n, T) => (P * V) / (n * T),
+                steps: (P, V, n, T) => [
+                    `Dados: P = ${P} Pa, V = ${V} m³, n = ${n} mol, T = ${T} K`,
+                    `Aplicando PV = nRT → R = PV/(nT)`,
+                    `R = (${P} × ${V}) / (${n} × ${T})`,
+                    `R = ${(P * V)} / ${(n * T)}`,
+                    `R = ${((P * V) / (n * T)).toFixed(2)} J/(mol·K)`
+                ]
+            },
+            {
+                id: 'densidade',
+                name: 'Densidade',
+                category: 'Física',
+                latex: '\\rho = \\frac{m}{V}',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'kg'},
+                    {symbol: 'V', name: 'Volume', unit: 'm³'}
+                ],
+                result: {symbol: 'ρ', unit: 'kg/m³'},
+                calc: (m, V) => m / V,
+                steps: (m, V) => [
+                    `Dados: m = ${m} kg, V = ${V} m³`,
+                    `Aplicando ρ = m / V`,
+                    `ρ = ${m} / ${V}`,
+                    `ρ = ${(m/V).toFixed(2)} kg/m³`
+                ]
+            },
+
+            // FÍSICA - Eletricidade
+            {
+                id: 'lei_ohm',
+                name: 'Lei de Ohm',
+                category: 'Física',
+                latex: 'V = Ri',
+                vars: [
+                    {symbol: 'R', name: 'Resistência', unit: 'Ω'},
+                    {symbol: 'i', name: 'Corrente', unit: 'A'}
+                ],
+                result: {symbol: 'V', unit: 'V'},
+                calc: (R, i) => R * i,
+                steps: (R, i) => [
+                    `Dados: R = ${R} Ω, i = ${i} A`,
+                    `Aplicando V = Ri`,
+                    `V = ${R} × ${i}`,
+                    `V = ${(R * i).toFixed(2)} V`
+                ]
+            },
+            {
+                id: 'potencia_eletrica',
+                name: 'Potência Elétrica',
+                category: 'Física',
+                latex: 'P = Vi',
+                vars: [
+                    {symbol: 'V', name: 'Tensão', unit: 'V'},
+                    {symbol: 'i', name: 'Corrente', unit: 'A'}
+                ],
+                result: {symbol: 'P', unit: 'W'},
+                calc: (V, i) => V * i,
+                steps: (V, i) => [
+                    `Dados: V = ${V} V, i = ${i} A`,
+                    `Aplicando P = Vi`,
+                    `P = ${V} × ${i}`,
+                    `P = ${(V * i).toFixed(2)} W`
+                ]
+            },
+            {
+                id: 'coulomb',
+                name: 'Lei de Coulomb',
+                category: 'Física',
+                latex: 'F = k\\frac{q_1q_2}{r^2}',
+                vars: [
+                    {symbol: 'q1', name: 'Carga 1', unit: 'C'},
+                    {symbol: 'q2', name: 'Carga 2', unit: 'C'},
+                    {symbol: 'r', name: 'Distância', unit: 'm'}
+                ],
+                result: {symbol: 'F', unit: 'N'},
+                calc: (q1, q2, r) => (9e9 * q1 * q2) / (r * r),
+                steps: (q1, q2, r) => [
+                    `Dados: q₁ = ${q1} C, q₂ = ${q2} C, r = ${r} m`,
+                    `Aplicando F = kq₁q₂/r² (k = 9×10⁹)`,
+                    `F = 9×10⁹ × ${q1} × ${q2} / ${r}²`,
+                    `F = ${(9e9 * q1 * q2).toExponential(2)} / ${r*r}`,
+                    `F = ${((9e9 * q1 * q2) / (r * r)).toFixed(2)} N`
+                ]
+            },
+
+            // FÍSICA - Ondas e Óptica
+            {
+                id: 'onda_fundamental',
+                name: 'Equação da Onda',
+                category: 'Física',
+                latex: 'v = \\lambda f',
+                vars: [
+                    {symbol: 'lambda', name: 'Comprimento de onda', unit: 'm'},
+                    {symbol: 'f', name: 'Frequência', unit: 'Hz'}
+                ],
+                result: {symbol: 'v', unit: 'm/s'},
+                calc: (lambda, f) => lambda * f,
+                steps: (lambda, f) => [
+                    `Dados: λ = ${lambda} m, f = ${f} Hz`,
+                    `Aplicando v = λf`,
+                    `v = ${lambda} × ${f}`,
+                    `v = ${(lambda * f).toFixed(2)} m/s`
+                ]
+            },
+            {
+                id: 'lei_snell',
+                name: 'Lei de Snell',
+                category: 'Física',
+                latex: 'n_1\\sin \\theta_1 = n_2\\sin \\theta_2',
+                vars: [
+                    {symbol: 'n1', name: 'Índice 1', unit: ''},
+                    {symbol: 'theta1', name: 'Ângulo 1', unit: '°'},
+                    {symbol: 'n2', name: 'Índice 2', unit: ''}
+                ],
+                result: {symbol: 'θ₂', unit: '°'},
+                calc: (n1, theta1, n2) => {
+                    const rad = Math.asin((n1 * Math.sin(theta1 * Math.PI / 180)) / n2);
+                    return (rad * 180 / Math.PI).toFixed(2);
+                },
+                steps: (n1, theta1, n2) => [
+                    `Dados: n₁ = ${n1}, θ₁ = ${theta1}°, n₂ = ${n2}`,
+                    `Aplicando n₁sen(θ₁) = n₂sen(θ₂)`,
+                    `${n1}×sen(${theta1}°) = ${n2}×sen(θ₂)`,
+                    `sen(θ₂) = ${(n1 * Math.sin(theta1 * Math.PI / 180)).toFixed(3)}/${n2}`,
+                    `sen(θ₂) = ${(n1 * Math.sin(theta1 * Math.PI / 180) / n2).toFixed(3)}`,
+                    `θ₂ = ${(Math.asin((n1 * Math.sin(theta1 * Math.PI / 180)) / n2) * 180 / Math.PI).toFixed(2)}°`
+                ]
+            },
+
+            // QUÍMICA
+            {
+                id: 'mols',
+                name: 'Número de Mols',
+                category: 'Química',
+                latex: 'n = \\frac{m}{M}',
+                vars: [
+                    {symbol: 'm', name: 'Massa', unit: 'g'},
+                    {symbol: 'M', name: 'Massa molar', unit: 'g/mol'}
+                ],
+                result: {symbol: 'n', unit: 'mol'},
+                calc: (m, M) => m / M,
+                steps: (m, M) => [
+                    `Dados: m = ${m} g, M = ${M} g/mol`,
+                    `Aplicando n = m/M`,
+                    `n = ${m}/${M}`,
+                    `n = ${(m/M).toFixed(2)} mol`
+                ]
+            },
+            {
+                id: 'molaridade',
+                name: 'Molaridade',
+                category: 'Química',
+                latex: 'M = \\frac{n}{V}',
+                vars: [
+                    {symbol: 'n', name: 'Mols', unit: 'mol'},
+                    {symbol: 'V', name: 'Volume', unit: 'L'}
+                ],
+                result: {symbol: 'M', unit: 'mol/L'},
+                calc: (n, V) => n / V,
+                steps: (n, V) => [
+                    `Dados: n = ${n} mol, V = ${V} L`,
+                    `Aplicando M = n/V`,
+                    `M = ${n}/${V}`,
+                    `M = ${(n/V).toFixed(2)} mol/L`
+                ]
+            },
+            {
+                id: 'ph',
+                name: 'pH',
+                category: 'Química',
+                latex: 'pH = -\\log[H^+]',
+                vars: [
+                    {symbol: 'h', name: '[H⁺]', unit: 'mol/L'}
+                ],
+                result: {symbol: 'pH', unit: ''},
+                calc: (h) => -Math.log10(h),
+                steps: (h) => [
+                    `Dados: [H⁺] = ${h} mol/L`,
+                    `Aplicando pH = -log[H⁺]`,
+                    `pH = -log(${h})`,
+                    `pH = ${(-Math.log10(h)).toFixed(2)}`
+                ]
+            },
+            {
+                id: 'diluicao',
+                name: 'Diluição',
+                category: 'Química',
+                latex: 'C_1V_1 = C_2V_2',
+                vars: [
+                    {symbol: 'c1', name: 'Concentração inicial', unit: 'mol/L'},
+                    {symbol: 'v1', name: 'Volume inicial', unit: 'L'},
+                    {symbol: 'c2', name: 'Concentração final', unit: 'mol/L'}
+                ],
+                result: {symbol: 'V₂', unit: 'L'},
+                calc: (c1, v1, c2) => (c1 * v1) / c2,
+                steps: (c1, v1, c2) => [
+                    `Dados: C₁ = ${c1} mol/L, V₁ = ${v1} L, C₂ = ${c2} mol/L`,
+                    `Aplicando C₁V₁ = C₂V₂`,
+                    `${c1} × ${v1} = ${c2} × V₂`,
+                    `V₂ = (${c1} × ${v1}) / ${c2}`,
+                    `V₂ = ${(c1 * v1)} / ${c2}`,
+                    `V₂ = ${((c1 * v1) / c2).toFixed(2)} L`
+                ]
+            },
+
+            // ECONOMIA E FINANÇAS - COM CORREÇÃO DE PERCENTUAL
+            {
+                id: 'juros_simples',
+                name: 'Juros Simples (Montante)',
+                category: 'Economia',
+                latex: 'M = C(1 + it)',
+                vars: [
+                    {symbol: 'C', name: 'Capital', unit: 'R$'},
+                    {symbol: 'i', name: 'Taxa', unit: '% a.m.', isPercent: true},
+                    {symbol: 't', name: 'Tempo', unit: 'meses'}
+                ],
+                result: {symbol: 'M', unit: 'R$'},
+                calc: (C, i, t) => {
+                    // i já vem dividido por 100 da função calculate
+                    return C * (1 + i * t);
+                },
+                steps: (C, i, t) => {
+                    const i_percent = (i * 100).toFixed(2);
+                    const i_decimal = i; // Já está convertido
+                    return [
+                        `Dados: C = R$ ${C}, i = ${i_percent}% a.m., t = ${t} meses`,
+                        `Conversão: ${i_percent}% = ${i_decimal}`,
+                        `Aplicando M = C(1 + it)`,
+                        `M = ${C}(1 + ${i_decimal} × ${t})`,
+                        `M = ${C} × ${(1 + i_decimal*t).toFixed(4)}`,
+                        `M = R$ ${formatarNumeroBrasil(C * (1 + i * t))}`
+                    ];
+                }
+            },
+            {
+                id: 'juros_compostos',
+                name: 'Juros Compostos (Montante)',
+                category: 'Economia',
+                latex: 'M = C(1 + i)^n',
+                vars: [
+                    {symbol: 'C', name: 'Capital', unit: 'R$'},
+                    {symbol: 'i', name: 'Taxa', unit: '% a.m.', isPercent: true},
+                    {symbol: 'n', name: 'Períodos', unit: 'meses'}
+                ],
+                result: {symbol: 'M', unit: 'R$'},
+                calc: (C, i, n) => {
+                    // i já vem dividido por 100
+                    return C * Math.pow(1 + i, n);
+                },
+                steps: (C, i, n) => {
+                    const i_percent = (i * 100).toFixed(2);
+                    const i_decimal = i;
+                    return [
+                        `Dados: C = R$ ${C}, i = ${i_percent}% a.m., n = ${n} meses`,
+                        `Conversão: ${i_percent}% = ${i_decimal}`,
+                        `Aplicando M = C(1 + i)^n`,
+                        `M = ${C}(1 + ${i_decimal})^${n}`,
+                        `M = ${C} × ${Math.pow(1 + i_decimal, n).toFixed(4)}`,
+                        `M = R$ ${formatarNumeroBrasil(C * Math.pow(1 + i_decimal, n))}`
+                    ];
+                }
+            },
+            {
+                id: 'vpl',
+                name: 'VPL (Valor Presente Líquido)',
+                category: 'Economia',
+                latex: 'VPL = \\sum\\frac{FC_t}{(1+i)^t}',
+                vars: [
+                    {symbol: 'fc', name: 'Fluxo de caixa', unit: 'R$'},
+                    {symbol: 'i', name: 'Taxa de desconto', unit: '%', isPercent: true},
+                    {symbol: 't', name: 'Período', unit: 'meses'}
+                ],
+                result: {symbol: 'VPL', unit: 'R$'},
+                calc: (fc, i, t) => {
+                    // i já vem dividido por 100
+                    return fc / Math.pow(1 + i, t);
+                },
+                steps: (fc, i, t) => {
+                    const i_percent = (i * 100).toFixed(2);
+                    const i_decimal = i;
+                    return [
+                        `Dados: FC = R$ ${fc}, i = ${i_percent}% a.m., t = ${t} meses`,
+                        `Conversão: ${i_percent}% = ${i_decimal}`,
+                        `Aplicando VPL = FC/(1+i)^t`,
+                        `VPL = ${fc}/(1 + ${i_decimal})^${t}`,
+                        `VPL = ${fc}/${Math.pow(1 + i_decimal, t).toFixed(4)}`,
+                        `VPL = R$ ${(fc / Math.pow(1 + i_decimal, t)).toFixed(2)}`
+                    ];
+                }
+            }
+        ];
+
+        let currentFormula = null;
+        let filteredFormulas = [...formulas];
+        let currentCategory = 'all';
+        window.dadosDasListas = {}; // Para armazenar listas de valores
+
+        // Get unique categories
+        const categories = ['all', ...[...new Set(formulas.map(f => f.category))]];
+
+        // Initialize the application
+        function init() {
+            renderCategoryFilters();
+            renderFormulaCards();
+            updateStatus();
+        }
+
+        function renderCategoryFilters() {
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = '';
+
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = `category-btn ${category === 'all' ? 'active' : ''}`;
+                btn.textContent = category === 'all' ? '📚 Todas as Fórmulas' : `📖 ${category}`;
+                btn.onclick = () => filterByCategory(category);
+                container.appendChild(btn);
+            });
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Apply category filter
+            if (category === 'all') {
+                filteredFormulas = [...formulas];
+            } else {
+                filteredFormulas = formulas.filter(f => f.category === category);
+            }
+            
+            // Re-apply search filter if any
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filteredFormulas = filteredFormulas.filter(formula => 
+                    formula.name.toLowerCase().includes(searchTerm) ||
+                    formula.category.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderFormulaCards();
+            updateStatus();
+        }
+
+        function renderFormulaCards() {
+            const container = document.getElementById('formulaCards');
+            container.innerHTML = '';
+
+            filteredFormulas.forEach(formula => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => selectFormula(formula);
+                
+                card.innerHTML = `
+                    <div class="name">
+                        <i class="fas fa-calculator"></i>
+                        ${formula.name}
+                    </div>
+                    <div class="category">${formula.category}</div>
+                    <div class="preview" id="preview-${formula.id}">
+                        ${formula.latex}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+                
+                // Render LaTeX for preview
+                katex.render(formula.latex, document.getElementById(`preview-${formula.id}`), {
+                    throwOnError: false,
+                    displayMode: false
+                });
+            });
+        }
+
+        function selectFormula(formula) {
+            currentFormula = formula;
+            window.dadosDasListas = {}; // Limpa dados anteriores
+
+            // Update UI
+            document.getElementById('formulaTitle').textContent = formula.name;
+            document.getElementById('formulaDisplay').classList.remove('empty');
+            
+            // Render formula with KaTeX
+            const displayElement = document.getElementById('formulaDisplay');
+            displayElement.innerHTML = '';
+            katex.render(formula.latex, displayElement, {
+                throwOnError: false,
+                displayMode: true
+            });
+            
+            // Create input fields
+            const inputsGrid = document.getElementById('inputsGrid');
+            inputsGrid.innerHTML = '';
+
+            formula.vars.forEach((variable, index) => {
+                // Detecta se é variável de lista
+                const isVariavelDeLista = variable.unit === 'lista' || 
+                    ['valores', 'dados', 'amostra'].some(palavra => 
+                        variable.name.toLowerCase().includes(palavra)
+                    );
+                
+                if (isVariavelDeLista) {
+                    inputsGrid.innerHTML += criarInputDeLista(variable, index);
+                } else {
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'input-group';
+                    inputGroup.innerHTML = `
+                        <label>${variable.name} (${variable.symbol}) - ${variable.unit}</label>
+                        <input type="number" step="any" id="var-${variable.symbol}" 
+                               placeholder="Digite o valor de ${variable.name}">
+                    `;
+                    inputsGrid.appendChild(inputGroup);
+                }
+            });
+            
+            // Clear results
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('stepsBox').classList.remove('show');
+            
+            // Update cards
+            document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+            event.target.closest('.card').classList.add('active');
+            
+            updateStatus();
+        }
+
+        function criarInputDeLista(variable, index) {
+            return `
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-secondary);">
+                        ${variable.name} (${variable.symbol}) - Adicione valores
+                    </label>
+                    <div class="lista-input-container" id="container-${variable.symbol}">
+                        <input type="text" id="input-${variable.symbol}" 
+                               placeholder="Digite um número e pressione Enter" 
+                               style="width: 100%; padding: 8px; border: none; background: transparent; color: var(--text-primary); outline: none; border-bottom: 1px solid var(--border-default);">
+                        <div class="lista-itens" id="itens-${variable.symbol}"></div>
+                        <div class="lista-botoes-container">
+                            <button onclick="adicionarItem('${variable.symbol}')" class="menu-item primary">
+                                <i class="fas fa-plus"></i> Adicionar
+                            </button>
+                            <button onclick="limparLista('${variable.symbol}')" class="menu-item danger">
+                                <i class="fas fa-trash"></i> Limpar
+                            </button>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; color: var(--text-tertiary);">
+                            Total de itens: <span id="contador-${variable.symbol}">0</span> | 
+                            Soma: <span id="soma-${variable.symbol}">0</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function adicionarItem(simbolo) {
+            const input = document.getElementById(`input-${simbolo}`);
+            const valor = parseFloat(input.value.replace(',', '.'));
+            
+            if (isNaN(valor)) {
+                alert('Digite um número válido!');
+                return;
+            }
+
+            if (!window.dadosDasListas[simbolo]) {
+                window.dadosDasListas[simbolo] = [];
+            }
+            
+            window.dadosDasListas[simbolo].push(valor);
+            atualizarLista(simbolo);
+            input.value = '';
+            input.focus();
+        }
+
+        function limparLista(simbolo) {
+            window.dadosDasListas[simbolo] = [];
+            atualizarLista(simbolo);
+        }
+
+        function removerItem(simbolo, index) {
+            window.dadosDasListas[simbolo].splice(index, 1);
+            atualizarLista(simbolo);
+        }
+
+        function atualizarLista(simbolo) {
+            const lista = window.dadosDasListas[simbolo] || [];
+            const container = document.getElementById(`itens-${simbolo}`);
+            const contador = document.getElementById(`contador-${simbolo}`);
+            const soma = document.getElementById(`soma-${simbolo}`);
+            
+            container.innerHTML = lista.map((valor, index) => `
+                <div class="lista-item">
+                    <span>${index + 1}. ${formatarNumeroBrasil(valor)}</span>
+                    <button onclick="removerItem('${simbolo}', ${index})" title="Remover">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            contador.textContent = lista.length;
+            soma.textContent = formatarNumeroBrasil(lista.reduce((acc, val) => acc + val, 0));
+        }
+
+        function filterFormulas() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Start with category filter
+            let baseFormulas = currentCategory === 'all' ? 
+                [...formulas] : 
+                formulas.filter(f => f.category === currentCategory);
+            
+            // Apply search filter
+            if (searchTerm) {
+                filteredFormulas = baseFormulas.filter(formula => 
+                    formula.name.toLowerCase().includes(searchTerm) ||
+                    formula.category.toLowerCase().includes(searchTerm)
+                );
+            } else {
+                filteredFormulas = baseFormulas;
+            }
+            
+            renderFormulaCards();
+            updateStatus();
+        }
+
+        function calculate() {
+            if (!currentFormula) {
+                alert('Por favor, selecione uma fórmula primeiro!');
+                return;
+            }
+            
+            const values = {};
+            let missingFields = [];
+            
+            // Processa variáveis normais e listas
+            currentFormula.vars.forEach(variable => {
+                const isLista = document.getElementById(`container-${variable.symbol}`);
+                
+                if (isLista) {
+                    const lista = window.dadosDasListas[variable.symbol] || [];
+                    if (lista.length === 0) {
+                        missingFields.push(`${variable.name} (adicione valores)`);
+                    } else {
+                        if (variable.symbol === 'valores') {
+                            values[variable.symbol] = lista;
+                        } else {
+                            values[variable.symbol] = lista.reduce((a, b) => a + b, 0);
+                        }
+                    }
+                } else {
+                    const input = document.getElementById(`var-${variable.symbol}`);
+                    let value = parseFloat(input.value);
+                    
+                    if (isNaN(value)) {
+                        missingFields.push(variable.name);
+                    } else {
+                        // CONVERSÃO PERCENTUAL AUTOMÁTICA
+                        if (variable.isPercent) {
+                            value = value / 100;
+                        }
+                        values[variable.symbol] = value;
+                    }
+                }
+            });
+            
+            if (missingFields.length > 0) {
+                alert(`Por favor, preencha: ${missingFields.join(', ')}`);
+                return;
+            }
+            
+            try {
+                const args = currentFormula.vars.map(v => values[v.symbol]);
+                const result = currentFormula.calc(...args);
+                const steps = currentFormula.steps(...args);
+                
+                let resultText, resultUnit = currentFormula.result.unit;
+                
+                if (typeof result === 'string') {
+                    resultText = result;
+                } else if (typeof result === 'number' && isFinite(result)) {
+                    resultText = formatarNumeroBrasil(result);
+                } else if (Array.isArray(result)) {
+                    resultText = `Média: ${formatarNumeroBrasil(result.reduce((a,b)=>a+b,0)/result.length)}`;
+                } else {
+                    resultText = String(result);
+                }
+                
+                document.getElementById('resultValue').textContent = resultText;
+                document.getElementById('resultUnit').textContent = resultUnit;
+                document.getElementById('resultBox').classList.add('show');
+                
+                const stepsContent = document.getElementById('stepsContent');
+                if (Array.isArray(steps)) {
+                    stepsContent.innerHTML = steps.map(step => 
+                        `<div class="step">${step}</div>`
+                    ).join('');
+                } else {
+                    stepsContent.innerHTML = `<div class="step">${steps}</div>`;
+                }
+                document.getElementById('stepsBox').classList.add('show');
+                
+            } catch (error) {
+                alert(`Erro no cálculo: ${error.message}`);
+                console.error('Calculation error:', error);
+            }
+        }
+
+        function clearCalculator() {
+            currentFormula = null;
+            window.dadosDasListas = {};
+            document.getElementById('formulaTitle').textContent = 'Selecione uma fórmula';
+            document.getElementById('formulaDisplay').innerHTML = `
+                <div style="color: var(--text-tertiary); text-align: center;">
+                    <i class="fas fa-hand-point-left"></i> Escolha uma fórmula da lista ao lado
+                </div>
+            `;
+            document.getElementById('formulaDisplay').classList.add('empty');
+            document.getElementById('inputsGrid').innerHTML = '';
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('stepsBox').classList.remove('show');
+            
+            document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
+            updateStatus();
+        }
+
+        function formatarNumeroBrasil(numero) {
+            if (typeof numero === 'number' && isFinite(numero)) {
+                if (Math.abs(numero) >= 1e6 || (Math.abs(numero) < 0.001 && numero !== 0)) {
+                    return numero.toExponential(2).replace('.', ',');
+                }
+                return numero.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+            return String(numero);
+        }
+
+        function generateGraph() {
+            if (!currentFormula) {
+                alert('Por favor, selecione uma fórmula primeiro!');
+                return;
+            }
+
+            const graphableFormulas = ['bhaskara', 'area_triangulo', 'area_circulo', 'teorema_pitagoras', 
+                                     'velocidade_media', 'aceleracao', 'mruv_posicao', 'energia_cinetica',
+                                     'juros_simples', 'juros_compostos'];
+
+            if (!graphableFormulas.includes(currentFormula.id)) {
+                alert('Esta fórmula não suporta visualização gráfica.');
+                return;
+            }
+
+            const values = {};
+            let missingFields = [];
+            
+            currentFormula.vars.forEach(variable => {
+                const input = document.getElementById(`var-${variable.symbol}`);
+                const value = parseFloat(input?.value || 0);
+                
+                if (isNaN(value) && variable.symbol !== 'g') {
+                    missingFields.push(variable.name);
+                } else {
+                    values[variable.symbol] = value;
+                }
+            });
+
+            if (missingFields.length > 0) {
+                alert(`Preencha pelo menos: ${missingFields.join(', ')}`);
+                return;
+            }
+
+            showGraphModal(currentFormula, values);
+        }
+
+        function showGraphModal(formula, values) {
+            const overlay = document.createElement('div');
+            overlay.className = 'graph-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s ease;
+            `;
+
+            const modal = document.createElement('div');
+            modal.className = 'graph-modal';
+            modal.style.cssText = `
+                background: var(--bg-surface);
+                border: 1px solid var(--border-default);
+                border-radius: 12px;
+                padding: 20px;
+                max-width: 90vw;
+                max-height: 90vh;
+                overflow: auto;
+                position: relative;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            `;
+
+            const header = document.createElement('div');
+            header.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid var(--border-default);
+            `;
+
+            const title = document.createElement('h3');
+            title.textContent = `Gráfico: ${formula.name}`;
+            title.style.cssText = `
+                color: var(--primary);
+                margin: 0;
+                font-size: 18px;
+            `;
+
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '✕';
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                font-size: 20px;
+                cursor: pointer;
+                padding: 5px;
+                border-radius: 4px;
+                transition: all 0.3s ease;
+            `;
+            closeBtn.onmouseover = () => {
+                closeBtn.style.background = 'var(--bg-surface-hover)';
+                closeBtn.style.color = 'var(--primary)';
+            };
+            closeBtn.onmouseout = () => {
+                closeBtn.style.background = 'none';
+                closeBtn.style.color = 'var(--text-secondary)';
+            };
+            closeBtn.onclick = () => document.body.removeChild(overlay);
+
+            header.appendChild(title);
+            header.appendChild(closeBtn);
+
+            const graphContainer = document.createElement('div');
+            graphContainer.id = 'graphCanvas';
+            graphContainer.style.cssText = `
+                width: 600px;
+                height: 400px;
+                border: 1px solid var(--border-default);
+                border-radius: 8px;
+                background: var(--bg-page);
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--text-secondary);
+            `;
+            graphContainer.innerHTML = 'Gráfico em desenvolvimento<br><small>Funcionalidade será implementada em breve</small>';
+
+            modal.appendChild(header);
+            modal.appendChild(graphContainer);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    document.body.removeChild(overlay);
+                }
+            };
+        }
+
+        function exportResult() {
+            if (!currentFormula) {
+                alert('Nenhuma fórmula selecionada para exportar.');
+                return;
+            }
+            
+            const result = document.getElementById('resultValue').textContent;
+            const unit = document.getElementById('resultUnit').textContent;
+            const steps = document.getElementById('stepsContent').innerHTML;
+            
+            const content = `# Cálculo: ${currentFormula.name}
+
+## Fórmula
+$${currentFormula.latex}$$
+
+## Resultado
+**${result} ${unit}**
+
+## Passos da Resolução
+${steps.replace(/<div class="step">/g, '').replace(/<\/div>/g, '\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>')}
+            `;
+            
+            const blob = new Blob([content], {type: 'text/markdown'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `calculo-${currentFormula.id}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function loadFormulaBank() {
+            document.getElementById('navSidebar').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleNavSidebar() {
+            const navSidebar = document.querySelector('.nav-sidebar');
+            navSidebar.classList.toggle('collapsed');
+        }
+
+        function updateStatus() {
+            const formulaCount = document.getElementById('formulaCount');
+            const selectedFormula = document.getElementById('selectedFormula');
+            
+            const totalCount = currentCategory === 'all' ? formulas.length : 
+                formulas.filter(f => f.category === currentCategory).length;
+            
+            formulaCount.textContent = `${filteredFormulas.length}/${totalCount} fórmulas`;
+            selectedFormula.textContent = currentFormula ? 
+                `Selecionada: ${currentFormula.name}` : 
+                'Nenhuma fórmula selecionada';
+        }
+
+		document.getElementById('toGoBackBtn').addEventListener('click', toGoBack);
+		
+		function toGoBack() {
+			const base = window.location.origin;
+			window.location.href = "../index.html";
+		}
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

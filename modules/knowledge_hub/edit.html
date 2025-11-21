@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Hub - Editor</title>
+    <link rel="stylesheet" href="./css/edit.css">
+	<script type="text/javascript">
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true,
+            processEnvironments: true
+          },
+          startup: {
+            ready: () => {
+              MathJax.startup.defaultReady();
+              MathJax.startup.promise.then(() => {
+                // Add wrapper to LaTeX blocks after rendering
+                setTimeout(wrapLatexBlocks, 500);
+              });
+            }
+          }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    </head>
+<body>
+    <div class="container">
+        <aside class="toc-sidebar-left" id="tocSidebar">
+            <div class="toc-header">
+                <h2>Navegação</h2>
+                <button class="toggle-toc-btn" onclick="toggleTOC()" title="Ocultar/Mostrar navegação">◀</button>
+            </div>
+            <div class="toc-content" id="tocContent"><div style="color: #6b7280; text-align: center; padding: 20px; font-size: 12px;">Nenhum título encontrado</div></div>
+        </aside>
+
+        <main class="main-content">
+            <div class="toolbar">
+                <input type="text" id="docTitle" placeholder="Título..." value="Novo Documento">
+                <button class="toolbar-btn" onclick="saveDocument()">Salvar</button>
+                <button class="toolbar-btn" onclick="exportMarkdown()">Exportar</button>
+                <button class="toolbar-btn" onclick="openSettings()">Configurações</button>
+                <button class="toolbar-btn" onclick="goBackToHub()" title="Voltar ao Hub">Voltar</button>
+                <button class="toolbar-btn" onclick="goToAssistant()">🤖 Assistente</button>
+            </div>
+
+            <div class="editor-container">
+                <div class="editor-pane">
+                    <div class="pane-header">Editor Markdown + LaTeX</div>
+                    <textarea id="editor"># Guia LaTeX
+
+## Fórmulas
+
+$E = mc^2$
+
+$$
+\int_{a}^{b} f(x) dx
+$$
+
+## Tabela
+
+| Comando | Descrição |
+|---------|-----------|
+| `\|pipe\|` | pipe em código |
+| $x^2$ | LaTeX inline |
+
+## Código
+
+```
+console.log('Olá');
+```
+</textarea>
+                </div>
+
+                <div class="preview-pane">
+                    <div class="pane-header">Preview em Tempo Real</div>
+                    <div id="preview"></div>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <div style="display: flex; gap: 15px;">
+                    <span id="charCount">0 caracteres</span>
+                    <span id="wordCount">0 palavras</span>
+                </div>
+                <span id="saveStatus"></span>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Configurações do Editor</h2>
+                <button class="close-btn" onclick="closeSettings()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="config-section">
+                    <h3>🎨 Cores dos Títulos</h3>
+                    <div class="config-group">
+                        <div class="config-item"><label>H1</label><input type="color" id="h1Color" value="#10b981"></div>
+                        <div class="config-item"><label>H2</label><input type="color" id="h2Color" value="#3b82f6"></div>
+                        <div class="config-item"><label>H3</label><input type="color" id="h3Color" value="#8b5cf6"></div>
+                        <div class="config-item"><label>H4</label><input type="color" id="h4Color" value="#f59e0b"></div>
+                        <div class="config-item"><label>H5</label><input type="color" id="h5Color" value="#ef4444"></div>
+                        <div class="config-item"><label>H6</label><input type="color" id="h6Color" value="#06b6d4"></div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <h3>💻 Blocos de Código</h3>
+                    <div class="config-group">
+                        <div class="config-item"><label>Texto</label><input type="color" id="codeText" value="#e0e0e0"></div>
+                        <div class="config-item"><label>Fundo</label><input type="color" id="codeBg" value="#1a1a1a"></div>
+                        <div class="config-item"><label>Borda</label><input type="color" id="codeBorder" value="#10b981"></div>
+                        <div class="config-item"><label>Espessura (px)</label><input type="number" id="codeBorderWidth" value="4" min="0" max="10"></div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <h3>📐 Blocos LaTeX</h3>
+                    <div class="config-group">
+                        <div class="config-item"><label>Texto</label><input type="color" id="latexText" value="#e0e0e0"></div>
+                        <div class="config-item"><label>Fundo</label><input type="color" id="latexBg" value="#0a0a0a"></div>
+                        <div class="config-item"><label>Borda</label><input type="color" id="latexBorder" value="#10b981"></div>
+                        <div class="config-item"><label>Espessura (px)</label><input type="number" id="latexBorderWidth" value="4" min="0" max="10"></div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <h3>💬 Blocos de Citação</h3>
+                    <div class="config-group">
+                        <div class="config-item"><label>Texto</label><input type="color" id="quoteText" value="#9ca3af"></div>
+                        <div class="config-item"><label>Fundo</label><input type="color" id="quoteBg" value="#1a1a1a"></div>
+                        <div class="config-item"><label>Borda</label><input type="color" id="quoteBorder" value="#10b981"></div>
+                        <div class="config-item"><label>Espessura (px)</label><input type="number" id="quoteBorderWidth" value="4" min="0" max="10"></div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <h3>📝 Código Inline</h3>
+                    <div class="config-group">
+                        <div class="config-item"><label>Texto</label><input type="color" id="codeInlineText" value="#f59e0b"></div>
+                        <div class="config-item"><label>Fundo</label><input type="color" id="codeInlineBg" value="#1a1a1a"></div>
+                        <div class="config-item"><label>Borda</label><input type="color" id="codeInlineBorder" value="#10b981"></div>
+                        <div class="config-item"><label>Espessura (px)</label><input type="number" id="codeInlineBorderWidth" value="2" min="0" max="10"></div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <h3>🔢 LaTeX Inline</h3>
+                    <div class="config-group">
+                        <div class="config-item"><label>Cor do Texto</label><input type="color" id="latexInlineText" value="#10b981"></div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <h3>📏 Espaçamento</h3>
+                    <div class="config-group">
+                        <div class="config-item"><label>Altura da Linha</label><input type="number" id="lineHeight" value="1.7" step="0.1" min="1" max="3"></div>
+                        <div class="config-item"><label>Espaço entre Palavras (px)</label><input type="number" id="wordSpacing" value="0" min="-5" max="20"></div>
+                        <div class="config-item"><label>Espaço entre Letras (px)</label><input type="number" id="letterSpacing" value="0" min="-2" max="10" step="0.5"></div>
+                        <div class="config-item"><label>Margem dos Blocos (px)</label><input type="number" id="margin" value="20" min="0" max="100"></div>
+                    </div>
+                </div>
+                <div class="config-section">
+                    <h3>🔤 Fonte</h3>
+                    <div class="config-group">
+                        <div class="config-item">
+                            <label>Família da Fonte</label>
+                            <select id="fontFamily">
+                                <option value="'Cambria Math', 'Times New Roman', serif">Cambria Math</option>
+                                <option value="'Times New Roman', serif">Times New Roman</option>
+                                <option value="'Calibri', sans-serif">Calibri</option>
+                                <option value="'Georgia', serif">Georgia</option>
+                                <option value="'Verdana', sans-serif">Verdana</option>
+                                <option value="'Courier New', monospace">Courier New</option>
+                                <option value="'Monotype Corsiva', cursive">Monotype Corsiva</option>
+                                <option value="'Arial', sans-serif">Arial</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 30px;">
+                    <button class="toolbar-btn" onclick="resetSettings()">🔄 Restaurar</button>
+                    <button class="toolbar-btn" style="background: #10b981; color: white;" onclick="applySettings()">✓ Aplicar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+	<script type="module" src="./js/hub-api.js"></script>
+    <script type="module" src="./js/edit.js"></script>
+</body>
+</html>

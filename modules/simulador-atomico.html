@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Atômico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* === CSS VARIABLES (Design System Nuclear) === */
+        :root {
+            /* Color System */
+            --color-primary-100: #E8F4F8;
+            --color-primary-500: #00BF93; /* Verde ciano workspace */
+            --color-primary-700: #00A085;
+            
+            --color-nuclear-100: #FEF2F2;
+            --color-nuclear-500: #DC2626; /* Vermelho nuclear */
+            --color-nuclear-700: #B91C1C;
+            
+            --color-bg-page: #0A0A0A;
+            --color-bg-surface: #141414;
+            --color-bg-surface-hover: rgba(22, 22, 22, 0.5);
+            
+            --color-border-default: #3f3f46;
+            --color-border-focus: #00BF93;
+            --color-border-light: #262626;
+            
+            --color-text-primary: #E4E4E7;
+            --color-text-secondary: #A1A1AA;
+            --color-text-high-contrast: #FFFFFF;
+            
+            --color-success: #22C55E;
+            --color-warning: #FBBF24;
+            --color-error: #F43F5E;
+            
+            /* Atomic-specific colors */
+            --color-proton: #DC2626;     /* Vermelho */
+            --color-neutron: #3B82F6;    /* Azul */
+            --color-electron: #00BF93;   /* Verde ciano */
+            --color-orbit: #8B5CF6;      /* Roxo */
+            
+            /* Element categories */
+            --color-star: #F59E0B;       /* Amarelo */
+            --color-life: #10B981;       /* Verde */
+            --color-radioactive: #EF4444; /* Vermelho */
+
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size-h1: 48px;
+            --font-size-h2: 24px;
+            --font-size-h3: 16px;
+            --font-size-body: 16px;
+            --font-size-body-sm: 14px;
+            
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Spacing (8px Grid) */
+            --space-xs: 8px;
+            --space-sm: 12px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+            --space-xxxl: 64px;
+            
+            /* Layout */
+            --layout-max-width: 1800px;
+            --radius-sm: 8px;
+            --border-width: 1px;
+            
+            /* Animations */
+            --transition-fast: 150ms ease-out;
+            --transition-normal: 200ms ease-out;
+        }
+
+        /* === GLOBAL STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-family);
+            background: var(--color-bg-page);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--color-bg-surface) 0%, #1a1a1a 100%);
+            border-bottom: var(--border-width) solid var(--color-border-light);
+            padding: var(--space-xl) var(--space-xxl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+            letter-spacing: -0.5%;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .atomic-icon {
+            font-size: 36px;
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-lg);
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: var(--font-size-body);
+            color: var(--color-text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* === MAIN LAYOUT === */
+        .app-main {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            padding: var(--space-xxl);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr 400px;
+            gap: var(--space-xl);
+            height: calc(100vh - 200px);
+        }
+
+        @media (max-width: 1400px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        /* === PANEL STYLES === */
+        .panel {
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            border: var(--border-width) solid var(--color-border-light);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary-500);
+            margin-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--color-primary-500);
+            padding-bottom: var(--space-sm);
+        }
+
+        /* === LEFT PANEL - ELEMENTS BANK === */
+        .category-tabs {
+            display: flex;
+            margin-bottom: var(--space-md);
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .category-tab {
+            flex: 1;
+            padding: var(--space-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-size: var(--font-size-body-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            background: var(--color-bg-page);
+        }
+
+        .category-tab:hover {
+            background: var(--color-bg-surface-hover);
+            color: var(--color-text-primary);
+        }
+
+        .category-tab.active {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .elements-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: var(--space-lg);
+        }
+
+        .element-item {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border-left: 4px solid transparent;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .element-item:hover {
+            transform: translateX(5px);
+            border-color: var(--color-primary-500);
+        }
+
+        .element-item.star { border-left-color: var(--color-star); }
+        .element-item.life { border-left-color: var(--color-life); }
+        .element-item.radioactive { border-left-color: var(--color-radioactive); }
+
+        .element-symbol {
+            font-size: 1.2em;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-xs);
+            color: var(--color-text-primary);
+        }
+
+        .element-name {
+            font-size: var(--font-size-body-sm);
+            color: var(--color-text-secondary);
+        }
+
+        /* === CENTER PANEL - VISUALIZATION === */
+        .visualization-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view-tabs {
+            display: flex;
+            margin-bottom: var(--space-lg);
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .view-tab {
+            flex: 1;
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-size: var(--font-size-body-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            background: var(--color-bg-page);
+        }
+
+        .view-tab:hover {
+            background: var(--color-bg-surface-hover);
+            color: var(--color-text-primary);
+        }
+
+        .view-tab.active {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .view-content {
+            flex: 1;
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            border: var(--border-width) solid var(--color-border-light);
+            margin-bottom: var(--space-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #atomViewer3D, #atomViewer2D {
+            width: 100%;
+            height: 100%;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+
+        /* === RIGHT PANEL - CONTROLS === */
+        .control-group {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .control-group h3 {
+            color: var(--color-primary-500);
+            margin-bottom: var(--space-md);
+            border-bottom: 2px solid var(--color-primary-500);
+            padding-bottom: var(--space-sm);
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* === SLIDERS === */
+        .slider-container {
+            margin: var(--space-md) 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-sm);
+            font-size: var(--font-size-body-sm);
+            color: var(--color-text-primary);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--color-border-light);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--color-primary-500);
+            cursor: pointer;
+            border: 2px solid var(--color-bg-page);
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-normal);
+            flex: 1;
+            font-size: var(--font-size-body-sm);
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-700);
+            transform: scale(1.03);
+        }
+
+        .btn-proton {
+            background: var(--color-proton);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-neutron {
+            background: var(--color-neutron);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-electron {
+            background: var(--color-electron);
+            color: var(--color-text-high-contrast);
+        }
+
+        /* === PARTICLE CONTROLS === */
+        .particle-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+            margin: var(--space-md) 0;
+        }
+
+        .particle-btn {
+            padding: var(--space-sm) var(--space-md);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: var(--font-weight-medium);
+            transition: all var(--transition-normal);
+            font-size: var(--font-size-body-sm);
+        }
+
+        /* === STATE BUTTONS === */
+        .state-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-sm);
+            margin: var(--space-md) 0;
+        }
+
+        .state-btn {
+            padding: var(--space-sm);
+            border: var(--border-width) solid var(--color-border-default);
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-size: var(--font-size-body-sm);
+            text-align: center;
+        }
+
+        .state-btn:hover {
+            border-color: var(--color-border-focus);
+        }
+
+        .state-btn.active {
+            background: var(--color-primary-500);
+            border-color: var(--color-primary-700);
+            color: var(--color-text-high-contrast);
+        }
+
+        /* === INDICATORS === */
+        .indicators {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+            margin: var(--space-md) 0;
+        }
+
+        .indicator {
+            background: var(--color-bg-surface);
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .indicator-value {
+            font-size: 1.3em;
+            font-weight: var(--font-weight-bold);
+            margin: var(--space-xs) 0;
+            color: var(--color-primary-500);
+        }
+
+        /* === STABILITY INDICATOR === */
+        .stability-indicator {
+            height: 20px;
+            background: linear-gradient(90deg, var(--color-error) 0%, var(--color-warning) 50%, var(--color-success) 100%);
+            border-radius: 10px;
+            margin: var(--space-md) 0;
+            position: relative;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .stability-marker {
+            position: absolute;
+            top: -4px;
+            width: 12px;
+            height: 28px;
+            background: var(--color-text-high-contrast);
+            border-radius: 6px;
+            transition: left 0.3s ease;
+            border: 2px solid var(--color-bg-page);
+        }
+
+        /* === SPECTRUM DISPLAY === */
+        .spectrum-display {
+            height: 120px;
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            margin: var(--space-md) 0;
+            position: relative;
+            overflow: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .energy-levels {
+            height: 200px;
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            margin: var(--space-md) 0;
+            position: relative;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        /* === PROPERTY GRID === */
+        .property-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+            margin: var(--space-md) 0;
+        }
+
+        .property {
+            background: var(--color-bg-surface);
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .property-value {
+            font-size: 1.1em;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 1400px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+            
+            .panel {
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-main {
+                padding: var(--space-lg);
+            }
+            
+            .app-header {
+                padding: var(--space-lg);
+            }
+            
+            .category-tabs, .view-tabs {
+                flex-direction: column;
+            }
+            
+            .particle-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .state-buttons {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .indicators {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="header-content">
+            <div>
+                <h1 class="app-title">
+                    <span class="atomic-icon">⚛️</span>
+                    MÓDULO ATÔMICO
+                </h1>
+                <p class="subtitle">Simulação Completa de Átomos - Banco de Elementos, Visualização 2D/3D e Controles em Tempo Real</p>
+            </div>
+            <div class="header-actions">
+                <!-- Reserved for future actions -->
+            </div>
+        </div>
+    </div>
+
+    <div class="app-main">
+        <div class="app-grid">
+            <!-- Painel Esquerdo - Banco de Elementos -->
+            <div class="panel">
+                <div class="panel-title">🏗️ Banco de Elementos</div>
+                
+                <div class="category-tabs">
+                    <div class="category-tab active" data-category="all">Todos</div>
+                    <div class="category-tab" data-category="star">Estrelas</div>
+                    <div class="category-tab" data-category="life">Vida</div>
+                    <div class="category-tab" data-category="radioactive">Radioativos</div>
+                </div>
+
+                <div class="elements-list" id="elementsList">
+                    <!-- Elementos serão carregados via JavaScript -->
+                </div>
+
+                <div class="control-group">
+                    <h3>🔍 Pesquisa Avançada</h3>
+                    <input type="text" id="elementSearch" placeholder="Buscar elemento..." 
+                           style="width: 100%; padding: var(--space-sm); background: var(--color-bg-surface); border: var(--border-width) solid var(--color-border-default); border-radius: var(--radius-sm); color: var(--color-text-primary); margin-bottom: var(--space-md);">
+                    <div class="property-grid">
+                        <div class="property">
+                            <div>Prótons</div>
+                            <div class="property-value" id="searchProtons">1-118</div>
+                        </div>
+                        <div class="property">
+                            <div>Estabilidade</div>
+                            <div class="property-value" id="searchStability">Todos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel Central - Visualização -->
+            <div class="visualization-panel">
+                <div class="view-tabs">
+                    <div class="view-tab active" data-view="3d">Visualização 3D</div>
+                    <div class="view-tab" data-view="2d">Visualização 2D</div>
+                    <div class="view-tab" data-view="spectrum">Espectro</div>
+                    <div class="view-tab" data-view="energy">Níveis de Energia</div>
+                </div>
+
+                <div class="view-content active" id="atomViewer3D">
+                    <!-- Visualizador 3D será inserido aqui -->
+                </div>
+
+                <div class="view-content" id="atomViewer2D" style="display: none;">
+                    <canvas id="atomCanvas2D"></canvas>
+                </div>
+
+                <div class="view-content" id="spectrumView" style="display: none;">
+                    <div class="spectrum-display" id="spectrumDisplay">
+                        <!-- Espectro será renderizado aqui -->
+                    </div>
+                    <div class="control-group">
+                        <h3>📊 Análise Espectral</h3>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Intensidade da Excitação:</span>
+                                <span id="excitationValue">50%</span>
+                            </div>
+                            <input type="range" id="excitationSlider" min="0" max="100" value="50">
+                        </div>
+                        <canvas id="spectrumChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="view-content" id="energyView" style="display: none;">
+                    <div class="energy-levels" id="energyLevels">
+                        <!-- Níveis de energia serão renderizados aqui -->
+                    </div>
+                    <div class="control-group">
+                        <h3>⚡ Transições Eletrônicas</h3>
+                        <div id="transitionsList">
+                            <!-- Lista de transições -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="animation-controls">
+                    <button class="btn btn-primary" onclick="startAnimation()">▶️ Play</button>
+                    <button class="btn btn-primary" onclick="pauseAnimation()">⏸️ Pause</button>
+                    <button class="btn btn-primary" onclick="resetAnimation()">🔄 Reset</button>
+                    <button class="btn btn-primary" onclick="exportAtomData()">💾 Exportar</button>
+                </div>
+            </div>
+
+            <!-- Painel Direito - Controles -->
+            <div class="panel">
+                <div class="control-group">
+                    <h3>🎛️ Controles do Átomo</h3>
+                    
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Temperatura:</span>
+                            <span id="temperatureValue">300 K</span>
+                        </div>
+                        <input type="range" id="temperatureSlider" min="0" max="10000" value="300" step="10">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Campo Magnético:</span>
+                            <span id="magneticValue">0 T</span>
+                        </div>
+                        <input type="range" id="magneticSlider" min="-10" max="10" value="0" step="0.1">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Radioatividade:</span>
+                            <span id="radioactivityValue">0 Bq</span>
+                        </div>
+                        <input type="range" id="radioactivitySlider" min="0" max="100" value="0">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>pH do Ambiente:</span>
+                            <span id="phValue">7.0</span>
+                        </div>
+                        <input type="range" id="phSlider" min="0" max="14" value="7" step="0.1">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>⚛️ Constituintes Atômicos</h3>
+                    
+                    <div class="particle-controls">
+                        <button class="btn btn-proton" onclick="addParticle('proton')">+ Próton</button>
+                        <button class="btn btn-proton" onclick="removeParticle('proton')">- Próton</button>
+                        <button class="btn btn-neutron" onclick="addParticle('neutron')">+ Nêutron</button>
+                        <button class="btn btn-neutron" onclick="removeParticle('neutron')">- Nêutron</button>
+                        <button class="btn btn-electron" onclick="addParticle('electron')">+ Elétron</button>
+                        <button class="btn btn-electron" onclick="removeParticle('electron')">- Elétron</button>
+                    </div>
+
+                    <div class="property-grid">
+                        <div class="property">
+                            <div>Prótons</div>
+                            <div class="property-value" id="protonCount">1</div>
+                        </div>
+                        <div class="property">
+                            <div>Nêutrons</div>
+                            <div class="property-value" id="neutronCount">0</div>
+                        </div>
+                        <div class="property">
+                            <div>Elétrons</div>
+                            <div class="property-value" id="electronCount">1</div>
+                        </div>
+                        <div class="property">
+                            <div>Carga</div>
+                            <div class="property-value" id="chargeValue">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🔬 Estados da Matéria</h3>
+                    
+                    <div class="state-buttons">
+                        <button class="state-btn active" data-state="solid">Sólido</button>
+                        <button class="state-btn" data-state="liquid">Líquido</button>
+                        <button class="state-btn" data-state="gas">Gasoso</button>
+                        <button class="state-btn" data-state="plasma">Plasma</button>
+                    </div>
+
+                    <div class="indicators">
+                        <div class="indicator">
+                            <div>Energia Interna</div>
+                            <div class="indicator-value" id="internalEnergy">0 eV</div>
+                        </div>
+                        <div class="indicator">
+                            <div>Pressão</div>
+                            <div class="indicator-value" id="pressureValue">1 atm</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>📈 Estabilidade Nuclear</h3>
+                    
+                    <div class="stability-indicator">
+                        <div class="stability-marker" id="stabilityMarker" style="left: 50%;"></div>
+                    </div>
+                    <div style="text-align: center; margin: var(--space-md) 0;">
+                        <span id="stabilityLabel" style="color: var(--color-success);">Estável</span>
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Excitação Eletrônica:</span>
+                            <span id="excitationLevel">0%</span>
+                        </div>
+                        <input type="range" id="excitationControl" min="0" max="100" value="0">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>📊 Propriedades Atuais</h3>
+                    
+                    <div class="property-grid">
+                        <div class="property">
+                            <div>Elemento</div>
+                            <div class="property-value" id="currentElement">H</div>
+                        </div>
+                        <div class="property">
+                            <div>Massa</div>
+                            <div class="property-value" id="currentMass">1.008 u</div>
+                        </div>
+                        <div class="property">
+                            <div>Raio</div>
+                            <div class="property-value" id="currentRadius">53 pm</div>
+                        </div>
+                        <div class="property">
+                            <div>Meia-vida</div>
+                            <div class="property-value" id="currentHalfLife">∞</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de dados de elementos categorizados
+        const elementsDatabase = {
+            'star': [
+                { symbol: 'H', name: 'Hidrogênio', protons: 1, neutrons: 0, electrons: 1, mass: 1.008, radius: 53, category: 'star', stability: 0.95 },
+                { symbol: 'He', name: 'Hélio', protons: 2, neutrons: 2, electrons: 2, mass: 4.0026, radius: 31, category: 'star', stability: 0.98 },
+                { symbol: 'C', name: 'Carbono', protons: 6, neutrons: 6, electrons: 6, mass: 12.011, radius: 67, category: 'star', stability: 0.90 },
+                { symbol: 'O', name: 'Oxigênio', protons: 8, neutrons: 8, electrons: 8, mass: 15.999, radius: 48, category: 'star', stability: 0.92 },
+                { symbol: 'Fe', name: 'Ferro', protons: 26, neutrons: 30, electrons: 26, mass: 55.845, radius: 140, category: 'star', stability: 0.85 }
+            ],
+            'life': [
+                { symbol: 'C', name: 'Carbono', protons: 6, neutrons: 6, electrons: 6, mass: 12.011, radius: 67, category: 'life', stability: 0.90 },
+                { symbol: 'H', name: 'Hidrogênio', protons: 1, neutrons: 0, electrons: 1, mass: 1.008, radius: 53, category: 'life', stability: 0.95 },
+                { symbol: 'O', name: 'Oxigênio', protons: 8, neutrons: 8, electrons: 8, mass: 15.999, radius: 48, category: 'life', stability: 0.92 },
+                { symbol: 'N', name: 'Nitrogênio', protons: 7, neutrons: 7, electrons: 7, mass: 14.007, radius: 56, category: 'life', stability: 0.88 },
+                { symbol: 'P', name: 'Fósforo', protons: 15, neutrons: 16, electrons: 15, mass: 30.974, radius: 98, category: 'life', stability: 0.80 },
+                { symbol: 'S', name: 'Enxofre', protons: 16, neutrons: 16, electrons: 16, mass: 32.06, radius: 88, category: 'life', stability: 0.82 }
+            ],
+            'radioactive': [
+                { symbol: 'U', name: 'Urânio-238', protons: 92, neutrons: 146, electrons: 92, mass: 238.03, radius: 175, category: 'radioactive', stability: 0.10, halfLife: '4.5e9 anos' },
+                { symbol: 'Ra', name: 'Rádio-226', protons: 88, neutrons: 138, electrons: 88, mass: 226.03, radius: 215, category: 'radioactive', stability: 0.15, halfLife: '1600 anos' },
+                { symbol: 'Pu', name: 'Plutônio-239', protons: 94, neutrons: 145, electrons: 94, mass: 239.05, radius: 175, category: 'radioactive', stability: 0.08, halfLife: '2.4e4 anos' },
+                { symbol: 'Th', name: 'Tório-232', protons: 90, neutrons: 142, electrons: 90, mass: 232.04, radius: 180, category: 'radioactive', stability: 0.12, halfLife: '1.4e10 anos' },
+                { symbol: 'Cs', name: 'Césio-137', protons: 55, neutrons: 82, electrons: 55, mass: 136.91, radius: 265, category: 'radioactive', stability: 0.20, halfLife: '30.2 anos' }
+            ]
+        };
+
+        // Estado atual do átomo
+        let currentAtom = {
+            protons: 1,
+            neutrons: 0,
+            electrons: 1,
+            temperature: 300, // Kelvin
+            magneticField: 0, // Tesla
+            radioactivity: 0, // Becquerel
+            pH: 7.0,
+            state: 'solid',
+            excitation: 0,
+            charge: 0
+        };
+
+        // Variáveis para visualização
+        let scene, camera, renderer, controls;
+        let animationId = null;
+        let isAnimating = false;
+        let spectrumChart = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeElementsList();
+            initialize3DViewer();
+            initialize2DCanvas();
+            initializeSpectrumChart();
+            initializeEventListeners();
+            updateAllDisplays();
+        });
+
+        // Banco de Elementos
+        function initializeElementsList() {
+            const list = document.getElementById('elementsList');
+            list.innerHTML = '';
+
+            // Combinar todos os elementos
+            const allElements = [
+                ...elementsDatabase.star,
+                ...elementsDatabase.life,
+                ...elementsDatabase.radioactive
+            ];
+
+            // Remover duplicatas
+            const uniqueElements = allElements.filter((element, index, self) =>
+                index === self.findIndex(e => e.symbol === element.symbol)
+            );
+
+            uniqueElements.forEach(element => {
+                const item = document.createElement('div');
+                item.className = `element-item ${element.category}`;
+                item.innerHTML = `
+                    <div class="element-symbol">${element.symbol}</div>
+                    <div class="element-name">${element.name}</div>
+                    <div style="font-size: 0.8em; color: var(--color-text-secondary);">
+                        P:${element.protons} N:${element.neutrons} E:${element.electrons}
+                    </div>
+                `;
+                item.addEventListener('click', () => loadElement(element));
+                list.appendChild(item);
+            });
+        }
+
+        function loadElement(element) {
+            currentAtom.protons = element.protons;
+            currentAtom.neutrons = element.neutrons;
+            currentAtom.electrons = element.electrons;
+            currentAtom.charge = 0; // Reset carga ao carregar elemento
+            
+            updateAllDisplays();
+            update3DVisualization();
+            update2DVisualization();
+        }
+
+        // Sistema de Visualização
+        function initialize3DViewer() {
+            const container = document.getElementById('atomViewer3D');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0A0A0A);
+            
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 10;
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            
+            // Luz ambiente
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            // Luz direcional
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Iniciar animação
+            animate3D();
+        }
+
+        function animate3D() {
+            animationId = requestAnimationFrame(animate3D);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function update3DVisualization() {
+            if (!scene) return;
+            
+            // Limpar cena
+            while(scene.children.length > 0) { 
+                scene.remove(scene.children[0]); 
+            }
+            
+            // Recriar luz
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Criar núcleo
+            const nucleusGeometry = new THREE.SphereGeometry(1, 32, 32);
+            const nucleusMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x3B82F6,
+                emissive: 0x1E3B8A,
+                shininess: 100
+            });
+            const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
+            scene.add(nucleus);
+            
+            // Criar órbitas e elétrons
+            const electronGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+            const electronMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x00BF93,
+                emissive: 0x00875A
+            });
+            
+            const orbits = calculateOrbits(currentAtom.electrons);
+            orbits.forEach((orbit, index) => {
+                // Órbita
+                const orbitGeometry = new THREE.RingGeometry(orbit.radius, orbit.radius + 0.05, 64);
+                const orbitMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x8B5CF6,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const orbitRing = new THREE.Mesh(orbitGeometry, orbitMaterial);
+                orbitRing.rotation.x = Math.PI / 2;
+                scene.add(orbitRing);
+                
+                // Elétron
+                const electron = new THREE.Mesh(electronGeometry, electronMaterial);
+                scene.add(electron);
+                
+                // Animação do elétron
+                const electronSpeed = 0.5 + (index * 0.1);
+                function animateElectron() {
+                    if (!isAnimating) return;
+                    
+                    const time = Date.now() * 0.001;
+                    const angle = time * electronSpeed;
+                    electron.position.x = Math.cos(angle) * orbit.radius;
+                    electron.position.y = Math.sin(angle) * orbit.radius;
+                    electron.position.z = Math.sin(angle * 0.5) * 0.5;
+                    
+                    requestAnimationFrame(animateElectron);
+                }
+                animateElectron();
+            });
+        }
+
+        function calculateOrbits(electronCount) {
+            const orbits = [];
+            let remainingElectrons = electronCount;
+            let orbitNumber = 1;
+            
+            while (remainingElectrons > 0) {
+                const capacity = 2 * Math.pow(orbitNumber, 2);
+                const electronsInOrbit = Math.min(remainingElectrons, capacity);
+                const radius = orbitNumber * 2;
+                
+                orbits.push({
+                    number: orbitNumber,
+                    radius: radius,
+                    electrons: electronsInOrbit,
+                    capacity: capacity
+                });
+                
+                remainingElectrons -= electronsInOrbit;
+                orbitNumber++;
+            }
+            
+            return orbits;
+        }
+
+        function initialize2DCanvas() {
+            const canvas = document.getElementById('atomCanvas2D');
+            const ctx = canvas.getContext('2d');
+            
+            // Ajustar tamanho do canvas
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            update2DVisualization();
+        }
+
+        function update2DVisualization() {
+            const canvas = document.getElementById('atomCanvas2D');
+            const ctx = canvas.getContext('2d');
+            
+            // Limpar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const maxRadius = Math.min(centerX, centerY) - 50;
+            
+            // Desenhar núcleo
+            const nucleusRadius = 20 + (currentAtom.protons + currentAtom.neutrons) / 10;
+            ctx.fillStyle = '#3B82F6';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, nucleusRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Desenhar prótons e nêutrons no núcleo
+            const totalNucleons = currentAtom.protons + currentAtom.neutrons;
+            const angleStep = (Math.PI * 2) / totalNucleons;
+            
+            for (let i = 0; i < totalNucleons; i++) {
+                const angle = i * angleStep;
+                const radius = nucleusRadius * 0.6;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                
+                ctx.fillStyle = i < currentAtom.protons ? '#DC2626' : '#3B82F6';
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Desenhar órbitas e elétrons
+            const orbits = calculateOrbits(currentAtom.electrons);
+            orbits.forEach((orbit, orbitIndex) => {
+                const orbitRadius = 50 + orbitIndex * 40;
+                
+                // Órbita
+                ctx.strokeStyle = 'rgba(139, 92, 246, 0.3)';
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, orbitRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Elétrons
+                const electronAngleStep = (Math.PI * 2) / orbit.electrons;
+                for (let i = 0; i < orbit.electrons; i++) {
+                    const angle = Date.now() * 0.001 * (0.5 + orbitIndex * 0.1) + i * electronAngleStep;
+                    const x = centerX + Math.cos(angle) * orbitRadius;
+                    const y = centerY + Math.sin(angle) * orbitRadius;
+                    
+                    ctx.fillStyle = '#00BF93';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Efeito de movimento
+                    ctx.strokeStyle = 'rgba(0, 191, 147, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            });
+            
+            // Continuar animação
+            if (isAnimating) {
+                requestAnimationFrame(update2DVisualization);
+            }
+        }
+
+        // Sistema de Controles
+        function initializeEventListeners() {
+            // Sliders
+            document.getElementById('temperatureSlider').addEventListener('input', updateTemperature);
+            document.getElementById('magneticSlider').addEventListener('input', updateMagneticField);
+            document.getElementById('radioactivitySlider').addEventListener('input', updateRadioactivity);
+            document.getElementById('phSlider').addEventListener('input', updatePH);
+            document.getElementById('excitationControl').addEventListener('input', updateExcitation);
+            
+            // Botões de estado
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentAtom.state = this.dataset.state;
+                    updateStateDisplay();
+                });
+            });
+            
+            // Abas de categoria
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterElements(this.dataset.category);
+                });
+            });
+            
+            // Abas de visualização
+            document.querySelectorAll('.view-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const view = this.dataset.view;
+                    document.querySelectorAll('.view-content').forEach(content => content.style.display = 'none');
+                    
+                    if (view === '3d') {
+                        document.getElementById('atomViewer3D').style.display = 'block';
+                    } else if (view === '2d') {
+                        document.getElementById('atomViewer2D').style.display = 'block';
+                        update2DVisualization();
+                    } else if (view === 'spectrum') {
+                        document.getElementById('spectrumView').style.display = 'block';
+                        updateSpectrum();
+                    } else if (view === 'energy') {
+                        document.getElementById('energyView').style.display = 'block';
+                        updateEnergyLevels();
+                    }
+                });
+            });
+        }
+
+        function filterElements(category) {
+            const items = document.querySelectorAll('.element-item');
+            items.forEach(item => {
+                if (category === 'all' || item.classList.contains(category)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Funções de atualização
+        function updateTemperature() {
+            const value = document.getElementById('temperatureSlider').value;
+            currentAtom.temperature = value;
+            document.getElementById('temperatureValue').textContent = value + ' K';
+            updateInternalEnergy();
+        }
+
+        function updateMagneticField() {
+            const value = document.getElementById('magneticSlider').value;
+            currentAtom.magneticField = value;
+            document.getElementById('magneticValue').textContent = value + ' T';
+        }
+
+        function updateRadioactivity() {
+            const value = document.getElementById('radioactivitySlider').value;
+            currentAtom.radioactivity = value;
+            document.getElementById('radioactivityValue').textContent = value + ' Bq';
+            updateStability();
+        }
+
+        function updatePH() {
+            const value = document.getElementById('phSlider').value;
+            currentAtom.pH = value;
+            document.getElementById('phValue').textContent = value;
+        }
+
+        function updateExcitation() {
+            const value = document.getElementById('excitationControl').value;
+            currentAtom.excitation = value;
+            document.getElementById('excitationLevel').textContent = value + '%';
+            updateSpectrum();
+        }
+
+        function updateStateDisplay() {
+            const energy = calculateInternalEnergy();
+            const pressure = calculatePressure();
+            
+            document.getElementById('internalEnergy').textContent = energy.toFixed(2) + ' eV';
+            document.getElementById('pressureValue').textContent = pressure.toFixed(2) + ' atm';
+        }
+
+        function calculateInternalEnergy() {
+            // Energia baseada na temperatura e estado
+            let baseEnergy = currentAtom.temperature * 0.001; // 0.001 eV por Kelvin
+            if (currentAtom.state === 'liquid') baseEnergy *= 1.5;
+            if (currentAtom.state === 'gas') baseEnergy *= 2;
+            if (currentAtom.state === 'plasma') baseEnergy *= 3;
+            
+            return baseEnergy + (currentAtom.excitation * 0.1);
+        }
+
+        function calculatePressure() {
+            // Pressão baseada no estado
+            switch(currentAtom.state) {
+                case 'solid': return 1.0;
+                case 'liquid': return 1.0;
+                case 'gas': return currentAtom.temperature / 300; // Pressão proporcional à temperatura
+                case 'plasma': return currentAtom.temperature / 100;
+                default: return 1.0;
+            }
+        }
+
+        function updateStability() {
+            const stability = calculateStability();
+            const marker = document.getElementById('stabilityMarker');
+            const label = document.getElementById('stabilityLabel');
+            
+            marker.style.left = (stability * 100) + '%';
+            
+            if (stability > 0.7) {
+                label.textContent = 'Muito Estável';
+                label.style.color = 'var(--color-success)';
+            } else if (stability > 0.4) {
+                label.textContent = 'Estável';
+                label.style.color = 'var(--color-warning)';
+            } else if (stability > 0.2) {
+                label.textContent = 'Instável';
+                label.style.color = 'var(--color-warning)';
+            } else {
+                label.textContent = 'Muito Instável';
+                label.style.color = 'var(--color-error)';
+            }
+        }
+
+        function calculateStability() {
+            // Fator de estabilidade baseado na razão nêutrons/prótons
+            const n_p_ratio = currentAtom.neutrons / currentAtom.protons;
+            let stability = 1.0;
+            
+            // Razão ideal é aproximadamente 1 para elementos leves
+            if (currentAtom.protons <= 20) {
+                stability -= Math.abs(n_p_ratio - 1) * 0.5;
+            } else {
+                // Para elementos pesados, a razão ideal aumenta
+                const idealRatio = 1 + (currentAtom.protons - 20) * 0.02;
+                stability -= Math.abs(n_p_ratio - idealRatio) * 0.3;
+            }
+            
+            // Penalidade por radioatividade
+            stability -= currentAtom.radioactivity * 0.01;
+            
+            // Penalidade por carga
+            stability -= Math.abs(currentAtom.charge) * 0.05;
+            
+            return Math.max(0, Math.min(1, stability));
+        }
+
+        // Controle de Partículas
+        function addParticle(type) {
+            switch(type) {
+                case 'proton':
+                    currentAtom.protons++;
+                    break;
+                case 'neutron':
+                    currentAtom.neutrons++;
+                    break;
+                case 'electron':
+                    currentAtom.electrons++;
+                    break;
+            }
+            updateParticleCounts();
+            updateAllDisplays();
+        }
+
+        function removeParticle(type) {
+            switch(type) {
+                case 'proton':
+                    if (currentAtom.protons > 1) currentAtom.protons--;
+                    break;
+                case 'neutron':
+                    if (currentAtom.neutrons > 0) currentAtom.neutrons--;
+                    break;
+                case 'electron':
+                    if (currentAtom.electrons > 1) currentAtom.electrons--;
+                    break;
+            }
+            updateParticleCounts();
+            updateAllDisplays();
+        }
+
+        function updateParticleCounts() {
+            document.getElementById('protonCount').textContent = currentAtom.protons;
+            document.getElementById('neutronCount').textContent = currentAtom.neutrons;
+            document.getElementById('electronCount').textContent = currentAtom.electrons;
+            document.getElementById('chargeValue').textContent = currentAtom.charge;
+            
+            // Atualizar elemento atual
+            const element = findElement(currentAtom.protons);
+            if (element) {
+                document.getElementById('currentElement').textContent = element.symbol;
+                document.getElementById('currentMass').textContent = (currentAtom.protons + currentAtom.neutrons).toFixed(2) + ' u';
+                document.getElementById('currentRadius').textContent = Math.round(50 + currentAtom.protons * 2) + ' pm';
+                document.getElementById('currentHalfLife').textContent = 
+                    calculateStability() > 0.3 ? '∞' : (Math.pow(10, (1 - calculateStability()) * 10)).toExponential(2) + ' anos';
+            }
+        }
+
+        function findElement(protons) {
+            const allElements = [
+                ...elementsDatabase.star,
+                ...elementsDatabase.life,
+                ...elementsDatabase.radioactive
+            ];
+            return allElements.find(el => el.protons === protons);
+        }
+
+        // Sistema de Espectro
+        function initializeSpectrumChart() {
+            const ctx = document.getElementById('spectrumChart').getContext('2d');
+            spectrumChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Violeta', 'Azul', 'Verde', 'Amarelo', 'Laranja', 'Vermelho'],
+                    datasets: [{
+                        label: 'Intensidade Espectral',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#f97316', '#ef4444'
+                        ],
+                        borderColor: [
+                            '#7c3aed', '#2563eb', '#059669', '#d97706', '#ea580c', '#dc2626'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#A1A1AA' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#A1A1AA' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#A1A1AA' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSpectrum() {
+            if (!spectrumChart) return;
+            
+            // Simular espectro baseado na excitação e elemento
+            const baseIntensity = currentAtom.excitation;
+            const elementFactor = currentAtom.protons * 0.1;
+            
+            const newData = [
+                Math.random() * baseIntensity * 0.8 + elementFactor, // Violeta
+                Math.random() * baseIntensity * 1.2 + elementFactor, // Azul
+                Math.random() * baseIntensity * 1.5 + elementFactor, // Verde
+                Math.random() * baseIntensity * 1.0 + elementFactor, // Amarelo
+                Math.random() * baseIntensity * 0.7 + elementFactor, // Laranja
+                Math.random() * baseIntensity * 0.5 + elementFactor  // Vermelho
+            ];
+            
+            spectrumChart.data.datasets[0].data = newData;
+            spectrumChart.update();
+            
+            // Atualizar display do espectro
+            const spectrumDisplay = document.getElementById('spectrumDisplay');
+            spectrumDisplay.innerHTML = '';
+            
+            newData.forEach((intensity, index) => {
+                const colorBar = document.createElement('div');
+                colorBar.style.cssText = `
+                    position: absolute;
+                    bottom: 0;
+                    left: ${(index / 6) * 100}%;
+                    width: ${100 / 6}%;
+                    height: ${intensity}%;
+                    background: ${spectrumChart.data.datasets[0].backgroundColor[index]};
+                    opacity: 0.8;
+                `;
+                spectrumDisplay.appendChild(colorBar);
+            });
+        }
+
+        function updateEnergyLevels() {
+            const container = document.getElementById('energyLevels');
+            container.innerHTML = '';
+            
+            const levels = calculateEnergyLevels();
+            levels.forEach((level, index) => {
+                const levelDiv = document.createElement('div');
+                levelDiv.style.cssText = `
+                    position: absolute;
+                    left: 20px;
+                    top: ${20 + index * 40}px;
+                    width: 90%;
+                    height: 30px;
+                    background: rgba(255,255,255,0.1);
+                    border-radius: 5px;
+                    border-left: 4px solid var(--color-electron);
+                `;
+                
+                const label = document.createElement('div');
+                label.style.cssText = `
+                    position: absolute;
+                    left: 10px;
+                    top: 5px;
+                    color: white;
+                    font-size: 12px;
+                `;
+                label.textContent = `n=${level.n} (${level.energy.toFixed(2)} eV)`;
+                
+                // Elétrons neste nível
+                for (let i = 0; i < level.electrons; i++) {
+                    const electron = document.createElement('div');
+                    electron.style.cssText = `
+                        position: absolute;
+                        right: ${10 + i * 20}px;
+                        top: 5px;
+                        width: 10px;
+                        height: 10px;
+                        background: var(--color-electron);
+                        border-radius: 50%;
+                    `;
+                    levelDiv.appendChild(electron);
+                }
+                
+                levelDiv.appendChild(label);
+                container.appendChild(levelDiv);
+            });
+        }
+
+        function calculateEnergyLevels() {
+            const levels = [];
+            let remainingElectrons = currentAtom.electrons;
+            
+            for (let n = 1; n <= 7 && remainingElectrons > 0; n++) {
+                const capacity = 2 * Math.pow(n, 2);
+                const electrons = Math.min(remainingElectrons, capacity);
+                const energy = -13.6 / Math.pow(n, 2); // Energia em eV
+                
+                levels.push({
+                    n: n,
+                    energy: energy,
+                    electrons: electrons,
+                    capacity: capacity
+                });
+                
+                remainingElectrons -= electrons;
+            }
+            
+            return levels;
+        }
+
+        // Funções de Animação
+        function startAnimation() {
+            isAnimating = true;
+            update2DVisualization();
+            update3DVisualization();
+        }
+
+        function pauseAnimation() {
+            isAnimating = false;
+        }
+
+        function resetAnimation() {
+            currentAtom = {
+                protons: 1,
+                neutrons: 0,
+                electrons: 1,
+                temperature: 300,
+                magneticField: 0,
+                radioactivity: 0,
+                pH: 7.0,
+                state: 'solid',
+                excitation: 0,
+                charge: 0
+            };
+            updateAllDisplays();
+        }
+
+        function updateAllDisplays() {
+            updateParticleCounts();
+            updateStability();
+            updateStateDisplay();
+            updateSpectrum();
+            updateEnergyLevels();
+        }
+
+        function exportAtomData() {
+            const data = {
+                atom: currentAtom,
+                properties: {
+                    stability: calculateStability(),
+                    internalEnergy: calculateInternalEnergy(),
+                    pressure: calculatePressure(),
+                    element: findElement(currentAtom.protons)
+                },
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `atom_data_${new Date().getTime()}.json`;
+            link.click();
+            
+            alert('Dados do átomo exportados com sucesso!');
+        }
+
+        // Configurar MathJax
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+</body>
+</html>

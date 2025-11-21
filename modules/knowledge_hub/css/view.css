@@ -1,0 +1,306 @@
+:root {
+	--h1-color: #10b981;
+	--h2-color: #3b82f6;
+	--h3-color: #8b5cf6;
+	--h4-color: #f59e0b;
+	--h5-color: #ef4444;
+	--h6-color: #06b6d4;
+	--code-block-text: #e0e0e0;
+	--code-block-bg: #1a1a1a;
+	--code-block-border: #10b981;
+	--code-block-border-width: 4px;
+	
+	/* ✅ NOVOS ESTILOS LaTeX BASEADOS NO EDITOR */
+	--latex-block-color: #1a1a2e;
+	--latex-block-bg: #000814;
+	--latex-block-border: #3b82f6;
+	
+	--latex-inline-text: #e0e0e0;
+	--latex-inline-bg: transparent;
+	
+	--quote-text: #9ca3af;
+	--quote-bg: #1a1a1a;
+	--quote-border: #10b981;
+	--quote-border-width: 4px;
+	--code-inline-text: #f59e0b;
+	--code-inline-bg: #1a1a1a;
+	--code-inline-border: #10b981;
+	--code-inline-border-width: 2px;
+	--line-height: 1.7;
+	--margin: 20px;
+	--font-family: 'Cambria Math', 'Times New Roman', serif;
+	
+	--header-height: 64px;
+	--header-padding: 16px 24px;
+	--header-font-size: 16px;
+	--header-line-height: 1.2;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #000; color: #e0e0e0; overflow: hidden; }
+.container { display: flex; height: 100vh; }
+
+.toc-sidebar-left { 
+	width: 280px; 
+	background: #0a0a0a; 
+	border-right: 1px solid #1a1a1a; 
+	display: flex; 
+	flex-direction: column; 
+}
+.toc-header { 
+	border-bottom: 1px solid #1a1a1a;
+	height: var(--header-height);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-height: var(--header-height);
+	padding: var(--header-padding);
+}
+.toc-header h2 { 
+	color: #10b981; 
+	font-size: var(--header-font-size); 
+	font-weight: 600; 
+	line-height: var(--header-line-height);
+}
+.doc-info { 
+	font-size: 11px; 
+	color: #6b7280; 
+	margin-top: 2px;
+	line-height: 1.2;
+}
+.toc-content { flex: 1; overflow-y: auto; padding: 10px; }
+.toc-item { padding: 8px 10px; margin: 3px 0; cursor: pointer; border-radius: 4px; font-size: 13px; transition: all 0.2s; color: #9ca3af; border-left: 3px solid transparent; }
+.toc-item:hover { background: #1a1a1a; color: #e0e0e0; border-left-color: #10b981; }
+.toc-item.active { background: #1a1a1a; color: #10b981; border-left-color: #10b981; font-weight: 600; }
+.toc-h1 { padding-left: 10px; font-weight: 600; font-size: 14px; }
+.toc-h2 { padding-left: 20px; font-size: 13px; }
+.toc-h3 { padding-left: 30px; font-size: 12px; }
+.toc-h4 { padding-left: 40px; font-size: 12px; }
+.toc-h5 { padding-left: 50px; font-size: 11px; }
+.toc-h6 { padding-left: 60px; font-size: 11px; }
+
+.main-content { flex: 1; display: flex; flex-direction: column; }
+
+.toolbar { 
+	background: #0a0a0a; 
+	border-bottom: 1px solid #1a1a1a; 
+	padding: var(--header-padding);
+	display: flex; 
+	gap: 12px; 
+	align-items: center; 
+	justify-content: space-between;
+	min-height: var(--header-height);
+	height: var(--header-height);
+}
+.doc-title { 
+	font-size: var(--header-font-size); 
+	font-weight: 600; 
+	color: #10b981;
+	display: flex;
+	align-items: center;
+	line-height: var(--header-line-height);
+	padding: 0;
+	height: 100%;
+}
+
+/* ✅ ESTILOS PARA CONTEÚDO MARKDOWN NO TÍTULO */
+.doc-title * {
+	color: inherit !important;
+	font-size: inherit !important;
+	font-weight: inherit !important;
+	margin: 0 !important;
+}
+.doc-title strong, .doc-title b {
+	color: #10b981 !important;
+	font-weight: 700 !important;
+}
+.toolbar-actions { 
+	display: flex; 
+	gap: 10px; 
+	align-items: center;
+	height: 100%;
+}
+.toolbar-btn { 
+	background: #1a1a1a; 
+	border: 1px solid #1a1a1a; 
+	color: #e0e0e0; 
+	padding: 10px 16px; 
+	border-radius: 6px; 
+	cursor: pointer; 
+	font-size: 14px; 
+	transition: all 0.3s; 
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	box-shadow: none;
+}
+.toolbar-btn:hover,
+.toolbar-btn:focus {
+	border-color: #10b981;
+	background: #1a1a1a;
+	color: #10b981;
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+}
+
+.content-wrapper { flex: 1; overflow-y: auto; }
+#content { max-width: 900px; margin: 0 auto; padding: var(--margin) 40px; font-family: var(--font-family); line-height: var(--line-height); }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+
+#content h1 { color: var(--h1-color); font-size: 36px; margin: 30px 0 20px; border-bottom: 2px solid #1a1a1a; padding-bottom: 15px; }
+#content h2 { color: var(--h2-color); font-size: 28px; margin: 25px 0 15px; }
+#content h3 { color: var(--h3-color); font-size: 24px; margin: 20px 0 12px; }
+#content h4 { color: var(--h4-color); font-size: 20px; margin: 18px 0 10px; }
+#content h5 { color: var(--h5-color); font-size: 18px; margin: 15px 0 8px; }
+#content h6 { color: var(--h6-color); font-size: 16px; margin: 12px 0 6px; }
+#content p { margin: 15px 0; color: #e0e0e0; }
+#content ul, #content ol { margin: 15px 0; padding-left: 30px; }
+#content li { margin: 8px 0; }
+#content a { color: #3b82f6; text-decoration: none; }
+#content a:hover { text-decoration: underline; }
+
+/* ✅ ESTILOS LaTeX BLOCK - IDÊNTICOS AO EDITOR */
+.latex-block-wrapper {
+	position: relative;
+	background: var(--latex-block-bg);
+	border-left: 6px solid var(--latex-block-border);
+	border-top: 2px solid var(--latex-block-border);
+	border-bottom: 2px solid var(--latex-block-border);
+	border-radius: 0 8px 8px 0;
+	padding: 20px 20px 15px 20px;
+	margin: 20px 0;
+	overflow: hidden;
+}
+
+/* LaTeX blocks dentro de tabelas - estilo compacto */
+#content td .latex-block-wrapper,
+#content th .latex-block-wrapper {
+	padding: 10px;
+	margin: 5px 0;
+	border-left-width: 4px;
+	border-radius: 0 4px 4px 0;
+	overflow: hidden !important;
+	text-align: center;
+	max-height: none !important;
+	background: var(--code-block-bg);
+}
+
+#content td .latex-block-label,
+#content th .latex-block-label {
+	font-size: 10px;
+	padding: 2px 6px;
+	top: 4px;
+	right: 6px;
+}
+
+.latex-block-label {
+	position: absolute;
+	top: 8px;
+	right: 12px;
+	background: linear-gradient(135deg, #9C27B0, #E91E63);
+	color: white;
+	padding: 4px 12px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 1px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.latex-block-wrapper .MathJax,
+.latex-block-wrapper mjx-container {
+	color: var(--latex-block-color) !important;
+}
+
+/* LaTeX Inline Styling */
+#content .MathJax {
+	color: var(--latex-inline-text) !important;
+	background: var(--latex-inline-bg) !important;
+	padding: 2px 4px !important;
+	border-radius: 3px !important;
+}
+
+/* ✅ ESTILOS ORIGINAIS PRESERVADOS */
+#content pre { background: var(--code-block-bg); color: var(--code-block-text); border-left: var(--code-block-border-width) solid var(--code-block-border); padding: 20px; margin: var(--margin) 0; overflow-x: auto; border-radius: 4px; }
+#content pre code { background: none !important; padding: 0 !important; border: none !important; color: inherit !important; }
+#content code { background: var(--code-inline-bg); color: var(--code-inline-text); padding: 4px 8px; border-radius: 4px; border-left: var(--code-inline-border-width) solid var(--code-inline-border); font-family: 'Courier New', monospace; font-size: 0.9em; }
+
+#content blockquote { border-left: var(--quote-border-width) solid var(--quote-border); background: var(--quote-bg); color: var(--quote-text); padding: 20px; margin: var(--margin) 0; font-style: italic; }
+
+#content table { border-collapse: collapse; width: 100%; margin: var(--margin) 0; background: #1a1a1a; border: 1px solid #2a2a2a; }
+#content th, #content td { border: 1px solid #2a2a2a; padding: 12px 15px; text-align: left; vertical-align: top; }
+#content th { background: #10b981; color: white; font-weight: 600; }
+#content tr:nth-child(even) { background: #0f0f0f; }
+
+/* ✅ BLOCOS LaTeX DENTRO DE TABELAS */
+#content td mjx-container,
+#content th mjx-container {
+	max-width: 100% !important;
+	transform-origin: center !important;
+}
+
+/* Cor do texto LaTeX em tabelas */
+#content td .latex-block-wrapper .MathJax,
+#content td .latex-block-wrapper mjx-container,
+#content th .latex-block-wrapper .MathJax,
+#content th .latex-block-wrapper mjx-container {
+	color: var(--code-block-text) !important;
+}
+
+/* Garantir que conteúdo dentro de células respeite os limites */
+#content td > *,
+#content th > * {
+	max-width: 100%;
+	overflow-wrap: break-word;
+}
+
+.loading { text-align: center; padding: 60px; color: #6b7280; }
+.error { text-align: center; padding: 60px; color: #dc2626; }
+
+@media print {
+	.toc-sidebar-left, .toolbar { display: none; }
+	#content { max-width: 100%; padding: 20px; }
+	
+	/* ✅ ESTILOS PRINT PARA LaTeX - IDÊNTICOS AO EDITOR */
+	.latex-block-wrapper {
+		background: #f5f5f5 !important;
+		page-break-inside: avoid;
+		border: 1px solid #ccc !important;
+	}
+
+	.latex-block-label {
+		color: #9C27B0 !important;
+	}
+
+	#content h1,
+	#content h2,
+	#content h3,
+	#content h4,
+	#content h5,
+	#content h6 {
+		page-break-after: avoid;
+		break-after: avoid;
+	}
+
+	#content pre,
+	#content blockquote,
+	#content table {
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+}
+
+@media (max-width: 768px) {
+	.toolbar-actions {
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+	.toolbar-btn {
+		padding: 8px 12px;
+		font-size: 13px;
+	}
+}

@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo Cósmico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* === CSS VARIABLES (Design System Nuclear) === */
+        :root {
+            /* Color System */
+            --color-primary-100: #E8F4F8;
+            --color-primary-500: #00BF93; /* Verde ciano workspace */
+            --color-primary-700: #00A085;
+            
+            --color-nuclear-100: #FEF2F2;
+            --color-nuclear-500: #DC2626; /* Vermelho nuclear */
+            --color-nuclear-700: #B91C1C;
+            
+            --color-bg-page: #0A0A0A;
+            --color-bg-surface: #141414;
+            --color-bg-surface-hover: rgba(22, 22, 22, 0.5);
+            
+            --color-border-default: #3f3f46;
+            --color-border-focus: #00BF93;
+            --color-border-light: #262626;
+            
+            --color-text-primary: #E4E4E7;
+            --color-text-secondary: #A1A1AA;
+            --color-text-high-contrast: #FFFFFF;
+            
+            --color-success: #22C55E;
+            --color-warning: #FBBF24;
+            --color-error: #F43F5E;
+            
+            /* Cosmic-specific colors */
+            --color-cosmic: #8B5CF6;     /* Roxo cósmico */
+            --color-star: #FBBF24;       /* Amarelo estelar */
+            --color-planet: #3B82F6;     /* Azul planetário */
+            --color-blackhole: #000000;  /* Preto buraco negro */
+            --color-nebula: #EC4899;     /* Rosa nebulosa */
+            --color-supernova: #DC2626;  /* Vermelho supernova */
+
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size-h1: 48px;
+            --font-size-h2: 24px;
+            --font-size-h3: 16px;
+            --font-size-body: 16px;
+            --font-size-body-sm: 14px;
+            
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Spacing (8px Grid) */
+            --space-xs: 8px;
+            --space-sm: 12px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+            --space-xxxl: 64px;
+            
+            /* Layout */
+            --layout-max-width: 1440px;
+            --radius-sm: 8px;
+            --border-width: 1px;
+            
+            /* Animations */
+            --transition-fast: 150ms ease-out;
+            --transition-normal: 200ms ease-out;
+        }
+
+        /* === GLOBAL STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-family);
+            background: var(--color-bg-page);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--color-bg-surface) 0%, #1a1a1a 100%);
+            border-bottom: var(--border-width) solid var(--color-border-light);
+            padding: var(--space-xl) var(--space-xxl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+            letter-spacing: -0.5%;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .cosmic-icon {
+            font-size: 36px;
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-lg);
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: var(--font-size-body);
+            color: var(--color-text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* === MAIN LAYOUT === */
+        .app-main {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            padding: var(--space-xxl);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-xl);
+        }
+
+        /* === TAB SYSTEM === */
+        .tabs {
+            display: flex;
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            overflow: hidden;
+            margin-bottom: 0;
+            border: var(--border-width) solid var(--color-border-light);
+            border-bottom: none;
+        }
+
+        .tab {
+            flex: 1;
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border-bottom: 3px solid transparent;
+            font-size: var(--font-size-body-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            background: var(--color-bg-surface);
+        }
+
+        .tab:hover {
+            background: var(--color-bg-surface-hover);
+            color: var(--color-text-primary);
+        }
+
+        .tab.active {
+            background: var(--color-bg-surface);
+            border-bottom: 3px solid var(--color-cosmic);
+            color: var(--color-text-primary);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--color-bg-surface);
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            min-height: 600px;
+            width: 100%;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+            border-top: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* === SECTION STYLES === */
+        .section-title {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-lg);
+            letter-spacing: -1%;
+        }
+
+        .control-group {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            width: 100%;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .control-group h3 {
+            color: var(--color-cosmic);
+            margin-bottom: var(--space-md);
+            border-bottom: 2px solid var(--color-cosmic);
+            padding-bottom: var(--space-sm);
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* === SIMULATION CONTAINER === */
+        .simulation-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: var(--space-xl);
+        }
+
+        @media (max-width: 1024px) {
+            .simulation-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* === CELESTIAL SELECTOR === */
+        .celestial-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .celestial-btn {
+            background: var(--color-bg-surface);
+            border: var(--border-width) solid var(--color-border-default);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+
+        .celestial-btn:hover {
+            border-color: var(--color-border-focus);
+            transform: translateY(-2px);
+        }
+
+        .celestial-btn.active {
+            border-color: var(--color-cosmic);
+            background: var(--color-cosmic);
+            color: var(--color-text-high-contrast);
+        }
+
+        .celestial-icon {
+            font-size: 1.5em;
+            margin-bottom: var(--space-xs);
+        }
+
+        .celestial-name {
+            font-size: var(--font-size-body-sm);
+            opacity: 0.9;
+        }
+
+        /* === SLIDERS === */
+        .slider-container {
+            margin: var(--space-md) 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-xs);
+            font-size: var(--font-size-body-sm);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--color-bg-surface);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--color-cosmic);
+            cursor: pointer;
+            border: 2px solid var(--color-text-high-contrast);
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-normal);
+            flex: 1;
+            font-size: var(--font-size-body-sm);
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-700);
+            transform: scale(1.03);
+        }
+
+        .btn-cosmic {
+            background: var(--color-cosmic);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-cosmic:hover {
+            background: #9c4dff;
+            transform: scale(1.03);
+        }
+
+        .btn-success {
+            background: var(--color-success);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            transform: scale(1.03);
+        }
+
+        .controls {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        /* === COSMIC CANVAS === */
+        .cosmic-canvas {
+            width: 100%;
+            height: 500px;
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            border: var(--border-width) solid var(--color-border-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* === STATS GRID === */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        .stat-card {
+            background: var(--color-bg-page);
+            padding: var(--space-lg);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            border-left: 4px solid var(--color-cosmic);
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-cosmic);
+            margin: var(--space-xs) 0;
+        }
+
+        .stat-label {
+            font-size: var(--font-size-body-sm);
+            opacity: 0.8;
+        }
+
+        /* === COSMIC EQUATION === */
+        .cosmic-equation {
+            background: var(--color-bg-page);
+            padding: var(--space-lg);
+            border-radius: var(--radius-sm);
+            margin: var(--space-lg) 0;
+            text-align: center;
+            border-left: 4px solid var(--color-cosmic);
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        /* === INFO PANEL === */
+        .info-panel {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        /* === PARTICLE STYLES === */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .star {
+            background: radial-gradient(circle, var(--color-star), #ff9800);
+            box-shadow: 0 0 20px var(--color-star);
+        }
+
+        .planet {
+            background: radial-gradient(circle, var(--color-planet), #01579b);
+        }
+
+        .blackhole {
+            background: radial-gradient(circle, var(--color-blackhole), #4a148c);
+        }
+
+        .nebula {
+            background: radial-gradient(circle, var(--color-nebula), #7b1fa2);
+            opacity: 0.7;
+        }
+
+        .event-highimpact {
+            background: radial-gradient(circle, var(--color-supernova), #b71c1c);
+            box-shadow: 0 0 30px var(--color-supernova);
+        }
+
+        /* === BUBBLE ANIMATION === */
+        .bubble {
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            animation: bubble 1s infinite;
+        }
+        .bubble:nth-child(2) { animation-delay: 0.2s; }
+        .bubble:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bubble {
+            0%, 100% { transform: translateY(0); opacity: 0.5; }
+            50% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 768px) {
+            .app-main {
+                padding: var(--space-lg);
+            }
+            
+            .app-header {
+                padding: var(--space-lg);
+            }
+            
+            .tab {
+                padding: var(--space-sm);
+                font-size: var(--font-size-body-sm);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="header-content">
+            <div>
+                <h1 class="app-title">
+                    <span class="cosmic-icon">🌌</span>
+                    MÓDULO CÓSMICO
+                </h1>
+                <p class="subtitle">Simulações de sistemas estelares, buracos negros e eventos cósmicos</p>
+            </div>
+            <div class="header-actions">
+                <!-- Reserved for future actions -->
+            </div>
+        </div>
+    </div>
+
+    <div class="app-main">
+        <div class="app-grid">
+            <div class="tabs">
+                <div class="tab active" data-tab="solar">🌞 Sistema Solar</div>
+                <div class="tab" data-tab="stars">⭐ Estrelas</div>
+                <div class="tab" data-tab="blackholes">🕳️ Buracos Negros</div>
+                <div class="tab" data-tab="events">💥 Eventos Cósmicos</div>
+                <div class="tab" data-tab="fusion">🔥 Fusão Nuclear Estelar</div>
+                <div class="tab" data-tab="elements">🧪 Formação de Elementos</div>
+            </div>
+
+            <!-- ABA: Sistema Solar -->
+            <div class="tab-content active" id="solar">
+                <div class="simulation-container">
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <h3>🌠 Objetos Cósmicos</h3>
+                            <div class="celestial-selector" id="celestialGrid">
+                                <!-- Objetos serão inseridos via JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h3>⚙️ Parâmetros da Simulação</h3>
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Escala de Tempo:</span>
+                                    <span id="timeScaleValue">1x</span>
+                                </div>
+                                <input type="range" id="timeScale" min="0.1" max="100" value="1" step="0.1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Escala de Distância:</span>
+                                    <span id="distanceScaleValue">1x</span>
+                                </div>
+                                <input type="range" id="distanceScale" min="0.1" max="10" value="1" step="0.1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Intensidade Gravitacional:</span>
+                                    <span id="gravityValue">Normal</span>
+                                </div>
+                                <input type="range" id="gravity" min="0.1" max="5" value="1" step="0.1">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h3>🔭 Visualização</h3>
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Brilho Estelar:</span>
+                                    <span id="brightnessValue">100%</span>
+                                </div>
+                                <input type="range" id="brightness" min="10" max="200" value="100" step="10">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Detalhes de Partículas:</span>
+                                    <span id="particlesValue">Médio</span>
+                                </div>
+                                <input type="range" id="particles" min="10" max="1000" value="100" step="10">
+                            </div>
+                        </div>
+
+                        <div class="controls">
+                            <button class="btn btn-cosmic" onclick="startSimulation()">▶️ Iniciar Simulação</button>
+                            <button class="btn btn-primary" onclick="resetSimulation()">🔄 Reiniciar</button>
+                            <button class="btn btn-success" onclick="exportCosmicData()">📊 Exportar Dados</button>
+                        </div>
+                    </div>
+
+                    <div class="display-panel">
+                        <div class="cosmic-canvas" id="cosmicCanvas">
+                            <!-- Simulação cósmica será renderizada aqui -->
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Tempo Simulado</div>
+                                <div class="stat-value" id="simulatedTime">0 anos</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Objetos Ativos</div>
+                                <div class="stat-value" id="activeObjects">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Temperatura Média</div>
+                                <div class="stat-value" id="avgTemperature">0 K</div>
+                            </div>
+                        </div>
+
+                        <div class="cosmic-equation">
+                            <h4>Lei da Gravitação Universal</h4>
+                            <p>$$F = G \frac{m_1 m_2}{r^2}$$</p>
+                            <p>Onde:<br>
+                            \(F\) = Força gravitacional<br>
+                            \(G\) = Constante gravitacional<br>
+                            \(m_1, m_2\) = Massas dos corpos<br>
+                            \(r\) = Distância entre os centros</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel de Informações -->
+                <div class="info-panel">
+                    <h3>📚 Informações Cósmicas</h3>
+                    <div id="cosmicInfo">
+                        <p>Selecione um objeto cósmico para ver informações detalhadas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outras abas (conteúdo simplificado para demonstração) -->
+            <div class="tab-content" id="stars">
+                <div class="control-group">
+                    <h3>⭐ Simulação de Estrelas</h3>
+                    <p>Conteúdo da simulação de estrelas será implementado aqui.</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="blackholes">
+                <div class="control-group">
+                    <h3>🕳️ Simulação de Buracos Negros</h3>
+                    <p>Conteúdo da simulação de buracos negros será implementado aqui.</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="events">
+                <div class="control-group">
+                    <h3>💥 Simulação de Eventos Cósmicos</h3>
+                    <p>Conteúdo da simulação de eventos cósmicos será implementado aqui.</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="fusion">
+                <div class="control-group">
+                    <h3>🔥 Simulação de Fusão Nuclear Estelar</h3>
+                    <p>Conteúdo da simulação de fusão nuclear será implementado aqui.</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="elements">
+                <div class="control-group">
+                    <h3>🧪 Simulação de Formação de Elementos</h3>
+                    <p>Conteúdo da simulação de formação de elementos será implementado aqui.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados dos objetos cósmicos
+        const cosmicObjects = {
+            sun: {
+                name: "Sol",
+                type: "star",
+                icon: "☀️",
+                mass: 1.989e30, // kg
+                radius: 696340, // km
+                temperature: 5778, // K
+                luminosity: 3.828e26, // W
+                age: 4.6e9, // anos
+                composition: "74.9% H, 23.8% He, 1.3% outros",
+                description: "Estrela da sequência principal, classe G2V"
+            },
+            earth: {
+                name: "Terra",
+                type: "planet",
+                icon: "🌍",
+                mass: 5.972e24,
+                radius: 6371,
+                temperature: 288,
+                orbitPeriod: 365.25, // dias
+                distanceFromSun: 1.496e8, // km
+                composition: "Núcleo de Fe/Ni, manto de silicatos",
+                description: "Planeta rochoso, único conhecido com vida"
+            },
+            blackhole: {
+                name: "Buraco Negro Estelar",
+                type: "blackhole",
+                icon: "🕳️",
+                mass: 5e30, // ~2.5 massas solares
+                schwarzschildRadius: 8.85, // km para 3 massas solares
+                temperature: 0.00000006, // Hawking radiation
+                spin: 0.95, // a/M
+                description: "Região do espaço-tempo com gravidade extrema"
+            },
+            neutronStar: {
+                name: "Estrela de Nêutrons",
+                type: "star",
+                icon: "⭐",
+                mass: 2.8e30, // ~1.4 massas solares
+                radius: 10, // km
+                temperature: 6e5, // K
+                rotationPeriod: 0.001, // segundos
+                magneticField: 1e8, // Tesla
+                description: "Núcleo colapsado de estrela massiva"
+            },
+            supernova: {
+                name: "Supernova Tipo II",
+                type: "event",
+                icon: "💥",
+                energy: 1e44, // Joules
+                duration: 100, // dias
+                peakLuminosity: 1e9, // L_sol
+                elementsProduced: "Fe, Ni, O, Si, S",
+                description: "Explosão catastrófica de estrela massiva"
+            },
+            nebula: {
+                name: "Nebulosa Planetária",
+                type: "nebula",
+                icon: "🌫️",
+                mass: 0.6, // massas solares
+                radius: 0.5, // anos-luz
+                temperature: 10000, // K
+                expansionRate: 20, // km/s
+                composition: "H, He, C, O, N",
+                description: "Casca de gás ejetada por estrela moribunda"
+            }
+        };
+
+        let currentSimulation = 'solar';
+        let simulationActive = false;
+        let animationId = null;
+        let simulatedTime = 0;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCosmicGrid();
+            setupEventListeners();
+            initializeTabs();
+            updateDisplay();
+        });
+
+        function initializeCosmicGrid() {
+            const grid = document.getElementById('celestialGrid');
+            grid.innerHTML = '';
+
+            Object.keys(cosmicObjects).forEach(key => {
+                const obj = cosmicObjects[key];
+                const btn = document.createElement('div');
+                btn.className = `celestial-btn`;
+                btn.dataset.object = key;
+                
+                btn.innerHTML = `
+                    <div class="celestial-icon">${obj.icon}</div>
+                    <div class="celestial-name">${obj.name}</div>
+                `;
+
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.celestial-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    showObjectInfo(key);
+                });
+
+                grid.appendChild(btn);
+            });
+        }
+
+        function initializeTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSimulation = this.dataset.tab;
+                    
+                    // Ativar conteúdo da aba
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(currentSimulation).classList.add('active');
+                    
+                    resetSimulation();
+                    updateDisplay();
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            // Sliders
+            document.getElementById('timeScale').addEventListener('input', updateDisplay);
+            document.getElementById('distanceScale').addEventListener('input', updateDisplay);
+            document.getElementById('gravity').addEventListener('input', updateDisplay);
+            document.getElementById('brightness').addEventListener('input', updateDisplay);
+            document.getElementById('particles').addEventListener('input', updateDisplay);
+        }
+
+        function updateDisplay() {
+            // Atualizar valores dos sliders
+            document.getElementById('timeScaleValue').textContent = 
+                document.getElementById('timeScale').value + 'x';
+            
+            document.getElementById('distanceScaleValue').textContent = 
+                document.getElementById('distanceScale').value + 'x';
+
+            const gravityVal = parseFloat(document.getElementById('gravity').value);
+            document.getElementById('gravityValue').textContent = 
+                gravityVal === 1 ? 'Normal' : gravityVal < 1 ? 'Reduzida' : 'Aumentada';
+
+            document.getElementById('brightnessValue').textContent = 
+                document.getElementById('brightness').value + '%';
+
+            const particlesVal = parseInt(document.getElementById('particles').value);
+            let particlesText = 'Baixo';
+            if (particlesVal > 300) particlesText = 'Alto';
+            else if (particlesVal > 100) particlesText = 'Médio';
+            document.getElementById('particlesValue').textContent = particlesText;
+        }
+
+        function showObjectInfo(objectKey) {
+            const obj = cosmicObjects[objectKey];
+            const infoPanel = document.getElementById('cosmicInfo');
+            
+            let infoHTML = `
+                <h4>${obj.icon} ${obj.name}</h4>
+                <p><strong>Tipo:</strong> ${obj.type}</p>
+                <p><strong>Descrição:</strong> ${obj.description}</p>
+            `;
+
+            if (obj.mass) {
+                infoHTML += `<p><strong>Massa:</strong> ${formatMass(obj.mass)}</p>`;
+            }
+            if (obj.radius) {
+                infoHTML += `<p><strong>Raio:</strong> ${formatDistance(obj.radius)}</p>`;
+            }
+            if (obj.temperature) {
+                infoHTML += `<p><strong>Temperatura:</strong> ${formatTemperature(obj.temperature)}</p>`;
+            }
+            if (obj.composition) {
+                infoHTML += `<p><strong>Composição:</strong> ${obj.composition}</p>`;
+            }
+
+            infoPanel.innerHTML = infoHTML;
+        }
+
+        function startSimulation() {
+            if (simulationActive) return;
+            
+            simulationActive = true;
+            simulatedTime = 0;
+            
+            const canvas = document.getElementById('cosmicCanvas');
+            canvas.innerHTML = '';
+            
+            // Iniciar animação baseada na simulação selecionada
+            switch(currentSimulation) {
+                case 'solar':
+                    startSolarSystem();
+                    break;
+                case 'stars':
+                    startStarLifecycle();
+                    break;
+                case 'blackholes':
+                    startBlackholeSimulation();
+                    break;
+                case 'events':
+                    startCosmicEvents();
+                    break;
+                case 'fusion':
+                    startFusionSimulation();
+                    break;
+                case 'elements':
+                    startElementFormation();
+                    break;
+            }
+            
+            // Atualizar estatísticas em tempo real
+            updateStats();
+        }
+
+        function startSolarSystem() {
+            const canvas = document.getElementById('cosmicCanvas');
+            
+            // Criar sol
+            const sun = document.createElement('div');
+            sun.className = 'particle star';
+            sun.style.width = '80px';
+            sun.style.height = '80px';
+            sun.style.left = '50%';
+            sun.style.top = '50%';
+            sun.style.transform = 'translate(-50%, -50%)';
+            canvas.appendChild(sun);
+            
+            // Criar planetas
+            const planets = [
+                { name: 'Mercúrio', size: 8, distance: 100, speed: 0.5, color: '#8c7853' },
+                { name: 'Vênus', size: 12, distance: 140, speed: 0.4, color: '#e39e54' },
+                { name: 'Terra', size: 13, distance: 180, speed: 0.3, color: '#6b93d6' },
+                { name: 'Marte', size: 10, distance: 220, speed: 0.25, color: '#c1440e' },
+                { name: 'Júpiter', size: 30, distance: 280, speed: 0.15, color: '#c9b59d' },
+                { name: 'Saturno', size: 25, distance: 340, speed: 0.12, color: '#e4d191' },
+                { name: 'Urano', size: 18, distance: 390, speed: 0.09, color: '#d1e7e7' },
+                { name: 'Netuno', size: 17, distance: 430, speed: 0.07, color: '#5b5ddf' }
+            ];
+            
+            planets.forEach(planet => {
+                const planetEl = document.createElement('div');
+                planetEl.className = 'particle planet';
+                planetEl.style.width = planet.size + 'px';
+                planetEl.style.height = planet.size + 'px';
+                planetEl.style.background = `radial-gradient(circle, ${planet.color}, #333)`;
+                planetEl.dataset.angle = Math.random() * Math.PI * 2;
+                planetEl.dataset.speed = planet.speed;
+                planetEl.dataset.distance = planet.distance;
+                canvas.appendChild(planetEl);
+            });
+            
+            // Animar planetas
+            animateSolarSystem();
+        }
+
+        function animateSolarSystem() {
+            if (!simulationActive) return;
+            
+            const timeScale = parseFloat(document.getElementById('timeScale').value);
+            const planets = document.querySelectorAll('#cosmicCanvas .planet');
+            
+            planets.forEach(planet => {
+                let angle = parseFloat(planet.dataset.angle);
+                const speed = parseFloat(planet.dataset.speed) * timeScale;
+                const distance = parseFloat(planet.dataset.distance);
+                
+                angle += speed * 0.02;
+                planet.dataset.angle = angle;
+                
+                const centerX = 50; // %
+                const centerY = 50; // %
+                
+                const x = centerX + Math.cos(angle) * distance;
+                const y = centerY + Math.sin(angle) * distance;
+                
+                planet.style.left = x + '%';
+                planet.style.top = y + '%';
+            });
+            
+            simulatedTime += timeScale * 100000; // anos por frame
+            
+            animationId = requestAnimationFrame(animateSolarSystem);
+            updateStats();
+        }
+
+        function startStarLifecycle() {
+            const canvas = document.getElementById('cosmicCanvas');
+            canvas.innerHTML = '<div style="color: white; text-align: center; padding-top: 200px;">Simulação do Ciclo de Vida Estelar - Em desenvolvimento</div>';
+            
+            // Simulação básica de nascimento estelar
+            for (let i = 0; i < 50; i++) {
+                createParticle(canvas, 'star', 
+                    Math.random() * 100, Math.random() * 100,
+                    Math.random() * 10 + 5);
+            }
+        }
+
+        function startBlackholeSimulation() {
+            const canvas = document.getElementById('cosmicCanvas');
+            canvas.innerHTML = '<div style="color: white; text-align: center; padding-top: 200px;">Simulação de Buraco Negro - Em desenvolvimento</div>';
+            
+            // Criar buraco negro central
+            const bh = document.createElement('div');
+            bh.className = 'particle blackhole';
+            bh.style.width = '60px';
+            bh.style.height = '60px';
+            bh.style.left = '50%';
+            bh.style.top = '50%';
+            bh.style.transform = 'translate(-50%, -50%)';
+            canvas.appendChild(bh);
+            
+            // Criar estrelas sendo atraídas
+            for (let i = 0; i < 30; i++) {
+                createParticle(canvas, 'star', 
+                    Math.random() * 100, Math.random() * 100,
+                    Math.random() * 5 + 2);
+            }
+        }
+
+        function startCosmicEvents() {
+            const canvas = document.getElementById('cosmicCanvas');
+            canvas.innerHTML = '<div style="color: white; text-align: center; padding-top: 200px;">Simulação de Eventos Cósmicos - Em desenvolvimento</div>';
+            
+            // Criar supernova
+            const supernova = document.createElement('div');
+            supernova.className = 'particle event-highimpact';
+            supernova.style.width = '100px';
+            supernova.style.height = '100px';
+            supernova.style.left = '50%';
+            supernova.style.top = '50%';
+            supernova.style.transform = 'translate(-50%, -50%)';
+            supernova.style.animation = 'pulse 2s infinite';
+            canvas.appendChild(supernova);
+            
+            // Adicionar estilo de pulsação
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.7; }
+                    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function startFusionSimulation() {
+            const canvas = document.getElementById('cosmicCanvas');
+            canvas.innerHTML = '<div style="color: white; text-align: center; padding-top: 200px;">Simulação de Fusão Nuclear - Em desenvolvimento</div>';
+        }
+
+        function startElementFormation() {
+            const canvas = document.getElementById('cosmicCanvas');
+            canvas.innerHTML = '<div style="color: white; text-align: center; padding-top: 200px;">Formação de Elementos - Em desenvolvimento</div>';
+        }
+
+        function createParticle(container, type, x, y, size) {
+            const particle = document.createElement('div');
+            particle.className = `particle ${type}`;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = x + '%';
+            particle.style.top = y + '%';
+            container.appendChild(particle);
+            return particle;
+        }
+
+        function resetSimulation() {
+            simulationActive = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            const canvas = document.getElementById('cosmicCanvas');
+            canvas.innerHTML = '';
+            
+            simulatedTime = 0;
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('simulatedTime').textContent = formatTime(simulatedTime);
+            
+            const particles = document.querySelectorAll('#cosmicCanvas .particle').length;
+            document.getElementById('activeObjects').textContent = particles;
+            
+            // Temperatura baseada na simulação
+            let temp = 0;
+            switch(currentSimulation) {
+                case 'solar': temp = 5000; break;
+                case 'stars': temp = 15000; break;
+                case 'blackholes': temp = 1000000; break;
+                case 'events': temp = 10000000; break;
+                default: temp = 3000;
+            }
+            document.getElementById('avgTemperature').textContent = formatTemperature(temp);
+        }
+
+        function formatMass(kg) {
+            if (kg >= 1e30) return (kg / 1.989e30).toFixed(2) + ' M☉';
+            if (kg >= 1e24) return (kg / 5.972e24).toFixed(2) + ' M⊕';
+            return kg.toExponential(2) + ' kg';
+        }
+
+        function formatDistance(km) {
+            if (km >= 1e9) return (km / 1.496e8).toFixed(2) + ' AU';
+            if (km >= 1e6) return (km / 1e6).toFixed(1) + ' Mkm';
+            if (km >= 1e3) return (km / 1e3).toFixed(1) + ' kkm';
+            return km.toFixed(0) + ' km';
+        }
+
+        function formatTemperature(kelvin) {
+            if (kelvin >= 1e6) return (kelvin / 1e6).toFixed(1) + ' MK';
+            if (kelvin >= 1e3) return (kelvin / 1e3).toFixed(0) + ' kK';
+            return kelvin.toFixed(0) + ' K';
+        }
+
+        function formatTime(years) {
+            if (years >= 1e9) return (years / 1e9).toFixed(2) + ' bilhões de anos';
+            if (years >= 1e6) return (years / 1e6).toFixed(1) + ' milhões de anos';
+            if (years >= 1e3) return (years / 1e3).toFixed(0) + ' mil anos';
+            return years.toFixed(0) + ' anos';
+        }
+
+        function exportCosmicData() {
+            const data = {
+                simulacao: currentSimulation,
+                tempoSimulado: simulatedTime,
+                objetos: cosmicObjects,
+                parametros: {
+                    escalaTempo: document.getElementById('timeScale').value,
+                    escalaDistancia: document.getElementById('distanceScale').value,
+                    gravidade: document.getElementById('gravity').value
+                }
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `quantum-lab-cosmico-${new Date().getTime()}.json`;
+            link.click();
+            
+            alert('Dados cósmicos exportados com sucesso!');
+        }
+
+        // Configurar MathJax
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+</body>
+</html>

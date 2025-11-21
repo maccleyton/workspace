@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Químico - Tabela Periódica Interativa</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    
+    <style>
+        /* === WORKSPACE DESIGN SYSTEM - OTIMIZADO PARA 1366x768 === */
+        :root {
+            /* Primary Colors - Workspace Green */
+            --color-primary-500: #10b981;
+            --color-primary-400: #34d399;
+            --color-primary-700: #047857;
+            
+            /* Background Colors */
+            --color-bg-page: #0a0a0a;
+            --color-bg-surface: #141414;
+            --color-bg-surface-hover: #1a1a1a;
+            
+            /* Text Colors */
+            --color-text-primary: #e0e0e0;
+            --color-text-secondary: #9ca3af;
+            --color-text-tertiary: #6b7280;
+            
+            /* Border Colors */
+            --color-border-default: #1a1a1a;
+            --color-border-interactive: #374151;
+            
+            /* Element categories */
+            --color-alkali-metal: #ef4444;
+            --color-alkaline-earth: #f97316;
+            --color-transition-metal: #3b82f6;
+            --color-basic-metal: #10b981;
+            --color-semimetal: #8b5cf6;
+            --color-nonmetal: #ec4899;
+            --color-halogen: #f59e0b;
+            --color-noble-gas: #06b6d4;
+            --color-lanthanide: #7c3aed;
+            --color-actinide: #f43f5e;
+
+            /* Typography - REDUZIDA */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size-h1: 24px;
+            --font-size-h2: 18px;
+            --font-size-h3: 14px;
+            --font-size-body: 12px;
+            --font-size-body-sm: 10px;
+            
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Spacing - REDUZIDO */
+            --space-xs: 4px;
+            --space-sm: 6px;
+            --space-md: 8px;
+            --space-lg: 12px;
+            --space-xl: 16px;
+            --space-xxl: 20px;
+            
+            /* Layout - AJUSTADO */
+            --layout-max-width: 1366px;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --border-width: 1px;
+            
+            /* Animations */
+            --transition-fast: 150ms ease-out;
+            --transition-normal: 200ms ease-out;
+        }
+
+        /* === BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-family);
+            background: var(--color-bg-page);
+            color: var(--color-text-primary);
+            line-height: 1.4;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* === HEADER - REDUZIDO === */
+        .app-header {
+            background: var(--color-bg-surface);
+            border-bottom: var(--border-width) solid var(--color-border-default);
+            padding: 8px 12px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--color-primary-500);
+        }
+
+        .header-title { 
+            color: var(--color-primary-500); 
+            font-size: 16px; 
+            font-weight: var(--font-weight-semibold); 
+            margin: 0;
+        }
+
+        /* Search Container */
+        .header-center {
+            flex: 1;
+            max-width: 280px;
+            margin: 0 20px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            color: var(--color-text-tertiary);
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-default);
+            color: var(--color-text-primary);
+            padding: 6px 12px 6px 28px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-body-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Header Right */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle,
+        .user-menu {
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-default);
+            color: var(--color-text-primary);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-body-sm);
+            transition: all var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+            width: 28px;
+            height: 28px;
+        }
+
+        .theme-toggle:hover,
+        .theme-toggle:focus,
+        .user-menu:hover,
+        .user-menu:focus {
+            border-color: var(--color-primary-500);
+            background: var(--color-bg-page);
+            color: var(--color-primary-500);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+
+        .theme-icon,
+        .user-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* === MAIN CONTENT === */
+        .main-content {
+            height: calc(100vh - 48px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === 3 COLUMN LAYOUT - OTIMIZADO === */
+        .workspace-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 1fr;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* COLUNA ESQUERDA - TABELA PERIÓDICA */
+        .left-panel {
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-md);
+            border: var(--border-width) solid var(--color-border-default);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: var(--space-md);
+            border-bottom: var(--border-width) solid var(--color-border-default);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .panel-title {
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary-500);
+        }
+
+        .periodic-table {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-sm);
+            padding-right: var(--space-xs);
+        }
+
+        .element-item {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            border: var(--border-width) solid var(--color-border-default);
+            padding: var(--space-sm);
+            margin-bottom: var(--space-xs);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .element-item:hover {
+            border-color: var(--color-primary-500);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        }
+
+        .element-item.active {
+            border-color: var(--color-primary-500);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .element-symbol {
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-body);
+            color: var(--color-primary-500);
+            min-width: 32px;
+            text-align: center;
+        }
+
+        .element-name {
+            flex: 1;
+            font-size: var(--font-size-body-sm);
+        }
+
+        .element-number {
+            font-size: var(--font-size-body-sm);
+            color: var(--color-text-tertiary);
+            min-width: 24px;
+        }
+
+        /* COLUNA CENTRAL - INFORMAÇÕES */
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            overflow: hidden;
+        }
+
+        .info-card {
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-md);
+            border: var(--border-width) solid var(--color-border-default);
+            padding: var(--space-md);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            padding-bottom: var(--space-sm);
+            border-bottom: var(--border-width) solid var(--color-border-default);
+        }
+
+        .info-card-title {
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary-500);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .info-label {
+            font-size: var(--font-size-body-sm);
+            color: var(--color-text-secondary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .info-value {
+            font-size: var(--font-size-body);
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .info-value.highlight {
+            color: var(--color-primary-500);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* COLUNA DIREITA - CANVAS 3D */
+        .right-panel {
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-md);
+            border: var(--border-width) solid var(--color-border-default);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #atomCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .canvas-controls {
+            padding: var(--space-sm);
+            border-top: var(--border-width) solid var(--color-border-default);
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xs);
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: var(--space-xs) var(--space-sm);
+            border: var(--border-width) solid var(--color-border-default);
+            background: var(--color-bg-page);
+            color: var(--color-text-primary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-body-sm);
+            transition: all var(--transition-normal);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .control-btn:hover {
+            border-color: var(--color-primary-500);
+            color: var(--color-primary-500);
+        }
+
+        .control-btn.active {
+            background: var(--color-primary-500);
+            border-color: var(--color-primary-500);
+            color: #000000;
+        }
+
+        .control-btn i {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* Scroll */
+        .periodic-table::-webkit-scrollbar {
+            width: 4px;
+        }
+        .periodic-table::-webkit-scrollbar-track {
+            background: var(--color-bg-page);
+        }
+        .periodic-table::-webkit-scrollbar-thumb {
+            background: var(--color-border-default);
+            border-radius: 2px;
+        }
+        .periodic-table::-webkit-scrollbar-thumb:hover {
+            background: var(--color-border-interactive);
+        }
+
+        /* Responsive - AJUSTADO */
+        @media (max-width: 1366px) {
+            .workspace-layout {
+                grid-template-columns: 260px 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 1280px) {
+            .workspace-layout {
+                grid-template-columns: 240px 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .workspace-layout {
+                grid-template-columns: 220px 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <i data-lucide="flask" class="header-icon"></i>
+            <h1 class="header-title">Simulador Químico</h1>
+        </div>
+        
+        <div class="header-center">
+            <div class="search-container">
+                <i data-lucide="search" class="search-icon"></i>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Buscar elementos..."
+                    autocomplete="off"
+                >
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <button class="user-menu" id="toGoBackBtn">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="m15 18-6-6 6-6"/>
+				</svg>
+            </button>
+            <button class="theme-toggle" id="themeToggle" title="Alternar tema">
+                <i data-lucide="sun" class="theme-icon" id="themeIcon"></i>
+            </button>
+            <div class="user-menu">
+                <i data-lucide="user" class="user-icon"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="workspace-layout">
+            <!-- COLUNA ESQUERDA - TABELA PERIÓDICA -->
+            <section class="left-panel">
+                <div class="panel-header">
+                    <i data-lucide="grid-3x3" style="width: 16px; height: 16px; color: var(--color-primary-500);"></i>
+                    <div class="panel-title">Tabela Periódica</div>
+                </div>
+                <div class="periodic-table" id="periodicTable"></div>
+            </section>
+
+            <!-- COLUNA CENTRAL - INFORMAÇÕES DO ELEMENTO -->
+            <section class="center-panel">
+                <!-- Informações Básicas -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i data-lucide="info" style="width: 16px; height: 16px; color: var(--color-primary-500);"></i>
+                        <div class="info-card-title">Informações do Elemento</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Nome</div>
+                            <div class="info-value highlight" id="infoName">Hidrogênio</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Símbolo</div>
+                            <div class="info-value highlight" id="infoSymbol">H</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Número Atômico</div>
+                            <div class="info-value" id="infoNumber">1</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Massa Atômica</div>
+                            <div class="info-value" id="infoMass">1.008 u</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propriedades Físicas -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i data-lucide="thermometer" style="width: 16px; height: 16px; color: var(--color-primary-500);"></i>
+                        <div class="info-card-title">Propriedades Físicas</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Estado</div>
+                            <div class="info-value" id="infoState">Gasoso</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Densidade</div>
+                            <div class="info-value" id="infoDensity">0.0000899 g/cm³</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Ponto de Fusão</div>
+                            <div class="info-value" id="infoMelting">-259.16 °C</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Ponto de Ebulição</div>
+                            <div class="info-value" id="infoBoiling">-252.87 °C</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propriedades Químicas -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i data-lucide="flask-conical" style="width: 16px; height: 16px; color: var(--color-primary-500);"></i>
+                        <div class="info-card-title">Propriedades Químicas</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Eletronegatividade</div>
+                            <div class="info-value" id="infoElectronegativity">2.20</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Configuração Eletrônica</div>
+                            <div class="info-value" id="infoConfiguration">1s¹</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Raio Atômico</div>
+                            <div class="info-value" id="infoRadius">53 pm</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Descoberto em</div>
+                            <div class="info-value" id="infoDiscovered">1766</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COLUNA DIREITA - CANVAS 3D -->
+            <section class="right-panel">
+                <div class="panel-header">
+                    <i data-lucide="box" style="width: 16px; height: 16px; color: var(--color-primary-500);"></i>
+                    <div class="panel-title">Visualização 3D do Elemento</div>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="atomCanvas"></canvas>
+                </div>
+                <div class="canvas-controls">
+                    <button class="control-btn active" onclick="setViewMode('orbital')">
+                        <i data-lucide="circle"></i>
+                        Órbitas
+                    </button>
+                    <button class="control-btn" onclick="setViewMode('cloud')">
+                        <i data-lucide="cloud"></i>
+                        Nuvem
+                    </button>
+                    <button class="control-btn" onclick="setViewMode('nucleus')">
+                        <i data-lucide="target"></i>
+                        Núcleo
+                    </button>
+                    <button class="control-btn" onclick="toggleAnimation()">
+                        <i data-lucide="play"></i>
+                        Animar
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Inicializar ícones Lucide
+        lucide.createIcons();
+
+        // Dados da Tabela Periódica (exemplo reduzido)
+        const periodicTable = [
+            // Período 1
+            { number: 1, symbol: "H", name: "Hidrogênio", mass: "1.008", category: "nonmetal", state: "Gasoso", density: "0.0000899", melting: "-259.16", boiling: "-252.87", electronegativity: "2.20", configuration: "1s¹", radius: "53", discovered: "1766" },
+            { number: 2, symbol: "He", name: "Hélio", mass: "4.0026", category: "noble-gas", state: "Gasoso", density: "0.0001785", melting: "-272.20", boiling: "-268.93", electronegativity: "-", configuration: "1s²", radius: "31", discovered: "1868" },
+            
+            // Período 2
+            { number: 3, symbol: "Li", name: "Lítio", mass: "6.94", category: "alkali-metal", state: "Sólido", density: "0.534", melting: "180.50", boiling: "1342", electronegativity: "0.98", configuration: "[He] 2s¹", radius: "167", discovered: "1817" },
+            { number: 4, symbol: "Be", name: "Berílio", mass: "9.0122", category: "alkaline-earth", state: "Sólido", density: "1.85", melting: "1287", boiling: "2470", electronegativity: "1.57", configuration: "[He] 2s²", radius: "112", discovered: "1797" },
+            { number: 5, symbol: "B", name: "Boro", mass: "10.81", category: "semimetal", state: "Sólido", density: "2.34", melting: "2075", boiling: "4000", electronegativity: "2.04", configuration: "[He] 2s² 2p¹", radius: "87", discovered: "1808" },
+            { number: 6, symbol: "C", name: "Carbono", mass: "12.011", category: "nonmetal", state: "Sólido", density: "2.267", melting: "3550", boiling: "4027", electronegativity: "2.55", configuration: "[He] 2s² 2p²", radius: "67", discovered: "Antiguidade" },
+            { number: 7, symbol: "N", name: "Nitrogênio", mass: "14.007", category: "nonmetal", state: "Gasoso", density: "0.001251", melting: "-210.00", boiling: "-195.79", electronegativity: "3.04", configuration: "[He] 2s² 2p³", radius: "56", discovered: "1772" },
+            { number: 8, symbol: "O", name: "Oxigênio", mass: "15.999", category: "nonmetal", state: "Gasoso", density: "0.001429", melting: "-218.79", boiling: "-182.95", electronegativity: "3.44", configuration: "[He] 2s² 2p⁴", radius: "48", discovered: "1774" },
+            { number: 9, symbol: "F", name: "Flúor", mass: "18.998", category: "halogen", state: "Gasoso", density: "0.001696", melting: "-219.67", boiling: "-188.11", electronegativity: "3.98", configuration: "[He] 2s² 2p⁵", radius: "42", discovered: "1886" },
+            { number: 10, symbol: "Ne", name: "Neônio", mass: "20.180", category: "noble-gas", state: "Gasoso", density: "0.0008999", melting: "-248.59", boiling: "-246.08", electronegativity: "-", configuration: "[He] 2s² 2p⁶", radius: "38", discovered: "1898" },
+            
+            // Período 3
+            { number: 11, symbol: "Na", name: "Sódio", mass: "22.990", category: "alkali-metal", state: "Sólido", density: "0.971", melting: "97.72", boiling: "883", electronegativity: "0.93", configuration: "[Ne] 3s¹", radius: "190", discovered: "1807" },
+            { number: 12, symbol: "Mg", name: "Magnésio", mass: "24.305", category: "alkaline-earth", state: "Sólido", density: "1.738", melting: "650", boiling: "1090", electronegativity: "1.31", configuration: "[Ne] 3s²", radius: "145", discovered: "1755" },
+            { number: 13, symbol: "Al", name: "Alumínio", mass: "26.982", category: "basic-metal", state: "Sólido", density: "2.698", melting: "660.32", boiling: "2519", electronegativity: "1.61", configuration: "[Ne] 3s² 3p¹", radius: "118", discovered: "1825" },
+            { number: 14, symbol: "Si", name: "Silício", mass: "28.085", category: "semimetal", state: "Sólido", density: "2.3296", melting: "1414", boiling: "3265", electronegativity: "1.90", configuration: "[Ne] 3s² 3p²", radius: "111", discovered: "1824" },
+            { number: 15, symbol: "P", name: "Fósforo", mass: "30.974", category: "nonmetal", state: "Sólido", density: "1.82", melting: "44.15", boiling: "280.5", electronegativity: "2.19", configuration: "[Ne] 3s² 3p³", radius: "98", discovered: "1669" },
+            { number: 16, symbol: "S", name: "Enxofre", mass: "32.06", category: "nonmetal", state: "Sólido", density: "2.067", melting: "115.21", boiling: "444.72", electronegativity: "2.58", configuration: "[Ne] 3s² 3p⁴", radius: "88", discovered: "Antiguidade" },
+            { number: 17, symbol: "Cl", name: "Cloro", mass: "35.45", category: "halogen", state: "Gasoso", density: "0.003214", melting: "-101.5", boiling: "-34.04", electronegativity: "3.16", configuration: "[Ne] 3s² 3p⁵", radius: "79", discovered: "1774" },
+            { number: 18, symbol: "Ar", name: "Argônio", mass: "39.948", category: "noble-gas", state: "Gasoso", density: "0.001784", melting: "-189.34", boiling: "-185.85", electronegativity: "-", configuration: "[Ne] 3s² 3p⁶", radius: "71", discovered: "1894" },
+            
+            // Período 4
+            { number: 19, symbol: "K", name: "Potássio", mass: "39.098", category: "alkali-metal", state: "Sólido", density: "0.862", melting: "63.38", boiling: "759", electronegativity: "0.82", configuration: "[Ar] 4s¹", radius: "243", discovered: "1807" },
+            { number: 20, symbol: "Ca", name: "Cálcio", mass: "40.078", category: "alkaline-earth", state: "Sólido", density: "1.54", melting: "842", boiling: "1484", electronegativity: "1.00", configuration: "[Ar] 4s²", radius: "194", discovered: "1808" },
+            { number: 21, symbol: "Sc", name: "Escândio", mass: "44.956", category: "transition-metal", state: "Sólido", density: "2.989", melting: "1541", boiling: "2836", electronegativity: "1.36", configuration: "[Ar] 3d¹ 4s²", radius: "184", discovered: "1879" },
+            { number: 22, symbol: "Ti", name: "Titânio", mass: "47.867", category: "transition-metal", state: "Sólido", density: "4.54", melting: "1668", boiling: "3287", electronegativity: "1.54", configuration: "[Ar] 3d² 4s²", radius: "176", discovered: "1791" },
+            { number: 23, symbol: "V", name: "Vanádio", mass: "50.942", category: "transition-metal", state: "Sólido", density: "6.11", melting: "1910", boiling: "3407", electronegativity: "1.63", configuration: "[Ar] 3d³ 4s²", radius: "171", discovered: "1801" },
+            { number: 24, symbol: "Cr", name: "Cromo", mass: "51.996", category: "transition-metal", state: "Sólido", density: "7.15", melting: "1907", boiling: "2671", electronegativity: "1.66", configuration: "[Ar] 3d⁵ 4s¹", radius: "166", discovered: "1797" },
+            { number: 25, symbol: "Mn", name: "Manganês", mass: "54.938", category: "transition-metal", state: "Sólido", density: "7.44", melting: "1246", boiling: "2061", electronegativity: "1.55", configuration: "[Ar] 3d⁵ 4s²", radius: "161", discovered: "1774" },
+            { number: 26, symbol: "Fe", name: "Ferro", mass: "55.845", category: "transition-metal", state: "Sólido", density: "7.874", melting: "1538", boiling: "2862", electronegativity: "1.83", configuration: "[Ar] 3d⁶ 4s²", radius: "156", discovered: "Antiguidade" },
+            { number: 27, symbol: "Co", name: "Cobalto", mass: "58.933", category: "transition-metal", state: "Sólido", density: "8.86", melting: "1495", boiling: "2927", electronegativity: "1.88", configuration: "[Ar] 3d⁷ 4s²", radius: "152", discovered: "1735" },
+            { number: 28, symbol: "Ni", name: "Níquel", mass: "58.693", category: "transition-metal", state: "Sólido", density: "8.912", melting: "1455", boiling: "2913", electronegativity: "1.91", configuration: "[Ar] 3d⁸ 4s²", radius: "149", discovered: "1751" },
+            { number: 29, symbol: "Cu", name: "Cobre", mass: "63.546", category: "transition-metal", state: "Sólido", density: "8.96", melting: "1084.62", boiling: "2562", electronegativity: "1.90", configuration: "[Ar] 3d¹⁰ 4s¹", radius: "145", discovered: "Antiguidade" },
+            { number: 30, symbol: "Zn", name: "Zinco", mass: "65.38", category: "transition-metal", state: "Sólido", density: "7.134", melting: "419.53", boiling: "907", electronegativity: "1.65", configuration: "[Ar] 3d¹⁰ 4s²", radius: "142", discovered: "1746" },
+            { number: 31, symbol: "Ga", name: "Gálio", mass: "69.723", category: "basic-metal", state: "Sólido", density: "5.907", melting: "29.76", boiling: "2204", electronegativity: "1.81", configuration: "[Ar] 3d¹⁰ 4s² 4p¹", radius: "136", discovered: "1875" },
+            { number: 32, symbol: "Ge", name: "Germânio", mass: "72.630", category: "semimetal", state: "Sólido", density: "5.323", melting: "938.25", boiling: "2833", electronegativity: "2.01", configuration: "[Ar] 3d¹⁰ 4s² 4p²", radius: "125", discovered: "1886" },
+            { number: 33, symbol: "As", name: "Arsênio", mass: "74.922", category: "semimetal", state: "Sólido", density: "5.776", melting: "817", boiling: "614", electronegativity: "2.18", configuration: "[Ar] 3d¹⁰ 4s² 4p³", radius: "114", discovered: "1250" },
+            { number: 34, symbol: "Se", name: "Selênio", mass: "78.971", category: "nonmetal", state: "Sólido", density: "4.809", melting: "221", boiling: "685", electronegativity: "2.55", configuration: "[Ar] 3d¹⁰ 4s² 4p⁴", radius: "103", discovered: "1817" },
+            { number: 35, symbol: "Br", name: "Bromo", mass: "79.904", category: "halogen", state: "Líquido", density: "3.122", melting: "-7.2", boiling: "58.8", electronegativity: "2.96", configuration: "[Ar] 3d¹⁰ 4s² 4p⁵", radius: "94", discovered: "1826" },
+            { number: 36, symbol: "Kr", name: "Criptônio", mass: "83.798", category: "noble-gas", state: "Gasoso", density: "0.003733", melting: "-157.36", boiling: "-153.22", electronegativity: "3.00", configuration: "[Ar] 3d¹⁰ 4s² 4p⁶", radius: "88", discovered: "1898" },
+            
+            // Período 5
+            { number: 37, symbol: "Rb", name: "Rubídio", mass: "85.468", category: "alkali-metal", state: "Sólido", density: "1.532", melting: "39.31", boiling: "688", electronegativity: "0.82", configuration: "[Kr] 5s¹", radius: "265", discovered: "1861" },
+            { number: 38, symbol: "Sr", name: "Estrôncio", mass: "87.62", category: "alkaline-earth", state: "Sólido", density: "2.64", melting: "777", boiling: "1382", electronegativity: "0.95", configuration: "[Kr] 5s²", radius: "219", discovered: "1790" },
+            { number: 39, symbol: "Y", name: "Ítrio", mass: "88.906", category: "transition-metal", state: "Sólido", density: "4.469", melting: "1526", boiling: "3345", electronegativity: "1.22", configuration: "[Kr] 4d¹ 5s²", radius: "212", discovered: "1794" },
+            { number: 40, symbol: "Zr", name: "Zircônio", mass: "91.224", category: "transition-metal", state: "Sólido", density: "6.506", melting: "1855", boiling: "4409", electronegativity: "1.33", configuration: "[Kr] 4d² 5s²", radius: "206", discovered: "1789" },
+            { number: 41, symbol: "Nb", name: "Nióbio", mass: "92.906", category: "transition-metal", state: "Sólido", density: "8.57", melting: "2477", boiling: "4744", electronegativity: "1.6", configuration: "[Kr] 4d⁴ 5s¹", radius: "198", discovered: "1801" },
+            { number: 42, symbol: "Mo", name: "Molibdênio", mass: "95.95", category: "transition-metal", state: "Sólido", density: "10.22", melting: "2623", boiling: "4639", electronegativity: "2.16", configuration: "[Kr] 4d⁵ 5s¹", radius: "190", discovered: "1778" },
+            { number: 43, symbol: "Tc", name: "Tecnécio", mass: "[98]", category: "transition-metal", state: "Sólido", density: "11.5", melting: "2157", boiling: "4265", electronegativity: "1.9", configuration: "[Kr] 4d⁵ 5s²", radius: "183", discovered: "1937" },
+            { number: 44, symbol: "Ru", name: "Rutênio", mass: "101.07", category: "transition-metal", state: "Sólido", density: "12.37", melting: "2334", boiling: "4150", electronegativity: "2.2", configuration: "[Kr] 4d⁷ 5s¹", radius: "178", discovered: "1844" },
+            { number: 45, symbol: "Rh", name: "Ródio", mass: "102.91", category: "transition-metal", state: "Sólido", density: "12.41", melting: "1964", boiling: "3695", electronegativity: "2.28", configuration: "[Kr] 4d⁸ 5s¹", radius: "173", discovered: "1803" },
+            { number: 46, symbol: "Pd", name: "Paládio", mass: "106.42", category: "transition-metal", state: "Sólido", density: "12.02", melting: "1554.9", boiling: "2963", electronegativity: "2.20", configuration: "[Kr] 4d¹⁰", radius: "169", discovered: "1803" },
+            { number: 47, symbol: "Ag", name: "Prata", mass: "107.87", category: "transition-metal", state: "Sólido", density: "10.501", melting: "961.78", boiling: "2162", electronegativity: "1.93", configuration: "[Kr] 4d¹⁰ 5s¹", radius: "165", discovered: "Antiguidade" },
+            { number: 48, symbol: "Cd", name: "Cádmio", mass: "112.41", category: "transition-metal", state: "Sólido", density: "8.69", melting: "321.07", boiling: "767", electronegativity: "1.69", configuration: "[Kr] 4d¹⁰ 5s²", radius: "161", discovered: "1817" },
+            { number: 49, symbol: "In", name: "Índio", mass: "114.82", category: "basic-metal", state: "Sólido", density: "7.31", melting: "156.60", boiling: "2072", electronegativity: "1.78", configuration: "[Kr] 4d¹⁰ 5s² 5p¹", radius: "156", discovered: "1863" },
+            { number: 50, symbol: "Sn", name: "Estanho", mass: "118.71", category: "basic-metal", state: "Sólido", density: "7.287", melting: "231.93", boiling: "2602", electronegativity: "1.96", configuration: "[Kr] 4d¹⁰ 5s² 5p²", radius: "145", discovered: "Antiguidade" },
+            { number: 51, symbol: "Sb", name: "Antimônio", mass: "121.76", category: "semimetal", state: "Sólido", density: "6.685", melting: "630.63", boiling: "1587", electronegativity: "2.05", configuration: "[Kr] 4d¹⁰ 5s² 5p³", radius: "133", discovered: "Antiguidade" },
+            { number: 52, symbol: "Te", name: "Telúrio", mass: "127.60", category: "semimetal", state: "Sólido", density: "6.232", melting: "449.51", boiling: "988", electronegativity: "2.1", configuration: "[Kr] 4d¹⁰ 5s² 5p⁴", radius: "123", discovered: "1782" },
+            { number: 53, symbol: "I", name: "Iodo", mass: "126.90", category: "halogen", state: "Sólido", density: "4.93", melting: "113.7", boiling: "184.3", electronegativity: "2.66", configuration: "[Kr] 4d¹⁰ 5s² 5p⁵", radius: "115", discovered: "1811" },
+            { number: 54, symbol: "Xe", name: "Xenônio", mass: "131.29", category: "noble-gas", state: "Gasoso", density: "0.005887", melting: "-111.75", boiling: "-108.09", electronegativity: "2.60", configuration: "[Kr] 4d¹⁰ 5s² 5p⁶", radius: "108", discovered: "1898" },
+            
+            // Período 6
+            { number: 55, symbol: "Cs", name: "Césio", mass: "132.91", category: "alkali-metal", state: "Sólido", density: "1.873", melting: "28.44", boiling: "671", electronegativity: "0.79", configuration: "[Xe] 6s¹", radius: "298", discovered: "1860" },
+            { number: 56, symbol: "Ba", name: "Bário", mass: "137.33", category: "alkaline-earth", state: "Sólido", density: "3.594", melting: "727", boiling: "1897", electronegativity: "0.89", configuration: "[Xe] 6s²", radius: "253", discovered: "1808" },
+            { number: 57, symbol: "La", name: "Lantânio", mass: "138.91", category: "lanthanide", state: "Sólido", density: "6.145", melting: "920", boiling: "3464", electronegativity: "1.1", configuration: "[Xe] 5d¹ 6s²", radius: "---", discovered: "1839" },
+            { number: 58, symbol: "Ce", name: "Cério", mass: "140.12", category: "lanthanide", state: "Sólido", density: "6.770", melting: "795", boiling: "3443", electronegativity: "1.12", configuration: "[Xe] 4f¹ 5d¹ 6s²", radius: "---", discovered: "1803" },
+            { number: 59, symbol: "Pr", name: "Praseodímio", mass: "140.91", category: "lanthanide", state: "Sólido", density: "6.773", melting: "935", boiling: "3520", electronegativity: "1.13", configuration: "[Xe] 4f³ 6s²", radius: "---", discovered: "1885" },
+            { number: 60, symbol: "Nd", name: "Neodímio", mass: "144.24", category: "lanthanide", state: "Sólido", density: "7.007", melting: "1024", boiling: "3074", electronegativity: "1.14", configuration: "[Xe] 4f⁴ 6s²", radius: "---", discovered: "1885" },
+            { number: 61, symbol: "Pm", name: "Promécio", mass: "[145]", category: "lanthanide", state: "Sólido", density: "7.26", melting: "1042", boiling: "3000", electronegativity: "1.13", configuration: "[Xe] 4f⁵ 6s²", radius: "---", discovered: "1945" },
+            { number: 62, symbol: "Sm", name: "Samário", mass: "150.36", category: "lanthanide", state: "Sólido", density: "7.52", melting: "1074", boiling: "1794", electronegativity: "1.17", configuration: "[Xe] 4f⁶ 6s²", radius: "---", discovered: "1879" },
+            { number: 63, symbol: "Eu", name: "Európio", mass: "151.96", category: "lanthanide", state: "Sólido", density: "5.243", melting: "822", boiling: "1529", electronegativity: "1.2", configuration: "[Xe] 4f⁷ 6s²", radius: "---", discovered: "1901" },
+            { number: 64, symbol: "Gd", name: "Gadolínio", mass: "157.25", category: "lanthanide", state: "Sólido", density: "7.895", melting: "1313", boiling: "3273", electronegativity: "1.2", configuration: "[Xe] 4f⁷ 5d¹ 6s²", radius: "---", discovered: "1880" },
+            { number: 65, symbol: "Tb", name: "Térbio", mass: "158.93", category: "lanthanide", state: "Sólido", density: "8.229", melting: "1356", boiling: "3230", electronegativity: "1.2", configuration: "[Xe] 4f⁹ 6s²", radius: "---", discovered: "1843" },
+            { number: 66, symbol: "Dy", name: "Disprósio", mass: "162.50", category: "lanthanide", state: "Sólido", density: "8.55", melting: "1412", boiling: "2567", electronegativity: "1.22", configuration: "[Xe] 4f¹⁰ 6s²", radius: "---", discovered: "1886" },
+            { number: 67, symbol: "Ho", name: "Hólmio", mass: "164.93", category: "lanthanide", state: "Sólido", density: "8.795", melting: "1474", boiling: "2700", electronegativity: "1.23", configuration: "[Xe] 4f¹¹ 6s²", radius: "---", discovered: "1878" },
+            { number: 68, symbol: "Er", name: "Érbio", mass: "167.26", category: "lanthanide", state: "Sólido", density: "9.066", melting: "1529", boiling: "2868", electronegativity: "1.24", configuration: "[Xe] 4f¹² 6s²", radius: "---", discovered: "1843" },
+            { number: 69, symbol: "Tm", name: "Túlio", mass: "168.93", category: "lanthanide", state: "Sólido", density: "9.321", melting: "1545", boiling: "1950", electronegativity: "1.25", configuration: "[Xe] 4f¹³ 6s²", radius: "---", discovered: "1879" },
+            { number: 70, symbol: "Yb", name: "Itérbio", mass: "173.05", category: "lanthanide", state: "Sólido", density: "6.965", melting: "819", boiling: "1196", electronegativity: "1.1", configuration: "[Xe] 4f¹⁴ 6s²", radius: "---", discovered: "1878" },
+            { number: 71, symbol: "Lu", name: "Lutécio", mass: "174.97", category: "lanthanide", state: "Sólido", density: "9.84", melting: "1663", boiling: "3402", electronegativity: "1.27", configuration: "[Xe] 4f¹⁴ 5d¹ 6s²", radius: "---", discovered: "1907" },
+            { number: 72, symbol: "Hf", name: "Háfnio", mass: "178.49", category: "transition-metal", state: "Sólido", density: "13.31", melting: "2233", boiling: "4603", electronegativity: "1.3", configuration: "[Xe] 4f¹⁴ 5d² 6s²", radius: "---", discovered: "1923" },
+            { number: 73, symbol: "Ta", name: "Tântalo", mass: "180.95", category: "transition-metal", state: "Sólido", density: "16.654", melting: "3017", boiling: "5458", electronegativity: "1.5", configuration: "[Xe] 4f¹⁴ 5d³ 6s²", radius: "---", discovered: "1802" },
+            { number: 74, symbol: "W", name: "Tungstênio", mass: "183.84", category: "transition-metal", state: "Sólido", density: "19.25", melting: "3422", boiling: "5555", electronegativity: "2.36", configuration: "[Xe] 4f¹⁴ 5d⁴ 6s²", radius: "---", discovered: "1783" },
+            { number: 75, symbol: "Re", name: "Rênio", mass: "186.21", category: "transition-metal", state: "Sólido", density: "21.02", melting: "3186", boiling: "5596", electronegativity: "1.9", configuration: "[Xe] 4f¹⁴ 5d⁵ 6s²", radius: "---", discovered: "1925" },
+            { number: 76, symbol: "Os", name: "Ósmio", mass: "190.23", category: "transition-metal", state: "Sólido", density: "22.61", melting: "3033", boiling: "5012", electronegativity: "2.2", configuration: "[Xe] 4f¹⁴ 5d⁶ 6s²", radius: "---", discovered: "1803" },
+            { number: 77, symbol: "Ir", name: "Irídio", mass: "192.22", category: "transition-metal", state: "Sólido", density: "22.56", melting: "2446", boiling: "4428", electronegativity: "2.20", configuration: "[Xe] 4f¹⁴ 5d⁷ 6s²", radius: "---", discovered: "1803" },
+            { number: 78, symbol: "Pt", name: "Platina", mass: "195.08", category: "transition-metal", state: "Sólido", density: "21.46", melting: "1768.3", boiling: "3825", electronegativity: "2.28", configuration: "[Xe] 4f¹⁴ 5d⁹ 6s¹", radius: "---", discovered: "1735" },
+            { number: 79, symbol: "Au", name: "Ouro", mass: "196.97", category: "transition-metal", state: "Sólido", density: "19.282", melting: "1064.18", boiling: "2856", electronegativity: "2.54", configuration: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", radius: "---", discovered: "Antiguidade" },
+            { number: 80, symbol: "Hg", name: "Mercúrio", mass: "200.59", category: "transition-metal", state: "Líquido", density: "13.5336", melting: "-38.83", boiling: "356.73", electronegativity: "2.00", configuration: "[Xe] 4f¹⁴ 5d¹⁰ 6s²", radius: "---", discovered: "Antiguidade" },
+            { number: 81, symbol: "Tl", name: "Tálio", mass: "204.38", category: "basic-metal", state: "Sólido", density: "11.85", melting: "304", boiling: "1473", electronegativity: "1.62", configuration: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", radius: "---", discovered: "1861" },
+            { number: 82, symbol: "Pb", name: "Chumbo", mass: "207.2", category: "basic-metal", state: "Sólido", density: "11.342", melting: "327.46", boiling: "1749", electronegativity: "2.33", configuration: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", radius: "---", discovered: "Antiguidade" },
+            { number: 83, symbol: "Bi", name: "Bismuto", mass: "208.98", category: "basic-metal", state: "Sólido", density: "9.807", melting: "271.40", boiling: "1564", electronegativity: "2.02", configuration: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", radius: "---", discovered: "1753" },
+            { number: 84, symbol: "Po", name: "Polônio", mass: "[209]", category: "semimetal", state: "Sólido", density: "9.32", melting: "254", boiling: "962", electronegativity: "2.0", configuration: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", radius: "---", discovered: "1898" },
+            { number: 85, symbol: "At", name: "Astato", mass: "[210]", category: "halogen", state: "Sólido", density: "7", melting: "302", boiling: "337", electronegativity: "2.2", configuration: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", radius: "---", discovered: "1940" },
+            { number: 86, symbol: "Rn", name: "Radônio", mass: "[222]", category: "noble-gas", state: "Gasoso", density: "0.00973", melting: "-71", boiling: "-61.7", electronegativity: "2.2", configuration: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", radius: "---", discovered: "1900" },
+            
+            // Período 7
+            { number: 87, symbol: "Fr", name: "Frâncio", mass: "[223]", category: "alkali-metal", state: "Sólido", density: "1.87", melting: "27", boiling: "677", electronegativity: "0.7", configuration: "[Rn] 7s¹", radius: "---", discovered: "1939" },
+            { number: 88, symbol: "Ra", name: "Rádio", mass: "[226]", category: "alkaline-earth", state: "Sólido", density: "5.5", melting: "700", boiling: "1737", electronegativity: "0.9", configuration: "[Rn] 7s²", radius: "---", discovered: "1898" },
+            { number: 89, symbol: "Ac", name: "Actínio", mass: "[227]", category: "actinide", state: "Sólido", density: "10.07", melting: "1050", boiling: "3200", electronegativity: "1.1", configuration: "[Rn] 6d¹ 7s²", radius: "---", discovered: "1899" },
+            { number: 90, symbol: "Th", name: "Tório", mass: "232.04", category: "actinide", state: "Sólido", density: "11.72", melting: "1750", boiling: "4788", electronegativity: "1.3", configuration: "[Rn] 6d² 7s²", radius: "---", discovered: "1829" },
+            { number: 91, symbol: "Pa", name: "Protactínio", mass: "231.04", category: "actinide", state: "Sólido", density: "15.37", melting: "1572", boiling: "4000", electronegativity: "1.5", configuration: "[Rn] 5f² 6d¹ 7s²", radius: "---", discovered: "1913" },
+            { number: 92, symbol: "U", name: "Urânio", mass: "238.03", category: "actinide", state: "Sólido", density: "19.05", melting: "1132.2", boiling: "4131", electronegativity: "1.38", configuration: "[Rn] 5f³ 6d¹ 7s²", radius: "---", discovered: "1789" },
+            { number: 93, symbol: "Np", name: "Netúnio", mass: "[237]", category: "actinide", state: "Sólido", density: "20.45", melting: "644", boiling: "4000", electronegativity: "1.36", configuration: "[Rn] 5f⁴ 6d¹ 7s²", radius: "---", discovered: "1940" },
+            { number: 94, symbol: "Pu", name: "Plutônio", mass: "[244]", category: "actinide", state: "Sólido", density: "19.84", melting: "639.4", boiling: "3228", electronegativity: "1.28", configuration: "[Rn] 5f⁶ 7s²", radius: "---", discovered: "1940" },
+            { number: 95, symbol: "Am", name: "Amerício", mass: "[243]", category: "actinide", state: "Sólido", density: "13.69", melting: "1176", boiling: "2011", electronegativity: "1.13", configuration: "[Rn] 5f⁷ 7s²", radius: "---", discovered: "1944" },
+            { number: 96, symbol: "Cm", name: "Cúrio", mass: "[247]", category: "actinide", state: "Sólido", density: "13.51", melting: "1345", boiling: "3110", electronegativity: "1.28", configuration: "[Rn] 5f⁷ 6d¹ 7s²", radius: "---", discovered: "1944" },
+            { number: 97, symbol: "Bk", name: "Berquélio", mass: "[247]", category: "actinide", state: "Sólido", density: "14.79", melting: "986", boiling: "2627", electronegativity: "1.3", configuration: "[Rn] 5f⁹ 7s²", radius: "---", discovered: "1949" },
+            { number: 98, symbol: "Cf", name: "Califórnio", mass: "[251]", category: "actinide", state: "Sólido", density: "15.1", melting: "900", boiling: "1470", electronegativity: "1.3", configuration: "[Rn] 5f¹⁰ 7s²", radius: "---", discovered: "1950" },
+            { number: 99, symbol: "Es", name: "Einstênio", mass: "[252]", category: "actinide", state: "Sólido", density: "8.84", melting: "860", boiling: "996", electronegativity: "1.3", configuration: "[Rn] 5f¹¹ 7s²", radius: "---", discovered: "1952" },
+            { number: 100, symbol: "Fm", name: "Férmio", mass: "[257]", category: "actinide", state: "Sólido", density: "9.7", melting: "1527", boiling: "---", electronegativity: "1.3", configuration: "[Rn] 5f¹² 7s²", radius: "---", discovered: "1952" },
+            { number: 101, symbol: "Md", name: "Mendelévio", mass: "[258]", category: "actinide", state: "Sólido", density: "10.3", melting: "827", boiling: "---", electronegativity: "1.3", configuration: "[Rn] 5f¹³ 7s²", radius: "---", discovered: "1955" },
+            { number: 102, symbol: "No", name: "Nobélio", mass: "[259]", category: "actinide", state: "Sólido", density: "9.9", melting: "827", boiling: "---", electronegativity: "1.3", configuration: "[Rn] 5f¹⁴ 7s²", radius: "---", discovered: "1958" },
+            { number: 103, symbol: "Lr", name: "Laurêncio", mass: "[266]", category: "actinide", state: "Sólido", density: "15.6", melting: "1627", boiling: "---", electronegativity: "1.3", configuration: "[Rn] 5f¹⁴ 7s² 7p¹", radius: "---", discovered: "1961" },
+            { number: 104, symbol: "Rf", name: "Rutherfórdio", mass: "[267]", category: "transition-metal", state: "Sólido", density: "23.2", melting: "2100", boiling: "5500", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d² 7s²", radius: "---", discovered: "1964" },
+            { number: 105, symbol: "Db", name: "Dúbnio", mass: "[268]", category: "transition-metal", state: "Sólido", density: "29.3", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d³ 7s²", radius: "---", discovered: "1967" },
+            { number: 106, symbol: "Sg", name: "Seabórgio", mass: "[269]", category: "transition-metal", state: "Sólido", density: "35.0", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d⁴ 7s²", radius: "---", discovered: "1974" },
+            { number: 107, symbol: "Bh", name: "Bóhrio", mass: "[270]", category: "transition-metal", state: "Sólido", density: "37.1", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d⁵ 7s²", radius: "---", discovered: "1981" },
+            { number: 108, symbol: "Hs", name: "Hássio", mass: "[269]", category: "transition-metal", state: "Sólido", density: "40.7", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d⁶ 7s²", radius: "---", discovered: "1984" },
+            { number: 109, symbol: "Mt", name: "Meitnério", mass: "[278]", category: "transition-metal", state: "Sólido", density: "37.4", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d⁷ 7s²", radius: "---", discovered: "1982" },
+            { number: 110, symbol: "Ds", name: "Darmstádtio", mass: "[281]", category: "transition-metal", state: "Sólido", density: "34.8", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d⁹ 7s¹", radius: "---", discovered: "1994" },
+            { number: 111, symbol: "Rg", name: "Roentgênio", mass: "[282]", category: "transition-metal", state: "Sólido", density: "28.7", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s¹", radius: "---", discovered: "1994" },
+            { number: 112, symbol: "Cn", name: "Copernício", mass: "[285]", category: "transition-metal", state: "Gasoso", density: "14.0", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s²", radius: "---", discovered: "1996" },
+            { number: 113, symbol: "Nh", name: "Nihônio", mass: "[286]", category: "basic-metal", state: "Sólido", density: "16", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", radius: "---", discovered: "2004" },
+            { number: 114, symbol: "Fl", name: "Fleróvio", mass: "[289]", category: "basic-metal", state: "Sólido", density: "14", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", radius: "---", discovered: "1999" },
+            { number: 115, symbol: "Mc", name: "Moscóvio", mass: "[290]", category: "basic-metal", state: "Sólido", density: "13.5", melting: "---", boiling: "---", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", radius: "---", discovered: "2004" },
+            { number: 116, symbol: "Lv", name: "Livermório", mass: "[293]", category: "basic-metal", state: "Sólido", density: "12.9", melting: "~700", boiling: "~1100", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", radius: "~183", discovered: "2000" },
+            { number: 117, symbol: "Ts", name: "Tenessino", mass: "[294]", category: "halogen", state: "Sólido", density: "7.2", melting: "~700", boiling: "~883", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", radius: "~165", discovered: "2010" },
+            { number: 118, symbol: "Og", name: "Oganessônio", mass: "[294]", category: "noble-gas", state: "Gasoso", density: "4.9", melting: "~52", boiling: "~177", electronegativity: "---", configuration: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", radius: "~157", discovered: "2006" }
+        ];
+
+        // Variáveis globais
+        let currentElement = periodicTable[0]; // Hidrogênio por padrão
+        let scene, camera, renderer, controls;
+        let animationId = null;
+        let isAnimating = true;
+        let viewMode = 'orbital';
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePeriodicTable();
+            initializeAtomViewer();
+            updateElementInfo();
+        });
+
+        // Inicializar tabela periódica
+        function initializePeriodicTable() {
+            const table = document.getElementById('periodicTable');
+            table.innerHTML = '';
+            
+            periodicTable.forEach((element, index) => {
+                const elementItem = document.createElement('div');
+                elementItem.className = `element-item ${index === 0 ? 'active' : ''}`;
+                elementItem.innerHTML = `
+                    <div class="element-number">${element.number}</div>
+                    <div class="element-symbol">${element.symbol}</div>
+                    <div class="element-name">${element.name}</div>
+                `;
+                
+                elementItem.addEventListener('click', () => selectElement(element, elementItem));
+                table.appendChild(elementItem);
+            });
+        }
+
+        // Selecionar elemento
+        function selectElement(element, elementItem) {
+            currentElement = element;
+            
+            // Atualizar UI
+            document.querySelectorAll('.element-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            elementItem.classList.add('active');
+            
+            // Atualizar informações
+            updateElementInfo();
+            
+            // Atualizar visualização 3D
+            updateAtomViewer();
+        }
+
+        // Atualizar informações do elemento
+        function updateElementInfo() {
+            document.getElementById('infoName').textContent = currentElement.name;
+            document.getElementById('infoSymbol').textContent = currentElement.symbol;
+            document.getElementById('infoNumber').textContent = currentElement.number;
+            document.getElementById('infoMass').textContent = currentElement.mass + ' u';
+            
+            document.getElementById('infoState').textContent = currentElement.state;
+            document.getElementById('infoDensity').textContent = currentElement.density + ' g/cm³';
+            document.getElementById('infoMelting').textContent = currentElement.melting + ' °C';
+            document.getElementById('infoBoiling').textContent = currentElement.boiling + ' °C';
+            
+            document.getElementById('infoElectronegativity').textContent = currentElement.electronegativity;
+            document.getElementById('infoConfiguration').textContent = currentElement.configuration;
+            document.getElementById('infoRadius').textContent = currentElement.radius + ' pm';
+            document.getElementById('infoDiscovered').textContent = currentElement.discovered;
+        }
+
+        // Inicializar visualizador 3D
+        function initializeAtomViewer() {
+            const container = document.getElementById('atomCanvas');
+            if (!container) return;
+            
+            // Criar cena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            
+            // Configurar câmera
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Configurar renderizador
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Configurar controles
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            
+            // Adicionar luzes
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+            
+            // Redimensionamento responsivo
+            window.addEventListener('resize', () => {
+                if (container.clientWidth > 0) {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                }
+            });
+            
+            // Iniciar animação
+            animate();
+        }
+
+        // Animar cena
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            if (isAnimating) {
+                // Animar grupos de átomos
+                scene.children.forEach(child => {
+                    if (child.userData.isAtomGroup) {
+                        animateAtomGroup(child);
+                    }
+                });
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Animar grupo de átomo
+        function animateAtomGroup(atomGroup) {
+            // Rotação do grupo
+            atomGroup.rotation.y += 0.005;
+            
+            // Animar elétrons
+            for (let i = 1; i < atomGroup.children.length; i++) {
+                const child = atomGroup.children[i];
+                if (child.userData.orbitRadius !== undefined) {
+                    // Elétron - atualizar posição orbital
+                    child.userData.angle += child.userData.speed;
+                    child.position.x = Math.cos(child.userData.angle) * child.userData.orbitRadius;
+                    child.position.z = Math.sin(child.userData.angle) * child.userData.orbitRadius;
+                }
+            }
+        }
+
+        // Atualizar visualizador de átomo
+        function updateAtomViewer() {
+            if (!scene) return;
+            
+            // Limpar cena
+            scene.children.slice().forEach(child => {
+                if (child.type !== 'AmbientLight' && child.type !== 'DirectionalLight') {
+                    scene.remove(child);
+                }
+            });
+            
+            // Criar átomo
+            const atomGroup = createAtomGroup(currentElement);
+            scene.add(atomGroup);
+        }
+
+        // Criar grupo de átomo
+        function createAtomGroup(element) {
+            const group = new THREE.Group();
+            group.userData.isAtomGroup = true;
+            
+            // Núcleo
+            const nucleusGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const nucleusMaterial = new THREE.MeshPhongMaterial({ 
+                color: getAtomColor(element.symbol),
+                emissive: getAtomEmissive(element.symbol),
+                shininess: 100
+            });
+            const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
+            group.add(nucleus);
+            
+            if (viewMode === 'orbital') {
+                // Elétrons em órbitas
+                const electronCount = element.number;
+                const orbits = Math.ceil(electronCount / 8); // Máximo 8 elétrons por órbita
+                
+                for (let orbit = 0; orbit < orbits; orbit++) {
+                    const orbitRadius = 1.0 + orbit * 0.4;
+                    const electronsInOrbit = Math.min(8, electronCount - orbit * 8);
+                    
+                    // Órbita visual
+                    const orbitGeometry = new THREE.RingGeometry(orbitRadius - 0.02, orbitRadius + 0.02, 32);
+                    const orbitMaterial = new THREE.MeshBasicMaterial({ 
+                        color: 0x444444,
+                        side: THREE.DoubleSide,
+                        transparent: true,
+                        opacity: 0.3
+                    });
+                    const orbitMesh = new THREE.Mesh(orbitGeometry, orbitMaterial);
+                    orbitMesh.rotation.x = Math.PI / 2;
+                    group.add(orbitMesh);
+                    
+                    // Elétrons
+                    for (let i = 0; i < electronsInOrbit; i++) {
+                        const angle = (i / electronsInOrbit) * Math.PI * 2;
+                        const electronGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+                        const electronMaterial = new THREE.MeshPhongMaterial({ 
+                            color: 0x00ff88,
+                            emissive: 0x004400,
+                            shininess: 100
+                        });
+                        const electron = new THREE.Mesh(electronGeometry, electronMaterial);
+                        
+                        electron.userData.orbitRadius = orbitRadius;
+                        electron.userData.angle = angle;
+                        electron.userData.speed = 0.02 + Math.random() * 0.01;
+                        
+                        // Posicionar elétron
+                        electron.position.x = Math.cos(angle) * orbitRadius;
+                        electron.position.z = Math.sin(angle) * orbitRadius;
+                        
+                        group.add(electron);
+                    }
+                }
+            } else if (viewMode === 'cloud') {
+                // Nuvem de elétrons
+                const cloudRadius = 2.0;
+                const cloudGeometry = new THREE.SphereGeometry(cloudRadius, 16, 16);
+                const cloudMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0x00ff88,
+                    transparent: true,
+                    opacity: 0.1
+                });
+                const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+                group.add(cloud);
+                
+                // Adicionar elétrons representativos na nuvem
+                const electronCount = Math.min(element.number, 20);
+                const electronGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+                const electronMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x00ff88,
+                    emissive: 0x004400,
+                    shininess: 100
+                });
+                
+                for (let i = 0; i < electronCount; i++) {
+                    const electron = new THREE.Mesh(electronGeometry, electronMaterial);
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.random() * Math.PI;
+                    const r = cloudRadius * 0.8 * Math.random();
+                    
+                    electron.position.x = r * Math.sin(phi) * Math.cos(theta);
+                    electron.position.y = r * Math.sin(phi) * Math.sin(theta);
+                    electron.position.z = r * Math.cos(phi);
+                    
+                    group.add(electron);
+                }
+            } else if (viewMode === 'nucleus') {
+                // Foco no núcleo
+                const nucleusGeometry = new THREE.SphereGeometry(1.0, 16, 16);
+                const nucleusMaterial = new THREE.MeshPhongMaterial({ 
+                    color: getAtomColor(element.symbol),
+                    emissive: getAtomEmissive(element.symbol),
+                    shininess: 100
+                });
+                const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
+                group.add(nucleus);
+                
+                // Adicionar prótons e nêutrons visíveis
+                const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                
+                // Prótons
+                const protonMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+                const protonCount = element.number;
+                for (let i = 0; i < Math.min(protonCount, 20); i++) {
+                    const proton = new THREE.Mesh(particleGeometry, protonMaterial);
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.random() * Math.PI;
+                    const r = Math.random() * 0.8;
+                    
+                    proton.position.x = r * Math.sin(phi) * Math.cos(theta);
+                    proton.position.y = r * Math.sin(phi) * Math.sin(theta);
+                    proton.position.z = r * Math.cos(phi);
+                    
+                    group.add(proton);
+                }
+                
+                // Nêutrons
+                const neutronMaterial = new THREE.MeshPhongMaterial({ color: 0xaaaaaa });
+                const neutronCount = Math.round(parseFloat(element.mass)) - element.number;
+                for (let i = 0; i < Math.min(neutronCount, 20); i++) {
+                    const neutron = new THREE.Mesh(particleGeometry, neutronMaterial);
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.random() * Math.PI;
+                    const r = Math.random() * 0.8;
+                    
+                    neutron.position.x = r * Math.sin(phi) * Math.cos(theta);
+                    neutron.position.y = r * Math.sin(phi) * Math.sin(theta);
+                    neutron.position.z = r * Math.cos(phi);
+                    
+                    group.add(neutron);
+                }
+            }
+            
+            return group;
+        }
+
+        // Obter cor do átomo
+        function getAtomColor(symbol) {
+            const colors = {
+                'H': 0xffffff, 'He': 0xffd700, 'Li': 0xff6b6b, 'Be': 0x4ecdc4,
+                'B': 0xff9f40, 'C': 0x333333, 'N': 0x0066ff, 'O': 0xff0000,
+                'F': 0x90ee90, 'Ne': 0xff69b4, 'Na': 0xff6b6b, 'Mg': 0x4ecdc4,
+                'Al': 0xc0c0c0, 'Si': 0x808080, 'P': 0xffa500, 'S': 0xffff00,
+                'Cl': 0x00ff00, 'Ar': 0x87ceeb, 'K': 0xff6b6b, 'Ca': 0x4ecdc4,
+                'Sc': 0x9370db, 'Ti': 0x708090, 'V': 0x9370db, 'Cr': 0x708090,
+                'Mn': 0x9370db, 'Fe': 0xff8c00, 'Co': 0x9370db, 'Ni': 0x708090,
+                'Cu': 0xb87333, 'Zn': 0x708090, 'Ga': 0x9370db, 'Ge': 0x708090,
+                'As': 0x9370db, 'Se': 0xffa500, 'Br': 0x8b4513, 'Kr': 0x87ceeb,
+                'Rb': 0xff6b6b, 'Sr': 0x4ecdc4, 'Y': 0x9370db, 'Zr': 0x708090,
+                'Nb': 0x9370db, 'Mo': 0x708090, 'Tc': 0x9370db, 'Ru': 0x708090,
+                'Rh': 0x9370db, 'Pd': 0x708090, 'Ag': 0xc0c0c0, 'Cd': 0x708090,
+                'In': 0x9370db, 'Sn': 0x708090, 'Sb': 0x9370db, 'Te': 0xffa500,
+                'I': 0x8b4513, 'Xe': 0x87ceeb, 'Cs': 0xff6b6b, 'Ba': 0x4ecdc4,
+                'La': 0x9370db, 'Ce': 0x9370db, 'Pr': 0x9370db, 'Nd': 0x9370db,
+                'Pm': 0x9370db, 'Sm': 0x9370db, 'Eu': 0x9370db, 'Gd': 0x9370db,
+                'Tb': 0x9370db, 'Dy': 0x9370db, 'Ho': 0x9370db, 'Er': 0x9370db,
+                'Tm': 0x9370db, 'Yb': 0x9370db, 'Lu': 0x9370db, 'Hf': 0x708090,
+                'Ta': 0x9370db, 'W': 0x708090, 'Re': 0x9370db, 'Os': 0x708090,
+                'Ir': 0x9370db, 'Pt': 0x708090, 'Au': 0xffd700, 'Hg': 0x708090,
+                'Tl': 0x9370db, 'Pb': 0x708090, 'Bi': 0x9370db, 'Po': 0x9370db,
+                'At': 0x9370db, 'Rn': 0x87ceeb, 'Fr': 0xff6b6b, 'Ra': 0x4ecdc4,
+                'Ac': 0x9370db, 'Th': 0x9370db, 'Pa': 0x9370db, 'U': 0x9370db,
+                'Np': 0x9370db, 'Pu': 0x9370db, 'Am': 0x9370db, 'Cm': 0x9370db,
+                'Bk': 0x9370db, 'Cf': 0x9370db, 'Es': 0x9370db, 'Fm': 0x9370db,
+                'Md': 0x9370db, 'No': 0x9370db, 'Lr': 0x9370db, 'Rf': 0x708090,
+                'Db': 0x9370db, 'Sg': 0x708090, 'Bh': 0x9370db, 'Hs': 0x708090,
+                'Mt': 0x9370db, 'Ds': 0x708090, 'Rg': 0x9370db, 'Cn': 0x708090,
+                'Nh': 0x9370db, 'Fl': 0x708090, 'Mc': 0x9370db, 'Lv': 0x708090,
+                'Ts': 0x9370db, 'Og': 0x87ceeb
+            };
+            return colors[symbol] || 0x888888;
+        }
+
+        // Obter cor emissiva do átomo
+        function getAtomEmissive(symbol) {
+            const emissive = {
+                'H': 0x222222, 'He': 0x444400, 'Li': 0x442222, 'Be': 0x224444,
+                'B': 0x444422, 'C': 0x111111, 'N': 0x000044, 'O': 0x440000,
+                'F': 0x224422, 'Ne': 0x442244, 'Na': 0x442222, 'Mg': 0x224444,
+                'Al': 0x444444, 'Si': 0x222222, 'P': 0x444422, 'S': 0x444400,
+                'Cl': 0x004400, 'Ar': 0x224444, 'K': 0x442222, 'Ca': 0x224444,
+                'Sc': 0x442244, 'Ti': 0x222222, 'V': 0x442244, 'Cr': 0x222222,
+                'Mn': 0x442244, 'Fe': 0x444422, 'Co': 0x442244, 'Ni': 0x222222,
+                'Cu': 0x444422, 'Zn': 0x222222, 'Ga': 0x442244, 'Ge': 0x222222,
+                'As': 0x442244, 'Se': 0x444422, 'Br': 0x442222, 'Kr': 0x224444,
+                'Rb': 0x442222, 'Sr': 0x224444, 'Y': 0x442244, 'Zr': 0x222222,
+                'Nb': 0x442244, 'Mo': 0x222222, 'Tc': 0x442244, 'Ru': 0x222222,
+                'Rh': 0x442244, 'Pd': 0x222222, 'Ag': 0x444444, 'Cd': 0x222222,
+                'In': 0x442244, 'Sn': 0x222222, 'Sb': 0x442244, 'Te': 0x444422,
+                'I': 0x442222, 'Xe': 0x224444, 'Cs': 0x442222, 'Ba': 0x224444,
+                'La': 0x442244, 'Ce': 0x442244, 'Pr': 0x442244, 'Nd': 0x442244,
+                'Pm': 0x442244, 'Sm': 0x442244, 'Eu': 0x442244, 'Gd': 0x442244,
+                'Tb': 0x442244, 'Dy': 0x442244, 'Ho': 0x442244, 'Er': 0x442244,
+                'Tm': 0x442244, 'Yb': 0x442244, 'Lu': 0x442244, 'Hf': 0x222222,
+                'Ta': 0x442244, 'W': 0x222222, 'Re': 0x442244, 'Os': 0x222222,
+                'Ir': 0x442244, 'Pt': 0x222222, 'Au': 0x444400, 'Hg': 0x222222,
+                'Tl': 0x442244, 'Pb': 0x222222, 'Bi': 0x442244, 'Po': 0x442244,
+                'At': 0x442244, 'Rn': 0x224444, 'Fr': 0x442222, 'Ra': 0x224444,
+                'Ac': 0x442244, 'Th': 0x442244, 'Pa': 0x442244, 'U': 0x442244,
+                'Np': 0x442244, 'Pu': 0x442244, 'Am': 0x442244, 'Cm': 0x442244,
+                'Bk': 0x442244, 'Cf': 0x442244, 'Es': 0x442244, 'Fm': 0x442244,
+                'Md': 0x442244, 'No': 0x442244, 'Lr': 0x442244, 'Rf': 0x222222,
+                'Db': 0x442244, 'Sg': 0x222222, 'Bh': 0x442244, 'Hs': 0x222222,
+                'Mt': 0x442244, 'Ds': 0x222222, 'Rg': 0x442244, 'Cn': 0x222222,
+                'Nh': 0x442244, 'Fl': 0x222222, 'Mc': 0x442244, 'Lv': 0x222222,
+                'Ts': 0x442244, 'Og': 0x224444
+            };
+            return emissive[symbol] || 0x222222;
+        }
+
+        // Definir modo de visualização
+        function setViewMode(mode) {
+            viewMode = mode;
+            
+            // Atualizar botões
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.control-btn').classList.add('active');
+            
+            // Atualizar visualização
+            updateAtomViewer();
+        }
+
+        // Alternar animação
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            
+            // Atualizar botão
+            const btn = event.target.closest('.control-btn');
+            if (isAnimating) {
+                btn.innerHTML = '<i data-lucide="pause"></i> Pausar';
+            } else {
+                btn.innerHTML = '<i data-lucide="play"></i> Animar';
+            }
+            lucide.createIcons();
+        }
+
+        // Sistema de temas (simplificado)
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('light-theme');
+            const icon = document.getElementById('themeIcon');
+            if (document.body.classList.contains('light-theme')) {
+                icon.setAttribute('data-lucide', 'moon');
+            } else {
+                icon.setAttribute('data-lucide', 'sun');
+            }
+            lucide.createIcons();
+        });
+
+		document.getElementById('toGoBackBtn').addEventListener('click', toGoBack);
+		
+		function toGoBack() {
+			const base = window.location.origin;
+			window.location.href = "../../index.html";
+		}
+
+        // Funcionalidade de busca
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const elements = document.querySelectorAll('.element-item');
+            
+            elements.forEach(element => {
+                const name = element.querySelector('.element-name').textContent.toLowerCase();
+                const symbol = element.querySelector('.element-symbol').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || symbol.includes(searchTerm)) {
+                    element.style.display = 'flex';
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Hub - Manager</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <link rel="stylesheet" href="./css/manage.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>Gerenciar Vínculos</h1>
+        <a href="index.html" class="back-btn">
+            <span>Voltar</span>
+        </a>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Document Info -->
+        <div class="doc-info">
+            <div class="doc-title" id="docTitle">Carregando...</div>
+            <div class="doc-meta" id="docMeta"></div>
+        </div>
+
+        <!-- Children Section -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">📚 Documentos Vinculados</div>
+
+                <!-- Removido onclick -->
+                <button class="btn" id="btnOpenModal">
+                    <span>Adicionar Filho</span>
+                </button>
+            </div>
+            
+            <div id="childrenList" class="children-list">
+                <div class="empty-state">
+                    <div class="empty-icon">📄</div>
+                    <div class="empty-text">Nenhum documento vinculado ainda</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Child Modal -->
+    <div class="modal" id="addChildModal">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <div class="modal-title">➕ Adicionar Documento Filho</div>
+
+                <!-- Removido onclick -->
+                <button class="close-btn" id="btnCloseModal">✕</button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" id="tabExistingBtn">Vincular Existente</div>
+                <div class="tab" id="tabUploadBtn">Upload Novo</div>
+            </div>
+
+            <!-- Tab: Existing Documents -->
+            <div id="tabExisting" class="tab-content active">
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
+                    Selecione um documento existente para vincular como filho:
+                </p>
+
+                <div id="existingDocsGrid" class="documents-grid">
+                    <div class="empty-state">
+                        <div class="empty-text">Carregando documentos...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Upload New -->
+            <div id="tabUpload" class="tab-content">
+                <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
+                    Faça upload de um arquivo Markdown para criar um novo documento filho:
+                </p>
+
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">
+                        Clique ou arraste um arquivo Markdown (.md)<br>
+                        <small style="color: #6b7280;">Tamanho máximo: 5MB</small>
+                    </div>
+                </div>
+
+                <input type="file" id="fileInput" accept=".md">
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnCancel">Cancelar</button>
+
+                <!-- Removido onclick -->
+                <button class="btn" id="btnConfirm" style="display: none;">
+                    <span>Adicionar</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script type="module" src="./js/hub-api.js"></script>
+    <script type="module" src="./js/manage.js"></script>
+</body>
+</html>

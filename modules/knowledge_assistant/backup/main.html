@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente Pessoal - IA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Assistente Pessoal</h1>
+            <div class="header-buttons">
+                <button id="helpBtn" title="Ajuda">❓</button>
+                <button id="clearBtn" title="Limpar histórico">🗑️</button>
+            </div>
+        </header>
+        
+        <div id="chatContainer" class="chat-container">
+            <div class="welcome-message">
+                <h2>👋 Olá! Como posso ajudar?</h2>
+                <p>Digite <strong>"ajuda"</strong> para ver todos os comandos disponíveis.</p>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <textarea 
+                id="userInput" 
+                placeholder="Digite sua mensagem ou comando..."
+                rows="2"
+            ></textarea>
+            <div class="button-group">
+                <button id="voiceBtn" title="Falar">🎤</button>
+                <button id="sendBtn">Enviar</button>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <span id="statusText">Pronto</span>
+        </div>
+    </div>
+    
+	<script src="js/storage.js?v=3"></script>
+	<script src="js/api.js?v=3"></script>
+	<script src="js/speech.js?v=3"></script>
+	<script src="js/app.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Tela Inicial -->
+        <div id="startScreen" class="screen active">
+            <div class="header">
+                <h1>Dev Quiz</h1>
+                <p class="subtitle">Laboratório Virtual de Conhecimentos Científicos</p>
+            </div>
+            
+            <div class="config-panel">
+                <div class="form-group">
+                    <label for="playerName">Nome do Jogador:</label>
+                    <input type="text" id="playerName" placeholder="Digite seu nome" maxlength="20">
+                </div>
+                
+                <div class="form-group">
+                    <label for="language">Escolha a Linguagem:</label>
+                    <select id="language">
+                        <option value="python">🐍 Python</option>
+                        <option value="javascript">⚡ JavaScript</option>
+                        <option value="typescript">📘 TypeScript</option>
+                        <option value="java">☕ Java</option>
+                        <option value="csharp">💠 C#</option>
+                        <option value="cpp">⚙️ C++</option>
+                        <option value="go">🔵 Go</option>
+                        <option value="rust">🦀 Rust</option>
+                        <option value="php">🐘 PHP</option>
+                        <option value="swift">🍎 Swift</option>
+                        <option value="kotlin">🤖 Kotlin</option>
+                        <option value="sql">🗄️ SQL</option>
+                        <option value="random">🎲 Aleatório</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gameMode">Modo de Jogo:</label>
+                    <select id="gameMode">
+                        <option value="multipla">📝 Múltipla Escolha</option>
+                        <option value="erro">🔍 Identificar Erros</option>
+                        <option value="codigo">⚡ Desafio de Código</option>
+                        <option value="corrigir">🛠️ Corrigir Código</option>
+                    </select>
+                </div>
+                
+                <button id="startBtn" class="btn btn-primary">🚀 Iniciar Jogo</button>
+                <button id="rankingBtn" class="btn btn-secondary" style="margin-top: 10px;">🏆 Ver Ranking</button>
+            </div>
+            
+            <div class="rules">
+                <h3>📋 Regras do Jogo</h3>
+                <ul>
+                    <li>20 questões por partida</li>
+                    <li>Pontuação inicial: 100 pontos</li>
+                    <li>60 segundos por questão ⏱️</li>
+                    <li>Cada erro: -5 pontos</li>
+                    <li>Tempo esgotado: -5 pontos</li>
+                    <li>Game Over se cair abaixo de 50 pontos</li>
+                    <li>Feedback detalhado em cada questão</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Tela de Loading -->
+        <div id="loadingScreen" class="screen">
+            <div class="loader"></div>
+            <p>Gerando questões com IA...</p>
+        </div>
+        
+        <!-- Tela do Jogo -->
+        <div id="gameScreen" class="screen">
+            <div class="game-header">
+                <div class="score-panel">
+                    <span class="score-label">Pontuação:</span>
+                    <span id="score" class="score-value">100</span>
+                </div>
+                <div class="progress-panel">
+                    <span id="questionNumber">1</span> / 20
+                </div>
+            </div>
+            
+            <div id="questionContainer" class="question-container">
+                <!-- Questões serão inseridas aqui -->
+            </div>
+            
+            <div id="feedbackContainer" class="feedback-container hidden">
+                <!-- Feedback será inserido aqui -->
+            </div>
+            
+            <div class="action-buttons">
+                <button id="submitAnswer" class="btn btn-primary">✅ Confirmar Resposta</button>
+                <button id="nextQuestion" class="btn btn-secondary hidden">➡️ Próxima Questão</button>
+            </div>
+        </div>
+        
+        <!-- Tela de Game Over -->
+        <div id="gameOverScreen" class="screen">
+            <div class="game-over-content">
+                <h2 id="gameOverTitle">🔬 Experimento Concluído!</h2>
+                <div id="gameOverIcon" class="game-over-icon">⚛️</div>
+                <p id="gameOverMessage"></p>
+                <div class="final-score">
+                    <span>Pontuação Final:</span>
+                    <span id="finalScore">0</span>
+                </div>
+                <button id="restartBtn" class="btn btn-primary">🔄 Novo Experimento</button>
+            </div>
+        </div>
+        
+        <!-- Tela de Resultado Final -->
+        <div id="resultScreen" class="screen">
+            <div class="result-content">
+                <h2>⚛️ Resultado do Jogo</h2>
+                <div class="result-circle">
+                    <span id="resultScore">100</span>
+                    <span class="result-label">pontos</span>
+                </div>
+                <h3 id="resultTitle" class="result-title"></h3>
+                <p id="resultMessage" class="result-message"></p>
+                <div class="result-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="correctAnswers">0</span>
+                        <span class="stat-label">Acertos</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="wrongAnswers">0</span>
+                        <span class="stat-label">Erros</span>
+                    </div>
+                </div>
+                <button id="playAgainBtn" class="btn btn-primary">🔬 Novo Jogo</button>
+            </div>
+        </div>
+        
+        <!-- Tela de Ranking -->
+        <div id="rankingScreen" class="screen">
+            <div class="ranking-content">
+                <h2>🏆 Ranking de Jogadores</h2>
+                
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-language="all">Todos</button>
+                    <button class="filter-tab" data-language="python">Python</button>
+                    <button class="filter-tab" data-language="javascript">JavaScript</button>
+                    <button class="filter-tab" data-language="java">Java</button>
+                    <button class="filter-tab" data-language="typescript">TypeScript</button>
+                </div>
+                
+                <div id="rankingList" class="ranking-list">
+                    <!-- Lista será preenchida aqui -->
+                </div>
+                
+                <button id="backToMenuBtn" class="btn btn-secondary">⬅️ Voltar ao Menu</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/ranking.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/gemini.js"></script>
+    <script src="js/validator.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

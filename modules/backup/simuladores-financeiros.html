@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simuladores Financeiros</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* === CSS VARIABLES (Design System) === */
+        :root {
+            /* Color System */
+            --color-primary-100: #E6F5F1;
+            --color-primary-500: #019875;
+            --color-primary-700: #017A5E;
+            
+            --color-bg-page: #0A0A0A;
+            --color-bg-surface: #141414;
+            --color-bg-surface-hover: rgba(22, 22, 22, 0.5);
+            
+            --color-border-default: #3f3f46;
+            --color-border-focus: #019875;
+            --color-border-light: #262626;
+            
+            --color-text-primary: #E4E4E7;
+            --color-text-secondary: #A1A1AA;
+            --color-text-high-contrast: #FFFFFF;
+            
+            --color-success: #22C55E;
+            --color-warning: #FBBF24;
+            --color-error: #F43F5E;
+            
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size-h1: 48px;
+            --font-size-h2: 24px;
+            --font-size-h3: 16px;
+            --font-size-body: 16px;
+            --font-size-body-sm: 14px;
+            
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Spacing (8px Grid) */
+            --space-xs: 8px;
+            --space-sm: 12px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+            --space-xxxl: 64px;
+            
+            /* Layout */
+            --layout-max-width: 1440px;
+            --radius-sm: 8px;
+            --border-width: 1px;
+            
+            /* Animations */
+            --transition-fast: 150ms ease-out;
+            --transition-normal: 200ms ease-out;
+        }
+
+        /* === GLOBAL STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-family);
+            background: var(--color-bg-page);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--color-bg-surface) 0%, #1a1a1a 100%);
+            border-bottom: var(--border-width) solid var(--color-border-light);
+            padding: var(--space-xl) var(--space-xxl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+            letter-spacing: -0.5%;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-lg);
+            align-items: center;
+        }
+
+        /* === MAIN LAYOUT === */
+        .app-main {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            padding: var(--space-xxl);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-xl);
+        }
+
+        /* === TABS NAVIGATION === */
+        .tabs-container {
+            background: var(--color-bg-surface);
+            border: var(--border-width) solid var(--color-border-light);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-bottom: var(--space-xl);
+        }
+
+        .tabs-nav {
+            display: flex;
+            background: var(--color-bg-surface);
+            border-bottom: var(--border-width) solid var(--color-border-light);
+        }
+
+        .tab-button {
+            padding: var(--space-md) var(--space-xl);
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            min-height: 48px;
+            position: relative;
+        }
+
+        .tab-button:hover {
+            background: var(--color-bg-surface-hover);
+            color: var(--color-text-primary);
+        }
+
+        .tab-button.active {
+            color: var(--color-text-high-contrast);
+            border-bottom: 2px solid var(--color-primary-500);
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--color-primary-500);
+        }
+
+        /* === TAB CONTENT === */
+        .tab-content {
+            display: none;
+            padding: var(--space-xl);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-section {
+            background: var(--color-bg-surface);
+            border: var(--border-width) solid var(--color-border-light);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xl);
+        }
+
+        .section-title {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-lg);
+            letter-spacing: -1%;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-lg) var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        /* Grupo de inputs de taxa (para taxas híbridas lado a lado) */
+        .rate-input-group {
+            display: grid;
+            grid-template-columns: 1fr 150px;
+            gap: var(--space-md);
+            align-items: end;
+        }
+        
+        /* Wrapper para alinhamento perfeito das taxas */
+        .rate-group-wrapper {
+            display: flex;
+            gap: var(--space-md);
+            align-items: flex-start;
+        }
+        
+        /* Inputs de taxa com largura reduzida */
+        .rate-input {
+            max-width: 140px;
+        }
+        
+        /* Input de data com largura reduzida */
+        .date-input {
+            max-width: 180px;
+        }
+
+        .form-label {
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+        }
+
+        .form-input,
+        .form-select {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--color-bg-page);
+            border: var(--border-width) solid var(--color-border-default);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-body);
+            transition: all var(--transition-normal);
+            min-height: 48px;
+        }
+        
+        .form-select {
+            width: 100%;
+            max-width: 200px;
+        }
+        
+        /* Select específico para tipo de taxa */
+        .form-select#investmentRateType {
+            max-width: 160px;
+        }
+
+        .form-input:hover,
+        .form-select:hover {
+            border-color: var(--color-text-secondary);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 3px rgba(1, 152, 117, 0.3);
+        }
+
+        .form-input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .form-input:disabled,
+        .form-select:disabled {
+            background: var(--color-bg-surface);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* === CHECKBOXES & RADIOS === */
+        .checkbox-group,
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            margin-left: 0;
+            padding-left: 0;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .radio-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-item input[type="checkbox"],
+        .radio-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--color-primary-500);
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            padding: var(--space-md) var(--space-xl);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-700);
+            transform: scale(1.03);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-surface);
+            color: var(--color-text-primary);
+            border: var(--border-width) solid var(--color-border-default);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-text-secondary);
+        }
+
+        /* === RESULTS SECTION === */
+        .results-section {
+            background: var(--color-bg-surface);
+            border: var(--border-width) solid var(--color-border-light);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xl);
+            margin-top: var(--space-xl);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .result-metric {
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .result-metric-label {
+            font-size: var(--font-size-body-sm);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .result-metric-value {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+        }
+
+        /* === TABLES === */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-lg);
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: var(--space-md) var(--space-lg);
+            text-align: left;
+            border-bottom: var(--border-width) solid var(--color-border-light);
+        }
+
+        .results-table th {
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            background: var(--color-bg-surface);
+            position: sticky;
+            top: 0;
+        }
+
+        .results-table tr:hover {
+            background: var(--color-bg-page);
+        }
+
+        .results-table .numeric {
+            text-align: right;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1024px) {
+            .app-main {
+                padding: var(--space-lg);
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: var(--font-size-h2);
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+            
+            .tabs-nav {
+                flex-wrap: wrap;
+            }
+            
+            .tab-button {
+                flex: 1;
+                min-width: 120px;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* === LOADING STATES === */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-border-light);
+            border-top: 2px solid var(--color-primary-500);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* === UTILITIES === */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-success {
+            color: var(--color-success);
+        }
+
+        .text-error {
+            color: var(--color-error);
+        }
+
+        .text-warning {
+            color: var(--color-warning);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .mb-0 { margin-bottom: 0; }
+        .mb-sm { margin-bottom: var(--space-sm); }
+        .mb-md { margin-bottom: var(--space-md); }
+        .mb-lg { margin-bottom: var(--space-lg); }
+        .mb-xl { margin-bottom: var(--space-xl); }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="app-title">Simuladores Financeiros</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="clearAllForms()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18l-2 13H5L3 6z"/>
+                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    Limpar
+                </button>
+                <button class="btn btn-secondary" id="toGoBackBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M15 6l-6 6 6 6"/>
+					</svg>
+                    Voltar
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <div class="app-grid">
+            <div class="tabs-container">
+                <nav class="tabs-nav">
+                    <button class="tab-button active" data-tab="investimentos">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="m19 9-5 5-4-4-3 3"/>
+                        </svg>
+                        Investimentos
+                    </button>
+                    <button class="tab-button" data-tab="desconto">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M9 9h.01M15 9h.01M9 15h.01M15 15h.01"/>
+                        </svg>
+                        Desconto Comercial
+                    </button>
+                    <button class="tab-button" data-tab="conversor">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 7h10v10H7z"/>
+                            <path d="M12 7v10M7 12h10"/>
+                        </svg>
+                        Conversor de Taxas
+                    </button>
+                    <button class="tab-button" data-tab="credito">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="18" rx="2" ry="2"/>
+                            <path d="M6 15h12"/>
+                            <path d="M6 11h12"/>
+                            <path d="M6 7h8"/>
+                        </svg>
+                        Operações de Crédito
+                    </button>
+                </nav>
+            </div>
+
+            <!-- SEÇÃO 1: SIMULADOR DE INVESTIMENTOS -->
+            <div class="tab-content active" id="investimentos">
+                <div class="tab-section">
+                    <h2 class="section-title">Simulador de Investimentos</h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Valor do Investimento (R$)</label>
+                            <input type="number" class="form-input" id="investmentValue" 
+                                   placeholder="0,00" min="0" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Taxa</label>
+                            <select class="form-select" id="investmentRateType">
+                                <option value="">Selecione...</option>
+                                <option value="cdi">CDI</option>
+                                <option value="selic">SELIC</option>
+                                <option value="ipca">IPCA</option>
+                                <option value="cdiplus">CDI+</option>
+                                <option value="selicplus">SELIC+</option>
+                                <option value="ipcaplus">IPCA+</option>
+                                <option value="prefixed">Prefixada</option>
+                            </select>
+                        </div>
+
+                        <div class="rate-group-wrapper">
+                            <div class="form-group">
+                                <label class="form-label">Taxa Base (% a.a.)</label>
+                                <input type="number" class="form-input rate-input" id="investmentBaseRate" 
+                                       placeholder="0,00" min="0" step="0.01">
+                                <small class="text-success" id="rateApiStatus">CDI: 14,9% | SELIC: 15,00% | IPCA: 5.20%</small>
+                                <small class="text-secondary" style="visibility: hidden;">Placeholder</small>
+                            </div>
+                            <div class="form-group" id="flexRateGroup" style="display: none;">
+                                <label class="form-label">Flex (%)</label>
+                                <input type="number" class="form-input rate-input" id="investmentFlexRate" 
+                                       placeholder="0,00" min="-10" max="10" step="0.01">
+                                <small class="text-secondary">Spread</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Data de Vencimento</label>
+                            <input type="date" class="form-input date-input" id="investmentMaturity">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="investmentIrExempt">
+                                    <span>Isento de Imposto de Renda (selecione se aplicável)</span>
+                                </label>
+                                <small class="text-secondary" id="irInfo">
+                                    A alíquota será calculada automaticamente com base no prazo
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-section" id="investmentResults" style="display: none;">
+                        <h3 class="section-title">Resultados do Investimento</h3>
+                        
+                        <div class="results-grid">
+                            <div class="result-metric">
+                                <div class="result-metric-label">Taxa Real</div>
+                                <div class="result-metric-value" id="realRate">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Valor Bruto</div>
+                                <div class="result-metric-value" id="grossValue">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Rendimento</div>
+                                <div class="result-metric-value" id="yieldValue">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">IOF</div>
+                                <div class="result-metric-value" id="iofValue">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">IRRF</div>
+                                <div class="result-metric-value" id="irrfValue">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Valor Líquido</div>
+                                <div class="result-metric-value text-success" id="netValue">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2: DESCONTO COMERCIAL -->
+            <div class="tab-content" id="desconto">
+                <div class="tab-section">
+                    <h2 class="section-title">Desconto Comercial</h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Valor Nominal do Título (R$)</label>
+                            <input type="number" class="form-input" id="nominalValue" 
+                                   placeholder="0,00" min="0" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Data de Vencimento</label>
+                            <input type="date" class="form-input" id="discountMaturity">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Taxa de Desconto (% a.m.)</label>
+                            <input type="number" class="form-input" id="discountRate" 
+                                   placeholder="0,00" min="0" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tarifas Adicionais (R$)</label>
+                            <input type="number" class="form-input" id="discountTariffs" 
+                                   placeholder="0,00" min="0" step="0.01" value="0">
+                        </div>
+                    </div>
+
+                    <div class="results-section" id="discountResults" style="display: none;">
+                        <h3 class="section-title">Resultados do Desconto</h3>
+                        
+                        <div class="results-grid">
+                            <div class="result-metric">
+                                <div class="result-metric-label">Prazo Médio (dias)</div>
+                                <div class="result-metric-value" id="averageTerm">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Juros/Custos</div>
+                                <div class="result-metric-value" id="discountInterest">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">IOF Fixo</div>
+                                <div class="result-metric-value" id="fixedIof">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">IOF Adicional</div>
+                                <div class="result-metric-value" id="additionalIof">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Valor Descontado</div>
+                                <div class="result-metric-value text-success" id="discountedAmount">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 3: CONVERSOR DE TAXAS -->
+            <div class="tab-content" id="conversor">
+                <div class="tab-section">
+                    <h2 class="section-title">Conversor de Taxas</h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Taxa de Entrada (%)</label>
+                            <input type="number" class="form-input" id="inputRate" 
+                                   placeholder="0,00" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Período de Origem</label>
+                            <select class="form-select" id="fromPeriod">
+                                <option value="day">Diário</option>
+                                <option value="week">Semanal</option>
+                                <option value="month">Mensal</option>
+                                <option value="bimester">Bimestral</option>
+                                <option value="quarter">Trimestral</option>
+                                <option value="semester">Semestral</option>
+                                <option value="year">Anual</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Período de Destino</label>
+                            <select class="form-select" id="toPeriod">
+                                <option value="day">Diário</option>
+                                <option value="week">Semanal</option>
+                                <option value="month">Mensal</option>
+                                <option value="bimester">Bimestral</option>
+                                <option value="quarter">Trimestral</option>
+                                <option value="semester">Semestral</option>
+                                <option value="year">Anual</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="results-section" id="conversionResults" style="display: none;">
+                        <h3 class="section-title">Taxas Convertidas</h3>
+                        
+                        <div class="results-grid">
+                            <div class="result-metric">
+                                <div class="result-metric-label">Taxa Convertida</div>
+                                <div class="result-metric-value" id="convertedRate">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Equivalente Mensal</div>
+                                <div class="result-metric-value" id="monthlyEquivalent">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Equivalente Anual</div>
+                                <div class="result-metric-value" id="yearlyEquivalent">-</div>
+                            </div>
+                        </div>
+
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Período</th>
+                                    <th class="text-right">Taxa Equivalente</th>
+                                </tr>
+                            </thead>
+                            <tbody id="conversionTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 4: OPERAÇÕES DE CRÉDITO -->
+            <div class="tab-content" id="credito">
+                <div class="tab-section">
+                    <h2 class="section-title">Operações de Crédito Unificadas</h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Valor Financiado (R$)</label>
+                            <input type="number" class="form-input" id="creditValue" 
+                                   placeholder="0,00" min="0" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Amortização</label>
+                            <select class="form-select" id="amortizationType">
+                                <option value="SAC">SAC (Sistema de Amortização Constante)</option>
+                                <option value="PRICE">PRICE (Sistema Price)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Dia Base</label>
+                            <select class="form-select" id="baseDay">
+                                <option value="1">1º dia do mês</option>
+                                <option value="15">15º dia do mês</option>
+                                <option value="30">Último dia do mês</option>
+                                <option value="contratacao">Data de contratação</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Carência (meses)</label>
+                            <select class="form-select" id="gracePeriod">
+                                <option value="0">0</option>
+                                <option value="3">3</option>
+                                <option value="6">6</option>
+                                <option value="9">9</option>
+                                <option value="12">12</option>
+                                <option value="15">15</option>
+                                <option value="18">18</option>
+                                <option value="21">21</option>
+                                <option value="24">24</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Juros na Carência</label>
+                            <div class="radio-group">
+                                <label class="radio-item">
+                                    <input type="radio" name="interestOnGrace" value="yes" checked>
+                                    <span>Sim - Calcular juros na carência</span>
+                                </label>
+                                <label class="radio-item">
+                                    <input type="radio" name="interestOnGrace" value="no">
+                                    <span>Não - Não calcular juros na carência</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="interestChargeGroup" style="display: none;">
+                            <label class="form-label">Forma de Cobrança (quando sem juros na carência)</label>
+                            <div class="radio-group">
+                                <label class="radio-item">
+                                    <input type="radio" name="interestCharge" value="first" checked>
+                                    <span>Cobrar na primeira parcela</span>
+                                </label>
+                                <label class="radio-item">
+                                    <input type="radio" name="interestCharge" value="amortization">
+                                    <span>Diluído nas parcelas de amortização</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Amortização</label>
+                            <select class="form-select" id="amortizationFrequency">
+                                <option value="monthly">Mensal</option>
+                                <option value="bimonthly">Bimestral</option>
+                                <option value="quarterly">Trimestral</option>
+                                <option value="semiannual">Semestral</option>
+                                <option value="annual">Anual</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Prazo Total (meses)</label>
+                            <select class="form-select" id="totalTerm">
+                                <option value="12">12</option>
+                                <option value="24">24</option>
+                                <option value="36">36</option>
+                                <option value="48">48</option>
+                                <option value="60">60</option>
+                                <option value="72">72</option>
+                                <option value="84">84</option>
+                                <option value="96">96</option>
+                                <option value="108">108</option>
+                                <option value="120">120</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">TAC - Tarifa de Contratação (R$)</label>
+                            <input type="number" class="form-input" id="tac" 
+                                   placeholder="0,00" min="0" step="0.01" value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">FLAT - Comissão (R$)</label>
+                            <input type="number" class="form-input" id="flatCommission" 
+                                   placeholder="0,00" min="0" step="0.01" value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Taxa (% a.m.)</label>
+                            <input type="number" class="form-input" id="interestRate" 
+                                   placeholder="0,00" step="0.01" value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Sobretaxa (% a.m.)</label>
+                            <input type="number" class="form-input" id="surchargeRate" 
+                                   placeholder="0,00" step="0.01" value="0">
+                        </div>
+                    </div>
+
+                    <div class="results-section" id="creditResults" style="display: none;">
+                        <h3 class="section-title">Resultados do Financiamento</h3>
+                        
+                        <div class="results-grid">
+                            <div class="result-metric">
+                                <div class="result-metric-label">CET Mensal</div>
+                                <div class="result-metric-value" id="cetMonthly">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">CET Anual</div>
+                                <div class="result-metric-value" id="cetAnnual">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Total de Juros</div>
+                                <div class="result-metric-value" id="totalInterest">-</div>
+                            </div>
+                            <div class="result-metric">
+                                <div class="result-metric-label">Valor Total Pago</div>
+                                <div class="result-metric-value" id="totalPaid">-</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-lg">
+                            <button class="btn btn-primary" onclick="exportSchedule()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14,2 14,8 20,8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                </svg>
+                                Exportar Cronograma
+                            </button>
+                        </div>
+
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Parcela</th>
+                                    <th class="text-right">Data de Vencimento</th>
+                                    <th class="text-right">Amortização</th>
+                                    <th class="text-right">Juros</th>
+                                    <th class="text-right">Valor da Parcela</th>
+                                    <th class="text-right">Saldo Devedor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="creditSchedule">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // === CONFIGURAÇÕES GLOBAIS ===
+        const CONFIG = {
+            // Taxas atuais (atualizar manualmente quando necessário)
+            currentRates: {
+                cdi: 14.9,     // 14,9% a.a.
+                selic: 15.00,  // 15,00% a.a.
+                ipca: 5.20     // 5.20% a.a.
+            },
+
+            // Mapeamento de períodos para número de dias
+            periodInDays: {
+                day: 1,
+                week: 7,
+                month: 30,
+                bimester: 60,
+                quarter: 90,
+                semester: 180,
+                year: 360
+            },
+
+            // Taxas de IRRF por prazo
+            irrfTracks: [
+                { days: 30, rate: 22.5 },
+                { days: 60, rate: 20.0 },
+                { days: 90, rate: 17.5 },
+                { days: 180, rate: 15.0 },
+                { days: 360, rate: 15.0 },
+                { days: Infinity, rate: 10.0 }
+            ],
+
+            // Taxas de IOF
+            iofTracks: [
+                { days: 30, rate: 0.000082 },
+                { days: 60, rate: 0.000164 },
+                { days: 90, rate: 0.000246 },
+                { days: 180, rate: 0.000410 },
+                { days: 360, rate: 0.000821 },
+                { days: Infinity, rate: 0.001645 }
+            ]
+        };
+
+        // === UTILITÁRIOS ===
+        function formatCurrency(value) {
+            if (Math.abs(value) >= 1e6) {
+                return new Intl.NumberFormat('pt-BR', {
+                    notation: 'scientific',
+                    maximumFractionDigits: 2
+                }).format(value);
+            }
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        function formatPercent(value) {
+            if (Math.abs(value) >= 1) {
+                return new Intl.NumberFormat('pt-BR', {
+                    notation: 'scientific',
+                    maximumFractionDigits: 2
+                }).format(value);
+            }
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'percent',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 6
+            }).format(value);
+        }
+
+        function formatNumber(value, decimals = 2) {
+            if (Math.abs(value) >= 1e6) {
+                return new Intl.NumberFormat('pt-BR', {
+                    notation: 'scientific',
+                    maximumFractionDigits: 2
+                }).format(value);
+            }
+            return new Intl.NumberFormat('pt-BR', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            }).format(value);
+        }
+
+        function formatDate(date) {
+            try {
+                // Se já é um objeto Date válido, usar diretamente
+                if (date instanceof Date && !isNaN(date.getTime())) {
+                    return new Intl.DateTimeFormat('pt-BR').format(date);
+                }
+                
+                // Se é uma string, tentar converter para Date
+                if (typeof date === 'string') {
+                    const parsedDate = new Date(date);
+                    if (!isNaN(parsedDate.getTime())) {
+                        return new Intl.DateTimeFormat('pt-BR').format(parsedDate);
+                    }
+                }
+                
+                // Se chegou até aqui, é uma string sem data válida
+                return date;
+            } catch (error) {
+                console.warn('Erro ao formatar data:', error, 'Data recebida:', date);
+                return 'Data inválida';
+            }
+        }
+
+        function calculateDays(startDate, endDate) {
+            const oneDay = 24 * 60 * 60 * 1000;
+            return Math.round(Math.abs((endDate - startDate) / oneDay));
+        }
+
+        function limitDecimals(value, decimals = 6) {
+            return parseFloat(value.toFixed(decimals));
+        }
+
+        // === SISTEMA DE ABAS ===
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTabs();
+            setupEventListeners();
+        });
+
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+                    
+                    // Remove active class from all tabs and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    button.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            // Investment calculator
+            const investmentInputs = ['investmentValue', 'investmentRateType', 'investmentBaseRate', 'investmentFlexRate', 'investmentMaturity', 'investmentIrExempt'];
+            investmentInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', debounce(calculateInvestment, 300));
+                }
+            });
+
+            // Discount calculator
+            const discountInputs = ['nominalValue', 'discountMaturity', 'discountRate', 'discountTariffs'];
+            discountInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', debounce(calculateDiscount, 300));
+                }
+            });
+
+            // Rate converter
+            const conversionInputs = ['inputRate', 'fromPeriod', 'toPeriod'];
+            conversionInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', debounce(calculateConversion, 300));
+                }
+            });
+
+            // Credit calculator
+            const creditInputs = ['creditValue', 'amortizationType', 'baseDay', 'gracePeriod', 'interestOnGrace', 'amortizationFrequency', 'totalTerm', 'tac', 'flatCommission', 'interestRate', 'surchargeRate'];
+            creditInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', debounce(calculateCredit, 300));
+                }
+            });
+
+            // Interest charge behavior
+            const interestOnGraceCheckbox = document.getElementById('interestOnGrace');
+            if (interestOnGraceCheckbox) {
+                interestOnGraceCheckbox.addEventListener('change', function() {
+                    const group = document.getElementById('interestChargeGroup');
+                    if (group) {
+                        group.style.display = this.checked ? 'block' : 'none';
+                    }
+                });
+            }
+
+            // Investment rate type behavior
+            const rateTypeSelect = document.getElementById('investmentRateType');
+            if (rateTypeSelect) {
+                rateTypeSelect.addEventListener('change', function() {
+                    const flexGroup = document.getElementById('flexRateGroup');
+                    const baseRateInput = document.getElementById('investmentBaseRate');
+                    const baseRateValue = document.getElementById('investmentBaseRate');
+                    
+                    if (flexGroup && baseRateInput && baseRateValue) {
+                        const isHybrid = this.value.includes('plus');
+                        const isPrefix = this.value === 'prefixed';
+                        
+                        flexGroup.style.display = isHybrid ? 'block' : 'none';
+                        // Para taxa prefixada, permitir entrada manual (não desabilitar)
+                        // baseRateInput.disabled = isPrefix;
+                        
+                        // Preencher taxa base automaticamente
+                        if (!isPrefix) {
+                            baseRateValue.value = CONFIG.currentRates[this.value] || 0;
+                        } else {
+                            // Para taxa prefixada, limpar o campo para entrada manual
+                            baseRateValue.value = '';
+                        }
+                    }
+                });
+                
+                // Disparar cálculo automaticamente após mudança na taxa
+                if (typeof calculateInvestment === 'function') {
+                    calculateInvestment();
+                }
+            }
+
+            // Interest on grace radio buttons behavior
+            const interestRadioButtons = document.querySelectorAll('input[name="interestOnGrace"]');
+            interestRadioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const group = document.getElementById('interestChargeGroup');
+                    if (group) {
+                        group.style.display = (this.value === 'no') ? 'block' : 'none';
+                    }
+                });
+            });
+
+            // IR info update based on days
+            const maturityInput = document.getElementById('investmentMaturity');
+            if (maturityInput) {
+                maturityInput.addEventListener('change', updateIrInfo);
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // === API DE TAXAS ===
+        async function loadApiRates() {
+            const statusElement = document.getElementById('rateApiStatus');
+            try {
+                // Usando taxas fixas ao invés de API
+                const fixedRates = {
+                    cdi: CONFIG.currentRates.cdi,
+                    selic: CONFIG.currentRates.selic,
+                    ipca: CONFIG.currentRates.ipca
+                };
+                
+                // Simular carregamento
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                updateRateSelectors(fixedRates);
+                
+                if (statusElement) {
+                    statusElement.textContent = 'Taxas atualizadas (CDI: 13.25% | SELIC: 13.25% | IPCA: 5.20%)';
+                    statusElement.className = 'text-success';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar taxas:', error);
+                if (statusElement) {
+                    statusElement.textContent = 'Erro ao carregar taxas';
+                    statusElement.className = 'text-error';
+                }
+            }
+        }
+
+        function updateRateSelectors(rates) {
+            console.log('Taxas disponíveis:', rates);
+            // As taxas são usadas automaticamente na função de rate type
+        }
+
+        // === ATUALIZAÇÃO DE INFO DE IR ===
+        function updateIrInfo() {
+            const maturityDate = document.getElementById('investmentMaturity')?.value;
+            const irInfo = document.getElementById('irInfo');
+            
+            if (!maturityDate || !irInfo) return;
+
+            const today = new Date();
+            const maturity = new Date(maturityDate);
+            const days = calculateDays(today, maturity);
+
+            if (days <= 0) {
+                irInfo.textContent = 'Data de vencimento deve ser futura';
+                irInfo.className = 'text-error';
+                return;
+            }
+
+            const irrfRate = CONFIG.irrfTracks.find(track => days <= track.days)?.rate || 10.0;
+            irInfo.textContent = `Prazo: ${days} dias - Alíquota de IR: ${irrfRate}% (você pode marcar como isento se aplicável)`;
+            irInfo.className = 'text-secondary';
+        }
+
+        // === CALCULADORA DE INVESTIMENTOS ===
+        function calculateInvestment() {
+            const investmentValue = parseFloat(document.getElementById('investmentValue')?.value || 0);
+            const rateType = document.getElementById('investmentRateType')?.value;
+            const baseRate = parseFloat(document.getElementById('investmentBaseRate')?.value || 0);
+            const flexRate = parseFloat(document.getElementById('investmentFlexRate')?.value || 0);
+            const maturityDate = document.getElementById('investmentMaturity')?.value;
+            const isIrExempt = document.getElementById('investmentIrExempt')?.checked || false;
+
+            // Validar campos obrigatórios (baseRate pode ser vazio para taxa prefixada)
+            if (!investmentValue || !rateType || !maturityDate) {
+                document.getElementById('investmentResults').style.display = 'none';
+                return;
+            }
+            if (!baseRate && rateType !== 'prefixed') {
+                document.getElementById('investmentResults').style.display = 'none';
+                return;
+            }
+
+            // Calcular prazo em dias
+            const today = new Date();
+            const maturity = new Date(maturityDate);
+            const days = calculateDays(today, maturity);
+
+            if (days <= 0) {
+                document.getElementById('investmentResults').style.display = 'none';
+                return;
+            }
+
+            // Calcular taxa anual
+            const annualRate = (baseRate + flexRate) / 100;
+
+            // Calcular rendimento bruto
+            const grossValue = investmentValue * Math.pow(1 + annualRate, days / 360);
+            const yieldValue = grossValue - investmentValue;
+
+            // Calcular IOF
+            const iofRate = CONFIG.iofTracks.find(track => days <= track.days)?.rate || 0.001645;
+            const iofValue = grossValue * iofRate;
+
+            // Calcular IRRF (se não isento)
+            let irrfValue = 0;
+            if (!isIrExempt) {
+                const irrfRatePercent = CONFIG.irrfTracks.find(track => days <= track.days)?.rate || 10.0;
+                const irrfRate = irrfRatePercent / 100;
+                const income = grossValue - investmentValue - iofValue;
+                irrfValue = income > 0 ? income * irrfRate : 0;
+            }
+
+            // Valor líquido
+            const netValue = grossValue - iofValue - irrfValue;
+
+            // Taxa real (descontando IOF e IRRF)
+            const netYield = netValue - investmentValue;
+            const realRate = netYield / investmentValue;
+
+            // Atualizar resultados
+            updateInvestmentResults({
+                realRate,
+                grossValue,
+                yieldValue,
+                iofValue,
+                irrfValue,
+                netValue
+            });
+
+            document.getElementById('investmentResults').style.display = 'block';
+        }
+
+        function updateInvestmentResults(results) {
+            const { realRate, grossValue, yieldValue, iofValue, irrfValue, netValue } = results;
+            
+            document.getElementById('realRate').textContent = formatPercent(realRate);
+            document.getElementById('grossValue').textContent = formatCurrency(grossValue);
+            document.getElementById('yieldValue').textContent = formatCurrency(yieldValue);
+            document.getElementById('iofValue').textContent = formatCurrency(iofValue);
+            document.getElementById('irrfValue').textContent = formatCurrency(irrfValue);
+            document.getElementById('netValue').textContent = formatCurrency(netValue);
+        }
+
+        // === CALCULADORA DE DESCONTO COMERCIAL ===
+        function calculateDiscount() {
+            const nominalValue = parseFloat(document.getElementById('nominalValue')?.value || 0);
+            const maturityDate = document.getElementById('discountMaturity')?.value;
+            const discountRate = parseFloat(document.getElementById('discountRate')?.value || 0) / 100;
+            const tariffs = parseFloat(document.getElementById('discountTariffs')?.value || 0);
+
+            if (!nominalValue || !maturityDate || !discountRate) {
+                document.getElementById('discountResults').style.display = 'none';
+                return;
+            }
+
+            // Calcular prazo em dias
+            const today = new Date();
+            const maturity = new Date(maturityDate);
+            const days = calculateDays(today, maturity);
+
+            if (days <= 0) {
+                document.getElementById('discountResults').style.display = 'none';
+                return;
+            }
+
+            // Calcular juros/custos
+            const interest = nominalValue * discountRate * (days / 30);
+
+            // Calcular IOF
+            const iofFixed = nominalValue * 0.0038; // 0,38% fixo
+            const iofAdditional = nominalValue * 0.000082 * days; // 0,0082% por dia
+
+            // Valor descontado
+            const discountedAmount = nominalValue - interest - iofFixed - iofAdditional - tariffs;
+
+            // Atualizar resultados
+            updateDiscountResults({
+                averageTerm: days,
+                discountInterest: interest,
+                fixedIof: iofFixed,
+                additionalIof: iofAdditional,
+                discountedAmount
+            });
+
+            document.getElementById('discountResults').style.display = 'block';
+        }
+
+        function updateDiscountResults(results) {
+            const { averageTerm, discountInterest, fixedIof, additionalIof, discountedAmount } = results;
+            
+            document.getElementById('averageTerm').textContent = averageTerm.toFixed(0);
+            document.getElementById('discountInterest').textContent = formatCurrency(discountInterest);
+            document.getElementById('fixedIof').textContent = formatCurrency(fixedIof);
+            document.getElementById('additionalIof').textContent = formatCurrency(additionalIof);
+            document.getElementById('discountedAmount').textContent = formatCurrency(discountedAmount);
+        }
+
+        // === CONVERSOR DE TAXAS ===
+        function convertInterestRate(rate, from, to) {
+            const exponent = CONFIG.periodInDays[to] / CONFIG.periodInDays[from];
+            const converted = Math.pow(1 + rate, exponent) - 1;
+            return limitDecimals(converted, 6);
+        }
+
+        function calculateConversion() {
+            const inputRate = parseFloat(document.getElementById('inputRate')?.value || 0) / 100;
+            const fromPeriod = document.getElementById('fromPeriod')?.value;
+            const toPeriod = document.getElementById('toPeriod')?.value;
+
+            if (!inputRate || !fromPeriod || !toPeriod) {
+                document.getElementById('conversionResults').style.display = 'none';
+                return;
+            }
+
+            // Taxa convertida
+            const convertedRate = convertInterestRate(inputRate, fromPeriod, toPeriod);
+            
+            // Equivalentes
+            const monthlyEquivalent = convertInterestRate(inputRate, fromPeriod, 'month');
+            const yearlyEquivalent = convertInterestRate(inputRate, fromPeriod, 'year');
+
+            // Tabela de equivalências
+            const tableData = [];
+            Object.keys(CONFIG.periodInDays).forEach(period => {
+                const equivalent = convertInterestRate(inputRate, fromPeriod, period);
+                tableData.push({
+                    period: getPeriodName(period),
+                    rate: equivalent
+                });
+            });
+
+            // Atualizar resultados
+            updateConversionResults({
+                convertedRate,
+                monthlyEquivalent,
+                yearlyEquivalent,
+                tableData
+            });
+
+            document.getElementById('conversionResults').style.display = 'block';
+        }
+
+        function updateConversionResults(results) {
+            const { convertedRate, monthlyEquivalent, yearlyEquivalent, tableData } = results;
+            
+            document.getElementById('convertedRate').textContent = formatPercent(convertedRate);
+            document.getElementById('monthlyEquivalent').textContent = formatPercent(monthlyEquivalent);
+            document.getElementById('yearlyEquivalent').textContent = formatPercent(yearlyEquivalent);
+
+            // Atualizar tabela
+            const tableBody = document.getElementById('conversionTable');
+            tableBody.innerHTML = '';
+            
+            tableData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.period}</td>
+                    <td class="text-right">${formatPercent(row.rate)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function getPeriodName(period) {
+            const names = {
+                day: 'Diário',
+                week: 'Semanal',
+                month: 'Mensal',
+                bimester: 'Bimestral',
+                quarter: 'Trimestral',
+                semester: 'Semestral',
+                year: 'Anual'
+            };
+            return names[period] || period;
+        }
+
+        // === CALCULADORA DE CRÉDITO ===
+        function calculateCredit() {
+            const creditValue = parseFloat(document.getElementById('creditValue')?.value || 0);
+            const amortizationType = document.getElementById('amortizationType')?.value;
+            const baseDay = document.getElementById('baseDay')?.value;
+            const gracePeriod = parseInt(document.getElementById('gracePeriod')?.value || 0);
+            const interestOnGrace = document.querySelector('input[name="interestOnGrace"]:checked')?.value === 'yes';
+            const amortizationFrequency = document.getElementById('amortizationFrequency')?.value;
+            const totalTerm = parseInt(document.getElementById('totalTerm')?.value || 0);
+            const tac = parseFloat(document.getElementById('tac')?.value || 0);
+            const flatCommission = parseFloat(document.getElementById('flatCommission')?.value || 0);
+            const interestRate = parseFloat(document.getElementById('interestRate')?.value || 0) / 100;
+            const surchargeRate = parseFloat(document.getElementById('surchargeRate')?.value || 0) / 100;
+
+            if (!creditValue || !amortizationType || !totalTerm || !interestRate) {
+                document.getElementById('creditResults').style.display = 'none';
+                return;
+            }
+
+            const totalRate = interestRate + surchargeRate;
+            const amortizationTerm = totalTerm - gracePeriod;
+
+            if (amortizationTerm <= 0) {
+                alert('Prazo total deve ser maior que a carência');
+                document.getElementById('creditResults').style.display = 'none';
+                return;
+            }
+
+            // Gerar cronograma
+            const schedule = generatePaymentSchedule({
+                creditValue,
+                totalRate,
+                amortizationType,
+                gracePeriod,
+                amortizationTerm,
+                amortizationFrequency
+            });
+
+            // Calcular totais
+            const totalInterest = schedule.reduce((sum, item) => sum + item.juros, 0);
+            const totalPaid = schedule.reduce((sum, item) => sum + item.parcelaValor, 0);
+
+            // Calcular CET
+            const cetMonthly = calculateCET(creditValue + tac + flatCommission, totalPaid, totalTerm);
+            const cetAnnual = Math.pow(1 + cetMonthly, 12) - 1;
+
+            // Atualizar resultados
+            updateCreditResults({
+                cetMonthly,
+                cetAnnual,
+                totalInterest,
+                totalPaid,
+                schedule
+            });
+
+            document.getElementById('creditResults').style.display = 'block';
+        }
+
+        function generatePaymentSchedule(params) {
+            const { creditValue, totalRate, amortizationType, gracePeriod, amortizationTerm, amortizationFrequency } = params;
+            
+            let saldoDevedor = creditValue;
+            const schedule = [];
+            
+            const amortizationAmount = amortizationType === 'SAC' 
+                ? creditValue / amortizationTerm 
+                : null;
+
+            for (let i = 1; i <= (gracePeriod + amortizationTerm); i++) {
+                const juros = saldoDevedor * totalRate;
+                let amortizacao = 0;
+                let parcela = 0;
+
+                if (i <= gracePeriod) {
+                    // Período de carência
+                    amortizacao = 0;
+                    parcela = juros;
+                } else {
+                    // Período de amortização
+                    if (amortizationType === 'SAC') {
+                        amortizacao = amortizationAmount;
+                        parcela = amortizacao + juros;
+                        saldoDevedor -= amortizacao;
+                    } else {
+                        // PRICE - parcela constante
+                        const rate = totalRate;
+                        const term = amortizationTerm;
+                        parcela = creditValue * (rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
+                        amortizacao = parcela - juros;
+                        saldoDevedor -= amortizacao;
+                    }
+                }
+
+                // Calcular data de vencimento (versão simplificada)
+                const vencimentoDate = new Date();
+                vencimentoDate.setDate(vencimentoDate.getDate() + (i * 30)); // 30 dias por parcela
+
+                schedule.push({
+                    numero: i,
+                    vencimento: vencimentoDate,
+                    amortizacao,
+                    juros,
+                    parcelaValor: Math.abs(parcela),
+                    saldoDevedor: Math.max(0, saldoDevedor)
+                });
+            }
+
+            return schedule;
+        }
+        
+
+        function calculateCET(principal, totalPaid, months) {
+            return Math.pow(totalPaid / principal, 1 / months) - 1;
+        }
+
+        function updateCreditResults(results) {
+            const { cetMonthly, cetAnnual, totalInterest, totalPaid, schedule } = results;
+            
+            document.getElementById('cetMonthly').textContent = formatPercent(cetMonthly);
+            document.getElementById('cetAnnual').textContent = formatPercent(cetAnnual);
+            document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+            document.getElementById('totalPaid').textContent = formatCurrency(totalPaid);
+
+            // Atualizar tabela do cronograma
+            const tableBody = document.getElementById('creditSchedule');
+            tableBody.innerHTML = '';
+            
+            schedule.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.numero}</td>
+                    <td class="text-right">${formatDate(item.vencimento)}</td>
+                    <td class="text-right">${formatCurrency(item.amortizacao)}</td>
+                    <td class="text-right">${formatCurrency(item.juros)}</td>
+                    <td class="text-right">${formatCurrency(item.parcelaValor)}</td>
+                    <td class="text-right">${formatCurrency(item.saldoDevedor)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // === FUNÇÕES UTILITÁRIAS ===
+        function clearAllForms() {
+            if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+                // Limpar todos os inputs
+                const inputs = document.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        input.checked = false;
+                    } else {
+                        input.value = '';
+                    }
+                });
+
+                // Resetar valores padrão
+                const defaultRadio = document.querySelector('input[name="interestOnGrace"][value="yes"]');
+                if (defaultRadio) defaultRadio.checked = true;
+                
+                const defaultAmortization = document.getElementById('amortizationType');
+                if (defaultAmortization) defaultAmortization.value = 'SAC';
+                
+                const defaultGrace = document.getElementById('gracePeriod');
+                if (defaultGrace) defaultGrace.value = '0';
+                
+                const defaultTerm = document.getElementById('totalTerm');
+                if (defaultTerm) defaultTerm.value = '12';
+
+                // Esconder resultados
+                const resultSections = document.querySelectorAll('.results-section');
+                resultSections.forEach(section => {
+                    section.style.display = 'none';
+                });
+
+                // Resetar grupos dependentes
+                const interestGroup = document.getElementById('interestChargeGroup');
+                const flexGroup = document.getElementById('flexRateGroup');
+                if (interestGroup) interestGroup.style.display = 'none';
+                if (flexGroup) flexGroup.style.display = 'none';
+
+                // Resetar info de IR
+                const irInfo = document.getElementById('irInfo');
+                if (irInfo) {
+                    irInfo.textContent = 'A alíquota será calculada automaticamente com base no prazo';
+                    irInfo.className = 'text-secondary';
+                }
+            }
+        }
+
+		document.getElementById('toGoBackBtn').addEventListener('click', toGoBack);
+		
+		function toGoBack() {
+			const base = window.location.origin;
+			window.location.href = "../index.html";
+		}
+
+        function exportSchedule() {
+            alert('Funcionalidade de exportação em desenvolvimento. O cronograma pode ser copiado selecionando a tabela.');
+        }
+    </script>
+</body>
+</html>

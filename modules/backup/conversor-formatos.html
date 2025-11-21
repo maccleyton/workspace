@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Formatos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========================================
+           WORKSPACE HUB - MAIN STYLES
+           Sistema de cores, tipografia e layout base
+           ======================================== */
+
+        /* CSS Custom Properties - Color System */
+        :root {
+          /* Primary Colors */
+          --color-primary-500: #3B82F6;
+          --color-primary-400: #60A5FA;
+          --color-primary-900: #1E3A8A;
+          
+          /* Background Colors */
+          --color-bg-page: #0A0A0A;
+          --color-bg-surface: #141414;
+          --color-bg-surface-hover: #1A1A1A;
+          
+          /* Text Colors */
+          --color-text-primary: #E4E4E7;
+          --color-text-secondary: #A1A1AA;
+          --color-text-tertiary: #52525B;
+          
+          /* Border Colors */
+          --color-border-default: #27272A;
+          --color-border-interactive: #3F3F46;
+          
+          /* Semantic Colors */
+          --color-success-500: #22C55E;
+          --color-warning-500: #EAB308;
+          --color-error-500: #EF4444;
+          
+          /* Theme Colors */
+          --theme-bg-page: var(--color-bg-page);
+          --theme-bg-surface: var(--color-bg-surface);
+          --theme-text-primary: var(--color-text-primary);
+          --theme-text-secondary: var(--color-text-secondary);
+          --theme-text-tertiary: var(--color-text-tertiary);
+          --theme-border-default: var(--color-border-default);
+          --theme-border-interactive: var(--color-border-interactive);
+          --theme-primary: var(--color-primary-500);
+        }
+
+        /* Spacing System (8px base) */
+        :root {
+          --space-xs: 8px;
+          --space-sm: 12px;
+          --space-md: 16px;
+          --space-lg: 24px;
+          --space-xl: 32px;
+          --space-2xl: 48px;
+          --space-3xl: 64px;
+          --space-4xl: 96px;
+        }
+
+        /* Typography System */
+        :root {
+          --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          --font-size-xs: 12px;
+          --font-size-sm: 14px;
+          --font-size-md: 16px;
+          --font-size-lg: 18px;
+          --font-size-xl: 24px;
+          --font-size-2xl: 48px;
+          
+          --font-weight-regular: 400;
+          --font-weight-medium: 500;
+          --font-weight-semibold: 600;
+          --font-weight-bold: 700;
+          
+          --line-height-tight: 1.2;
+          --line-height-snug: 1.3;
+          --line-height-normal: 1.4;
+          --line-height-relaxed: 1.5;
+          
+          --letter-spacing-tight: -0.02em;
+          --letter-spacing-normal: 0;
+          --letter-spacing-wide: 0.02em;
+        }
+
+        /* Border Radius */
+        :root {
+          --radius-sm: 8px;
+          --radius-md: 12px;
+          --radius-lg: 16px;
+        }
+
+        /* Shadows & Effects */
+        :root {
+          --shadow-glow-focus: 0 0 0 3px rgba(59, 130, 246, 0.3);
+          --shadow-glow-hover: 0 0 0 2px rgba(59, 130, 246, 0.2);
+          --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Animations */
+        :root {
+          --transition-fast: 150ms ease-out;
+          --transition-normal: 200ms ease-out;
+          --transition-slow: 300ms ease-out;
+        }
+
+        /* Base Reset */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        html {
+          scroll-behavior: smooth;
+        }
+
+        body {
+          font-family: var(--font-family-primary);
+          font-size: var(--font-size-md);
+          font-weight: var(--font-weight-regular);
+          line-height: var(--line-height-relaxed);
+          color: var(--theme-text-primary);
+          background-color: var(--theme-bg-page);
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          overflow-x: hidden;
+        }
+
+        /* App Container */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .app-header {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          background-color: var(--theme-bg-surface);
+          border-bottom: 1px solid var(--theme-border-default);
+          backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 var(--space-lg);
+          height: 70px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: var(--space-lg);
+        }
+
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: var(--space-md);
+        }
+
+        .back-button {
+          display: flex;
+          align-items: center;
+          gap: var(--space-sm);
+          padding: var(--space-sm) var(--space-md);
+          background: var(--theme-bg-page);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-sm);
+          color: var(--theme-text-secondary);
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          cursor: pointer;
+          transition: all var(--transition-normal);
+          text-decoration: none;
+        }
+
+        .back-button:hover {
+          background: var(--theme-bg-surface-hover);
+          color: var(--theme-text-primary);
+          border-color: var(--theme-primary);
+        }
+
+        .header-center {
+          flex: 1;
+          text-align: center;
+        }
+
+        .app-title {
+          font-size: var(--font-size-xl);
+          font-weight: var(--font-weight-bold);
+          line-height: var(--line-height-tight);
+          letter-spacing: var(--letter-spacing-tight);
+          
+          background: linear-gradient(to right, #019875, #02b48a);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          text-shadow: 0 2px 10px rgba(1, 152, 117, 0.3);
+        }
+
+        .header-right {
+          display: flex;
+          align-items: center;
+          gap: var(--space-md);
+        }
+
+        .theme-toggle {
+          width: 44px;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--theme-bg-page);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+          transition: all var(--transition-normal);
+          color: var(--theme-text-secondary);
+        }
+
+        .theme-toggle:hover {
+          background: var(--theme-bg-surface-hover);
+          color: var(--theme-text-primary);
+        }
+
+        /* Main Content */
+        .app-main {
+          flex: 1;
+          padding: var(--space-4xl) 0;
+          max-width: 1200px;
+          margin: 0 auto;
+          width: 100%;
+        }
+
+        .converter-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-xl);
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 0 var(--space-lg);
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+          display: flex;
+          background: var(--theme-bg-surface);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-lg);
+          padding: var(--space-xs);
+          gap: var(--space-xs);
+        }
+
+        .tab-button {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-sm);
+          padding: var(--space-md) var(--space-lg);
+          background: transparent;
+          border: none;
+          border-radius: var(--radius-md);
+          color: var(--theme-text-secondary);
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          cursor: pointer;
+          transition: all var(--transition-normal);
+          text-decoration: none;
+          white-space: nowrap;
+        }
+
+        .tab-button:hover {
+          background: var(--theme-bg-page);
+          color: var(--theme-text-primary);
+        }
+
+        .tab-button.active {
+          background: linear-gradient(to right, #019875, #02b48a);
+          color: white;
+          box-shadow: var(--shadow-card);
+        }
+
+        .tab-button svg {
+          flex-shrink: 0;
+        }
+
+        /* Tab Content */
+        .tab-content {
+          display: none;
+        }
+
+        .tab-content.active {
+          display: block;
+        }
+
+        /* Converter Section */
+        .converter-section {
+          background: var(--theme-bg-surface);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-md);
+          padding: var(--space-xl);
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-xl);
+        }
+
+        .input-section,
+        .output-section {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-sm);
+        }
+
+        .input-label {
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          color: var(--theme-text-secondary);
+          margin: 0;
+        }
+
+        .text-input,
+        .number-input,
+        .text-output,
+        .number-output {
+          width: 100%;
+          padding: var(--space-md);
+          background: var(--theme-bg-page);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-sm);
+          color: var(--theme-text-primary);
+          font-size: var(--font-size-sm);
+          font-family: 'JetBrains Mono', monospace;
+          transition: all var(--transition-normal);
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        .text-output,
+        .number-output {
+          padding-right: 80px;
+        }
+
+        .text-input:focus,
+        .number-input:focus,
+        .text-output:focus,
+        .number-output:focus {
+          outline: none;
+          border-color: var(--color-primary-500);
+          box-shadow: var(--shadow-glow-focus);
+          background: var(--theme-bg-surface-hover);
+        }
+
+        .text-input::placeholder,
+        .number-input::placeholder {
+          color: var(--theme-text-tertiary);
+        }
+
+        /* Convert Options */
+        .convert-options {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-lg);
+          padding: var(--space-lg);
+          background: var(--theme-bg-page);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-sm);
+        }
+
+        .options-row {
+          display: flex;
+          align-items: center;
+          gap: var(--space-lg);
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .option-group {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-sm);
+          min-width: 120px;
+        }
+
+        .option-label {
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          color: var(--theme-text-secondary);
+          text-align: center;
+        }
+
+        .base-select {
+          padding: var(--space-sm) var(--space-md);
+          background: var(--theme-bg-surface);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-sm);
+          color: var(--theme-text-primary);
+          font-size: var(--font-size-sm);
+          cursor: pointer;
+          transition: all var(--transition-normal);
+          min-width: 120px;
+        }
+
+        .base-select:focus {
+          outline: none;
+          border-color: var(--color-primary-500);
+          box-shadow: var(--shadow-glow-focus);
+        }
+
+        .base-select:hover {
+          background: var(--theme-bg-surface-hover);
+        }
+
+        /* Select Options Styling */
+        .base-select option {
+          background: var(--theme-bg-surface);
+          color: var(--theme-text-primary);
+          padding: var(--space-sm) var(--space-md);
+        }
+
+        .base-select option:hover {
+          background: var(--color-primary-500);
+          color: white;
+        }
+
+        /* Convert Arrow */
+        .convert-arrow {
+          color: var(--theme-text-tertiary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: var(--space-sm);
+        }
+
+        /* Convert Button */
+        .convert-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-sm);
+          padding: var(--space-md) var(--space-xl);
+          background: var(--color-primary-500);
+          color: white;
+          border: none;
+          border-radius: var(--radius-sm);
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-semibold);
+          cursor: pointer;
+          transition: all var(--transition-normal);
+          margin: 0 auto;
+          min-width: 150px;
+        }
+
+        .convert-button:hover {
+          background: var(--color-primary-400);
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-card);
+        }
+
+        .convert-button:active {
+          transform: translateY(0);
+        }
+
+        .convert-button:disabled {
+          background: var(--theme-text-tertiary);
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+
+        .convert-button svg {
+          flex-shrink: 0;
+        }
+
+        /* Copy Button */
+        .copy-button {
+          position: absolute;
+          right: var(--space-sm);
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          gap: var(--space-xs);
+          padding: var(--space-sm) var(--space-md);
+          background: var(--color-primary-500);
+          color: white;
+          border: none;
+          border-radius: var(--radius-sm);
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-medium);
+          cursor: pointer;
+          transition: all var(--transition-normal);
+          opacity: 0;
+          visibility: hidden;
+        }
+
+        .output-section:hover .copy-button {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .copy-button:hover {
+          background: var(--color-primary-400);
+          transform: translateY(-50%) scale(1.05);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+          background: var(--theme-bg-surface);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-md);
+          padding: var(--space-xl);
+        }
+
+        .quick-actions-title {
+          font-size: var(--font-size-lg);
+          font-weight: var(--font-weight-semibold);
+          color: var(--theme-text-primary);
+          margin-bottom: var(--space-lg);
+          text-align: center;
+        }
+
+        .quick-actions-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: var(--space-md);
+        }
+
+        .quick-action-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-sm);
+          padding: var(--space-md);
+          background: var(--theme-bg-page);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-sm);
+          color: var(--theme-text-secondary);
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          cursor: pointer;
+          transition: all var(--transition-normal);
+          text-align: center;
+          min-height: 48px;
+        }
+
+        .quick-action-btn:hover {
+          background: var(--theme-bg-surface-hover);
+          color: var(--theme-text-primary);
+          border-color: var(--color-primary-500);
+          transform: translateY(-1px);
+        }
+
+        .quick-action-btn svg {
+          flex-shrink: 0;
+          color: var(--color-primary-500);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          opacity: 0;
+          visibility: hidden;
+          transition: all var(--transition-normal);
+        }
+
+        .loading-overlay.active {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .loading-spinner {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: var(--space-md);
+          padding: var(--space-xl);
+          background: var(--theme-bg-surface);
+          border: 1px solid var(--theme-border-default);
+          border-radius: var(--radius-lg);
+          color: var(--theme-text-primary);
+        }
+
+        .spinner {
+          width: 32px;
+          height: 32px;
+          border: 3px solid var(--theme-border-default);
+          border-top: 3px solid var(--color-primary-500);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner p {
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          margin: 0;
+        }
+
+        /* Toast Notifications */
+        .toast {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: var(--theme-bg-surface);
+          color: var(--theme-text-primary);
+          padding: 12px 16px;
+          border-radius: 8px;
+          border: 1px solid var(--theme-border-default);
+          box-shadow: var(--shadow-card);
+          z-index: 10000;
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-medium);
+          max-width: 300px;
+          animation: slideInRight 0.3s ease;
+        }
+
+        .toast.success {
+          border-left: 4px solid var(--color-success-500);
+        }
+
+        .toast.error {
+          border-left: 4px solid var(--color-error-500);
+        }
+
+        .toast.warning {
+          border-left: 4px solid var(--color-warning-500);
+        }
+
+        .toast.info {
+          border-left: 4px solid var(--color-primary-500);
+        }
+
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideOutRight {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+
+        /* Input States */
+        .input-valid {
+          border-color: var(--color-success-500) !important;
+          background: rgba(34, 197, 94, 0.1) !important;
+        }
+
+        .input-invalid {
+          border-color: var(--color-error-500) !important;
+          background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .app-main {
+            padding: var(--space-lg) var(--space-md);
+          }
+          
+          .header-content {
+            padding: 0 var(--space-md);
+            height: 56px;
+          }
+          
+          .converter-section {
+            padding: var(--space-lg);
+          }
+          
+          .options-row {
+            flex-direction: column;
+            gap: var(--space-md);
+          }
+          
+          .convert-arrow {
+            transform: rotate(90deg);
+          }
+          
+          .quick-actions-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .app-title {
+            font-size: var(--font-size-lg);
+          }
+        }
+
+        @media (max-width: 480px) {
+          .app-main {
+            padding: var(--space-md);
+          }
+          
+          .tab-button {
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--font-size-xs);
+          }
+          
+          .converter-section {
+            padding: var(--space-md);
+          }
+          
+          .quick-actions {
+            padding: var(--space-md);
+          }
+        }
+
+        /* Animation for converter wrapper */
+        .converter-wrapper {
+          animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Focus visible for accessibility */
+        .tab-button:focus-visible,
+        .convert-button:focus-visible,
+        .quick-action-btn:focus-visible,
+        .base-select:focus-visible,
+        .back-button:focus-visible,
+        .theme-toggle:focus-visible {
+          outline: 2px solid var(--color-primary-500);
+          outline-offset: 2px;
+        }
+
+        /* Selection styling */
+        ::selection {
+          background: var(--color-primary-500);
+          color: white;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+          background: var(--theme-bg-surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background: var(--theme-border-default);
+          border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background: var(--theme-text-tertiary);
+        }
+
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="back-button" id="toGoBackBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                        Voltar
+                    </button>
+                </div>
+                <div class="header-center">
+                    <h1 class="app-title">Conversor de Formatos</h1>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle" id="themeToggle" title="Alternar Tema">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <div class="converter-wrapper">
+                <!-- Tab Navigation -->
+                <div class="tab-navigation">
+                    <button class="tab-button active" data-tab="text">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10,9 9,9 8,9"/>
+                        </svg>
+                        Texto
+                    </button>
+                    <button class="tab-button" data-tab="number">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                        Números
+                    </button>
+                </div>
+
+                <!-- Converter Content -->
+                <div class="converter-content">
+                    <!-- Text Converter -->
+                    <div class="tab-content active" id="text-converter">
+                        <div class="converter-section">
+                            <div class="input-section">
+                                <label for="text-input" class="input-label">Texto de Entrada</label>
+                                <textarea 
+                                    id="text-input" 
+                                    class="text-input" 
+                                    placeholder="Digite o texto aqui..."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+
+                            <div class="convert-options">
+                                <div class="options-row">
+                                    <div class="option-group">
+                                        <label class="option-label">Converter de:</label>
+                                        <select id="text-from-base" class="base-select">
+                                            <option value="text">Texto</option>
+                                            <option value="binary">Binário</option>
+                                            <option value="hex">Hexadecimal</option>
+                                            <option value="octal">Octal</option>
+                                        </select>
+                                    </div>
+                                    <div class="convert-arrow">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                                        </svg>
+                                    </div>
+                                    <div class="option-group">
+                                        <label class="option-label">Converter para:</label>
+                                        <select id="text-to-base" class="base-select">
+                                            <option value="binary">Binário</option>
+                                            <option value="hex">Hexadecimal</option>
+                                            <option value="octal">Octal</option>
+                                            <option value="text">Texto</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="output-section">
+                                <label for="text-output" class="input-label">Resultado</label>
+                                <textarea 
+                                    id="text-output" 
+                                    class="text-output" 
+                                    placeholder="Resultado aparecerá aqui..."
+                                    rows="4"
+                                    readonly
+                                ></textarea>
+                                <button id="text-copy-btn" class="copy-button" title="Copiar resultado">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
+                                    Copiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Number Converter -->
+                    <div class="tab-content" id="number-converter">
+                        <div class="converter-section">
+                            <div class="input-section">
+                                <label for="number-input" class="input-label">Número de Entrada</label>
+                                <input 
+                                    type="text" 
+                                    id="number-input" 
+                                    class="number-input" 
+                                    placeholder="Digite o número aqui..."
+                                />
+                            </div>
+
+                            <div class="convert-options">
+                                <div class="options-row">
+                                    <div class="option-group">
+                                        <label class="option-label">Converter de:</label>
+                                        <select id="number-from-base" class="base-select">
+                                            <option value="decimal">Decimal</option>
+                                            <option value="binary">Binário</option>
+                                            <option value="hex">Hexadecimal</option>
+                                            <option value="octal">Octal</option>
+                                        </select>
+                                    </div>
+                                    <div class="convert-arrow">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                                        </svg>
+                                    </div>
+                                    <div class="option-group">
+                                        <label class="option-label">Converter para:</label>
+                                        <select id="number-to-base" class="base-select">
+                                            <option value="binary">Binário</option>
+                                            <option value="hex">Hexadecimal</option>
+                                            <option value="octal">Octal</option>
+                                            <option value="decimal">Decimal</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="output-section">
+                                <label for="number-output" class="input-label">Resultado</label>
+                                <input 
+                                    type="text" 
+                                    id="number-output" 
+                                    class="number-output" 
+                                    placeholder="Resultado aparecerá aqui..."
+                                    readonly
+                                />
+                                <button id="number-copy-btn" class="copy-button" title="Copiar resultado">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
+                                    Copiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3 class="quick-actions-title">Ações Rápidas</h3>
+                    <div class="quick-actions-grid">
+                        <button class="quick-action-btn" data-text="Olá Mundo!" data-to="binary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            "Olá Mundo!" → Binário
+                        </button>
+                        <button class="quick-action-btn" data-number="255" data-to="hex">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            255 → Hexadecimal
+                        </button>
+                        <button class="quick-action-btn" data-text="1010" data-from="binary" data-to="hex">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            1010 (Bin) → Hex
+                        </button>
+                        <button class="quick-action-btn" data-clear="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3,6 5,6 21,6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                <line x1="14" y1="11" x2="14" y2="17"/>
+                            </svg>
+                            Limpar Tudo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Convertendo...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===========================================
+        // CONVERSOR DE FORMATOS - SISTEMA UNIFICADO
+        // ===========================================
+
+        // Configuração global
+        const ConverterConfig = {
+            version: '2.0.0',
+            debug: false,
+            autoConvert: true,
+            debounceTime: 300,
+            maxHistoryItems: 20
+        };
+
+        // Logger
+        const Logger = {
+            log: (message, data = null) => {
+                if (ConverterConfig.debug) {
+                    console.log(`[Converter] ${message}`, data);
+                }
+            },
+            error: (message, error = null) => {
+                console.error(`[Converter Error] ${message}`, error);
+            }
+        };
+
+        // ===========================================
+        // CONVERTER CORE
+        // ===========================================
+        class ConverterCore {
+            constructor() {
+                this.isInitialized = false;
+                this.history = [];
+                this.loadHistory();
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadSavedTheme();
+                Logger.log('Core inicializado');
+            }
+
+            setupEventListeners() {
+                // Tab navigation
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const tabName = btn.getAttribute('data-tab');
+                        this.switchTab(tabName);
+                    });
+                });
+
+                // Auto-conversão para texto
+                this.setupTextConversion();
+                
+                // Auto-conversão para números
+                this.setupNumberConversion();
+
+                // Botões de copiar
+                this.setupCopyButtons();
+
+                // Ações rápidas
+                this.setupQuickActions();
+
+                // Theme toggle
+                this.setupThemeToggle();
+            }
+
+            setupTextConversion() {
+                const textInput = document.getElementById('text-input');
+                const textFromBase = document.getElementById('text-from-base');
+                const textToBase = document.getElementById('text-to-base');
+
+                if (textInput && textFromBase && textToBase) {
+                    // Auto-conversão ao digitar
+                    let textConversionTimeout;
+                    textInput.addEventListener('input', () => {
+                        clearTimeout(textConversionTimeout);
+                        if (ConverterConfig.autoConvert) {
+                            textConversionTimeout = setTimeout(() => {
+                                this.convertText();
+                            }, ConverterConfig.debounceTime);
+                        }
+                    });
+
+                    // Auto-conversão ao mudar base
+                    textFromBase.addEventListener('change', () => this.convertText());
+                    textToBase.addEventListener('change', () => this.convertText());
+
+
+                }
+            }
+
+            setupNumberConversion() {
+                const numberInput = document.getElementById('number-input');
+                const numberFromBase = document.getElementById('number-from-base');
+                const numberToBase = document.getElementById('number-to-base');
+
+                if (numberInput && numberFromBase && numberToBase) {
+                    // Auto-conversão ao digitar
+                    let numberConversionTimeout;
+                    numberInput.addEventListener('input', () => {
+                        clearTimeout(numberConversionTimeout);
+                        if (ConverterConfig.autoConvert) {
+                            numberConversionTimeout = setTimeout(() => {
+                                this.convertNumber();
+                            }, ConverterConfig.debounceTime);
+                        }
+                    });
+
+                    // Auto-conversão ao mudar base
+                    numberFromBase.addEventListener('change', () => this.convertNumber());
+                    numberToBase.addEventListener('change', () => this.convertNumber());
+
+
+                }
+            }
+
+            setupCopyButtons() {
+                const textCopyBtn = document.getElementById('text-copy-btn');
+                const numberCopyBtn = document.getElementById('number-copy-btn');
+
+                if (textCopyBtn) {
+                    textCopyBtn.addEventListener('click', () => this.copyToClipboard('text'));
+                }
+
+                if (numberCopyBtn) {
+                    numberCopyBtn.addEventListener('click', () => this.copyToClipboard('number'));
+                }
+            }
+
+            setupQuickActions() {
+                const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+                quickActionBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.handleQuickAction(btn);
+                    });
+                });
+            }
+
+            setupThemeToggle() {
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', () => {
+                        this.cycleTheme();
+                    });
+                }
+            }
+
+            switchTab(tabName) {
+                // Remove active de todas as abas
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // Remove active de todos os conteúdos
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // Ativa a aba correta
+                const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
+                const activeContent = document.getElementById(`${tabName}-converter`);
+
+                if (activeButton && activeContent) {
+                    activeButton.classList.add('active');
+                    activeContent.classList.add('active');
+                    Logger.log(`Alternado para aba: ${tabName}`);
+                }
+            }
+
+            convertText() {
+                const input = document.getElementById('text-input');
+                const output = document.getElementById('text-output');
+                const fromBase = document.getElementById('text-from-base').value;
+                const toBase = document.getElementById('text-to-base').value;
+
+                if (!input || !output) return;
+
+                const inputValue = input.value.trim();
+
+                if (!inputValue) {
+                    output.value = '';
+                    this.clearValidationStyles(input);
+                    return;
+                }
+
+                try {
+                    this.showLoading(true);
+                    
+                    let result = '';
+                    
+                    // Converte da base de origem para texto primeiro
+                    let text = inputValue;
+                    if (fromBase !== 'text') {
+                        text = this.decodeFromBase(inputValue, fromBase);
+                    }
+
+                    // Converte do texto para a base de destino
+                    if (toBase === 'text') {
+                        result = text;
+                    } else {
+                        result = this.encodeToBase(text, toBase);
+                    }
+
+                    output.value = result;
+                    this.setValidStyle(input);
+                    
+                    // Salva no histórico
+                    this.saveToHistory(inputValue, fromBase, result, toBase, 'text');
+                    
+                } catch (error) {
+                    Logger.error('Erro na conversão de texto:', error);
+                    output.value = `Erro: ${error.message}`;
+                    this.setInvalidStyle(input);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            convertNumber() {
+                const input = document.getElementById('number-input');
+                const output = document.getElementById('number-output');
+                const fromBase = document.getElementById('number-from-base').value;
+                const toBase = document.getElementById('number-to-base').value;
+
+                if (!input || !output) {
+                    Logger.error('Elementos de entrada/saída não encontrados');
+                    return;
+                }
+
+                const inputValue = input.value.trim();
+
+                if (!inputValue) {
+                    output.value = '';
+                    this.clearValidationStyles(input);
+                    return;
+                }
+
+                try {
+                    Logger.log('Convertendo número:', inputValue, 'de', fromBase, 'para', toBase);
+                    this.showLoading(true);
+                    
+                    // Valida entrada
+                    if (!this.validateNumberInput(inputValue, fromBase)) {
+                        throw new Error(`Número inválido para base ${fromBase.toUpperCase()}`);
+                    }
+
+                    // Converte para decimal primeiro
+                    const decimalValue = this.parseNumber(inputValue, fromBase);
+                    Logger.log('Valor decimal:', decimalValue);
+
+                    // Converte de decimal para base de destino
+                    let result = '';
+                    switch (toBase) {
+                        case 'decimal':
+                            result = decimalValue.toString();
+                            break;
+                        case 'binary':
+                            result = decimalValue.toString(2);
+                            break;
+                        case 'hex':
+                            result = decimalValue.toString(16).toUpperCase();
+                            break;
+                        case 'octal':
+                            result = decimalValue.toString(8);
+                            break;
+                        default:
+                            throw new Error(`Base não suportada: ${toBase}`);
+                    }
+
+                    Logger.log('Resultado:', result);
+                    output.value = result;
+                    this.setValidStyle(input);
+                    
+                    // Salva no histórico
+                    this.saveToHistory(inputValue, fromBase, result, toBase, 'number');
+                    
+                } catch (error) {
+                    Logger.error('Erro na conversão de número:', error);
+                    output.value = `Erro: ${error.message}`;
+                    this.setInvalidStyle(input);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            decodeFromBase(str, fromBase) {
+                switch (fromBase) {
+                    case 'binary':
+                        return this.binaryToText(str);
+                    case 'hex':
+                        return this.hexToText(str);
+                    case 'octal':
+                        return this.octalToText(str);
+                    case 'text':
+                        return str;
+                    default:
+                        throw new Error(`Base não suportada: ${fromBase}`);
+                }
+            }
+
+            encodeToBase(text, toBase) {
+                switch (toBase) {
+                    case 'binary':
+                        return this.textToBinary(text);
+                    case 'hex':
+                        return this.textToHex(text);
+                    case 'octal':
+                        return this.textToOctal(text);
+                    case 'text':
+                        return text;
+                    default:
+                        throw new Error(`Base não suportada: ${toBase}`);
+                }
+            }
+
+            textToBinary(text) {
+                return Array.from(text)
+                    .map(char => char.charCodeAt(0).toString(2).padStart(8, '0'))
+                    .join(' ');
+            }
+
+            binaryToText(binary) {
+                const binaryArray = binary.trim().split(/\s+/);
+                return binaryArray
+                    .map(bin => String.fromCharCode(parseInt(bin, 2)))
+                    .join('');
+            }
+
+            textToHex(text) {
+                return Array.from(text)
+                    .map(char => char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'))
+                    .join(' ');
+            }
+
+            hexToText(hex) {
+                const hexArray = hex.trim().split(/\s+/);
+                return hexArray
+                    .map(hex => String.fromCharCode(parseInt(hex, 16)))
+                    .join('');
+            }
+
+            textToOctal(text) {
+                return Array.from(text)
+                    .map(char => char.charCodeAt(0).toString(8).padStart(3, '0'))
+                    .join(' ');
+            }
+
+            octalToText(octal) {
+                const octalArray = octal.trim().split(/\s+/);
+                return octalArray
+                    .map(oct => String.fromCharCode(parseInt(oct, 8)))
+                    .join('');
+            }
+
+            validateNumberInput(value, base) {
+                const patterns = {
+                    decimal: /^-?\d+$/,
+                    binary: /^[01]+$/,
+                    hex: /^[0-9A-Fa-f]+$/,
+                    octal: /^[0-7]+$/
+                };
+
+                const pattern = patterns[base];
+                if (!pattern) return false;
+
+                const isValid = pattern.test(value);
+                Logger.log('Validating', value, 'for base', base, ':', isValid);
+                return isValid;
+            }
+
+            parseNumber(value, fromBase) {
+                Logger.log('Parsing number:', value, 'from base:', fromBase);
+                const decimalValue = parseInt(value, fromBase);
+                
+                if (isNaN(decimalValue)) {
+                    const error = `Não foi possível converter "${value}" da base ${fromBase.toUpperCase()}`;
+                    Logger.error(error);
+                    throw new Error(error);
+                }
+
+                Logger.log('Parsed decimal value:', decimalValue);
+                return decimalValue;
+            }
+
+            setValidStyle(element) {
+                this.clearValidationStyles(element);
+                element.classList.add('input-valid');
+            }
+
+            setInvalidStyle(element) {
+                this.clearValidationStyles(element);
+                element.classList.add('input-invalid');
+            }
+
+            clearValidationStyles(element) {
+                element.classList.remove('input-valid', 'input-invalid', 'input-warning');
+            }
+
+            showLoading(show) {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    if (show) {
+                        overlay.classList.add('active');
+                    } else {
+                        overlay.classList.remove('active');
+                    }
+                }
+            }
+
+            async copyToClipboard(type) {
+                const output = document.getElementById(`${type}-output`);
+                if (!output || !output.value) return;
+
+                try {
+                    await navigator.clipboard.writeText(output.value);
+                    this.showToast('Copiado para a área de transferência!', 'success');
+                } catch (error) {
+                    // Fallback para browsers mais antigos
+                    output.select();
+                    document.execCommand('copy');
+                    this.showToast('Copiado para a área de transferência!', 'success');
+                }
+            }
+
+            showToast(message, type = 'info') {
+                // Remove toast existente
+                const existingToast = document.querySelector('.toast');
+                if (existingToast) {
+                    existingToast.remove();
+                }
+
+                // Cria novo toast
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `<span class="toast-message">${message}</span>`;
+
+                // Adiciona ao DOM
+                document.body.appendChild(toast);
+
+                // Remove após 3 segundos
+                setTimeout(() => {
+                    toast.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 3000);
+            }
+
+            handleQuickAction(btn) {
+                const textData = btn.getAttribute('data-text');
+                const numberData = btn.getAttribute('data-number');
+                const fromBase = btn.getAttribute('data-from') || 'text';
+                const toBase = btn.getAttribute('data-to') || 'binary';
+                const clearAll = btn.getAttribute('data-clear');
+
+                if (clearAll) {
+                    this.clearAll();
+                    return;
+                }
+
+                // Ativa a aba correta
+                if (textData) {
+                    this.switchTab('text');
+                    const textInput = document.getElementById('text-input');
+                    const textFromBase = document.getElementById('text-from-base');
+                    const textToBase = document.getElementById('text-to-base');
+
+                    if (textInput && textFromBase && textToBase) {
+                        textInput.value = textData;
+                        textFromBase.value = fromBase;
+                        textToBase.value = toBase;
+                        setTimeout(() => this.convertText(), 100);
+                    }
+                } else if (numberData) {
+                    this.switchTab('number');
+                    const numberInput = document.getElementById('number-input');
+                    const numberFromBase = document.getElementById('number-from-base');
+                    const numberToBase = document.getElementById('number-to-base');
+
+                    if (numberInput && numberFromBase && numberToBase) {
+                        numberInput.value = numberData;
+                        numberFromBase.value = fromBase;
+                        numberToBase.value = toBase;
+                        setTimeout(() => this.convertNumber(), 100);
+                    }
+                }
+            }
+
+            clearAll() {
+                const textInput = document.getElementById('text-input');
+                const textOutput = document.getElementById('text-output');
+                const numberInput = document.getElementById('number-input');
+                const numberOutput = document.getElementById('number-output');
+
+                if (textInput) textInput.value = '';
+                if (textOutput) textOutput.value = '';
+                if (numberInput) numberInput.value = '';
+                if (numberOutput) numberOutput.value = '';
+
+                // Remove estilos de validação
+                [textInput, textOutput, numberInput, numberOutput].forEach(element => {
+                    if (element) this.clearValidationStyles(element);
+                });
+
+                this.showToast('Todos os campos foram limpos', 'info');
+            }
+
+            cycleTheme() {
+                const themes = ['dark', 'light', 'blue', 'green', 'purple', 'orange'];
+                const currentTheme = localStorage.getItem('converter-theme') || 'dark';
+                const currentIndex = themes.indexOf(currentTheme);
+                const nextIndex = (currentIndex + 1) % themes.length;
+                const nextTheme = themes[nextIndex];
+                
+                this.applyTheme(nextTheme);
+                this.showToast(`Tema alterado para: ${nextTheme}`, 'info');
+            }
+
+            applyTheme(themeName) {
+                document.documentElement.setAttribute('data-theme', themeName);
+                localStorage.setItem('converter-theme', themeName);
+                Logger.log('Tema aplicado:', themeName);
+            }
+
+            loadSavedTheme() {
+                const savedTheme = localStorage.getItem('converter-theme');
+                if (savedTheme) {
+                    this.applyTheme(savedTheme);
+                }
+            }
+
+            saveToHistory(input, fromBase, output, toBase, type) {
+                const entry = {
+                    id: Date.now(),
+                    input,
+                    fromBase,
+                    output,
+                    toBase,
+                    type,
+                    timestamp: new Date().toISOString()
+                };
+
+                this.history.unshift(entry);
+                
+                // Limita histórico
+                if (this.history.length > ConverterConfig.maxHistoryItems) {
+                    this.history = this.history.slice(0, ConverterConfig.maxHistoryItems);
+                }
+
+                this.saveHistory();
+            }
+
+            saveHistory() {
+                try {
+                    localStorage.setItem('converter-history', JSON.stringify(this.history));
+                } catch (error) {
+                    Logger.error('Erro ao salvar histórico:', error);
+                }
+            }
+
+            loadHistory() {
+                try {
+                    const stored = localStorage.getItem('converter-history');
+                    this.history = stored ? JSON.parse(stored) : [];
+                } catch (error) {
+                    Logger.error('Erro ao carregar histórico:', error);
+                    this.history = [];
+                }
+            }
+        }
+
+        // ===========================================
+        // THEME MANAGER
+        // ===========================================
+        class ThemeManager {
+            constructor(converter) {
+                this.converter = converter;
+                this.themes = {
+                    dark: {
+                        name: 'Escuro',
+                        icon: '🌙'
+                    },
+                    light: {
+                        name: 'Claro',
+                        icon: '☀️'
+                    },
+                    blue: {
+                        name: 'Azul',
+                        icon: '🔵'
+                    },
+                    green: {
+                        name: 'Verde',
+                        icon: '🟢'
+                    },
+                    purple: {
+                        name: 'Roxo',
+                        icon: '🟣'
+                    },
+                    orange: {
+                        name: 'Laranja',
+                        icon: '🟠'
+                    }
+                };
+            }
+
+            getCurrentTheme() {
+                return localStorage.getItem('converter-theme') || 'dark';
+            }
+        }
+
+        // ===========================================
+        // INICIALIZAÇÃO
+        // ===========================================
+        let converter;
+        let themeManager;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                Logger.log('Iniciando Conversor de Formatos...');
+                
+                // Inicializa conversor
+                converter = new ConverterCore();
+                
+                // Inicializa gerenciador de tema
+                themeManager = new ThemeManager(converter);
+                
+                // Adiciona atalhos de teclado
+                setupKeyboardShortcuts();
+                
+                Logger.log('Conversor de Formatos iniciado com sucesso!');
+                
+            } catch (error) {
+                Logger.error('Erro ao inicializar aplicação:', error);
+                alert('Erro ao carregar a aplicação. Por favor, recarregue a página.');
+            }
+        });
+
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + K: Focar entrada de texto
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    converter.switchTab('text');
+                    const textInput = document.getElementById('text-input');
+                    if (textInput) textInput.focus();
+                }
+
+                // Ctrl/Cmd + Shift + K: Focar entrada de número
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'K') {
+                    e.preventDefault();
+                    converter.switchTab('number');
+                    const numberInput = document.getElementById('number-input');
+                    if (numberInput) numberInput.focus();
+                }
+
+                // Ctrl/Cmd + 1: Aba de texto
+                if ((e.ctrlKey || e.metaKey) && e.key === '1') {
+                    e.preventDefault();
+                    converter.switchTab('text');
+                }
+
+                // Ctrl/Cmd + 2: Aba de número
+                if ((e.ctrlKey || e.metaKey) && e.key === '2') {
+                    e.preventDefault();
+                    converter.switchTab('number');
+                }
+
+                // Escape: Limpar campos
+                if (e.key === 'Escape') {
+                    converter.clearAll();
+                }
+
+                // Ctrl/Cmd + T: Alternar tema
+                if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+                    e.preventDefault();
+                    converter.cycleTheme();
+                }
+            });
+        }
+		
+		document.getElementById('toGoBackBtn').addEventListener('click', toGoBack);
+		
+		function toGoBack() {
+			const base = window.location.origin;
+			window.location.href = "../index.html";
+		}
+		
+        // Disponibiliza globalmente para debug
+        window.converter = converter;
+        window.themeManager = themeManager;
+        window.Logger = Logger;
+    </script>
+</body>
+</html>

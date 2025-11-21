@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente IA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🤖 Assistente IA</h1>
+                <div class="sidebar-status">
+                    <span class="status-dot"></span>
+                    <span>Online - Conectado</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-buttons">
+                <button class="sidebar-btn active">💬 Chat Geral</button>
+                <button class="sidebar-btn">🌤️ Clima</button>
+                <button class="sidebar-btn">🧮 Calculadora</button>
+                <button class="sidebar-btn">⏰ Timers</button>
+                <button class="sidebar-btn">🔍 Pesquisar</button>
+            </div>
+            
+            <div class="sidebar-footer">
+                Assistente IA v1.0<br>
+                Backend integrado
+            </div>
+        </aside>
+
+        <!-- Área de mensagens -->
+        <main class="main-content">
+            <div class="chat-header">
+                <div class="chat-title">💬 Chat Geral</div>
+                <div class="header-buttons">
+                    <button class="header-btn" id="clearBtn">🗑️</button>
+                    <button class="header-btn" id="helpBtn">❓</button>
+                </div>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome-message">
+                    <h2>👋 Olá! Eu sou o Knowledge Assistant</h2>
+                    <p>Pronto para ajudar com estudos, códigos e ideias.</p>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="userInput" placeholder="Digite sua mensagem..." rows="2"></textarea>
+                    <div class="button-group">
+                        <button id="voiceBtn">🎤</button>
+                        <button id="sendBtn">📤</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar de anotações -->
+        <aside class="annotations-sidebar">
+            <div class="annotations-header">
+                <h3>Anotações</h3>
+            </div>
+            <div class="annotations-content"></div>
+            <div class="annotations-footer">
+                <button class="new-annotation-btn">+ Nova Anotação</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/annotations.js"></script>
+
+</body>
+</html>

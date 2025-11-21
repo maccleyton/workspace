@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Físico</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* === CSS VARIABLES (Design System Nuclear) === */
+        :root {
+            /* Color System */
+            --color-primary-100: #E8F4F8;
+            --color-primary-500: #00BF93; /* Verde ciano workspace */
+            --color-primary-700: #00A085;
+            
+            --color-nuclear-100: #FEF2F2;
+            --color-nuclear-500: #DC2626; /* Vermelho nuclear */
+            --color-nuclear-700: #B91C1C;
+            
+            --color-bg-page: #0A0A0A;
+            --color-bg-surface: #141414;
+            --color-bg-surface-hover: rgba(22, 22, 22, 0.5);
+            
+            --color-border-default: #3f3f46;
+            --color-border-focus: #00BF93;
+            --color-border-light: #262626;
+            
+            --color-text-primary: #E4E4E7;
+            --color-text-secondary: #A1A1AA;
+            --color-text-high-contrast: #FFFFFF;
+            
+            --color-success: #22C55E;
+            --color-warning: #FBBF24;
+            --color-error: #F43F5E;
+            
+            /* Physics-specific colors */
+            --color-fusion: #DC2626;     /* Fusão - Vermelho */
+            --color-fission: #0284C7;    /* Fissão - Azul */
+            --color-collider: #16A34A;   /* Colisor - Verde */
+            --color-antimatter: #8B5CF6; /* Antimatéria - Roxo */
+            
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size-h1: 48px;
+            --font-size-h2: 24px;
+            --font-size-h3: 16px;
+            --font-size-body: 16px;
+            --font-size-body-sm: 14px;
+            
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Spacing (8px Grid) */
+            --space-xs: 8px;
+            --space-sm: 12px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+            --space-xxxl: 64px;
+            
+            /* Layout */
+            --layout-max-width: 1440px;
+            --radius-sm: 8px;
+            --border-width: 1px;
+            
+            /* Animations */
+            --transition-fast: 150ms ease-out;
+            --transition-normal: 200ms ease-out;
+        }
+
+        /* === GLOBAL STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-family);
+            background: var(--color-bg-page);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(135deg, var(--color-bg-surface) 0%, #1a1a1a 100%);
+            border-bottom: var(--border-width) solid var(--color-border-light);
+            padding: var(--space-xl) var(--space-xxl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+            letter-spacing: -0.5%;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .physics-icon {
+            font-size: 36px;
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-lg);
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: var(--font-size-body);
+            color: var(--color-text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* === MAIN LAYOUT === */
+        .app-main {
+            max-width: var(--layout-max-width);
+            margin: 0 auto;
+            padding: var(--space-xxl);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-xl);
+        }
+
+        /* === TAB SYSTEM === */
+        .tabs {
+            display: flex;
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            overflow: hidden;
+            margin-bottom: 0;
+            border: var(--border-width) solid var(--color-border-light);
+            border-bottom: none;
+        }
+
+        .tab {
+            flex: 1;
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border-bottom: 3px solid transparent;
+            font-size: var(--font-size-body-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            background: var(--color-bg-surface);
+        }
+
+        .tab:hover {
+            background: var(--color-bg-surface-hover);
+            color: var(--color-text-primary);
+        }
+
+        .tab.active {
+            background: var(--color-bg-surface);
+            border-bottom: 3px solid var(--color-primary-500);
+            color: var(--color-text-primary);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--color-bg-surface);
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            min-height: 600px;
+            width: 100%;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+            border-top: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* === SECTION STYLES === */
+        .section-title {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-lg);
+            letter-spacing: -1%;
+        }
+
+        .control-group {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            width: 100%;
+            overflow-x: hidden;
+            border: var(--border-width) solid var(--color-border-light);
+        }
+
+        .control-group h3 {
+            color: var(--color-primary-500);
+            margin-bottom: var(--space-md);
+            border-bottom: 2px solid var(--color-primary-500);
+            padding-bottom: var(--space-sm);
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* === SIMULATOR LAYOUT === */
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            height: 600px;
+        }
+
+        @media (max-width: 1024px) {
+            .simulator-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        .visualization-panel {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            border: var(--border-width) solid var(--color-border-light);
+            position: relative;
+        }
+
+        .controls-panel {
+            background: var(--color-bg-page);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            border: var(--border-width) solid var(--color-border-light);
+            overflow-y: auto;
+        }
+
+        #collider3D, #fusion3D, #fission3D, #antimatter3D {
+            width: 100%;
+            height: 100%;
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-sm);
+        }
+
+        /* === SLIDERS === */
+        .slider-container {
+            margin: var(--space-md) 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-xs);
+            font-size: var(--font-size-body-sm);
+            color: var(--color-text-secondary);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: var(--radius-sm);
+            background: var(--color-bg-surface);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--color-primary-500);
+            cursor: pointer;
+            border: 2px solid var(--color-bg-page);
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: var(--font-weight-semibold);
+            transition: all var(--transition-normal);
+            flex: 1;
+            font-size: var(--font-size-body-sm);
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary {
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-700);
+            transform: scale(1.03);
+        }
+
+        .btn-fusion {
+            background: var(--color-fusion);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-fission {
+            background: var(--color-fission);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-collider {
+            background: var(--color-collider);
+            color: var(--color-text-high-contrast);
+        }
+
+        .btn-antimatter {
+            background: var(--color-antimatter);
+            color: var(--color-text-high-contrast);
+        }
+
+        /* === ENERGY DISPLAY === */
+        .energy-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .energy-card {
+            background: var(--color-bg-surface);
+            padding: var(--space-lg);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            border-left: 4px solid var(--color-primary-500);
+        }
+
+        .energy-value {
+            font-size: 1.5em;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-500);
+            margin: var(--space-xs) 0;
+        }
+
+        /* === PARTICLE SELECTOR === */
+        .particle-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: var(--space-sm);
+            margin: var(--space-md) 0;
+        }
+
+        .particle-btn {
+            background: var(--color-bg-surface);
+            border: var(--border-width) solid var(--color-border-default);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-size: var(--font-size-body-sm);
+        }
+
+        .particle-btn:hover {
+            border-color: var(--color-border-focus);
+            transform: translateY(-2px);
+        }
+
+        .particle-btn.active {
+            border-color: var(--color-primary-500);
+            background: var(--color-primary-500);
+            color: var(--color-text-high-contrast);
+        }
+
+        /* === REACTION EQUATION === */
+        .reaction-equation {
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-sm);
+            padding: var(--space-lg);
+            text-align: center;
+            font-size: 1.2em;
+            margin: var(--space-lg) 0;
+            border-left: 4px solid var(--color-primary-500);
+        }
+
+        /* === DATA LOG === */
+        .data-log {
+            background: var(--color-bg-surface);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md);
+            margin: var(--space-md) 0;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: var(--font-size-body-sm);
+        }
+
+        .log-entry {
+            margin: var(--space-xs) 0;
+            padding: var(--space-sm);
+            border-left: 3px solid var(--color-primary-500);
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* === STATUS INDICATORS === */
+        .status-indicators {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-sm);
+            margin: var(--space-lg) 0;
+        }
+
+        .status-indicator {
+            background: var(--color-bg-surface);
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 1.2em;
+            font-weight: var(--font-weight-bold);
+            margin: var(--space-xs) 0;
+            color: var(--color-primary-500);
+        }
+
+        /* === EXPERIMENT PRESETS === */
+        .experiment-presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-sm);
+            margin: var(--space-md) 0;
+        }
+
+        .preset-btn {
+            background: var(--color-bg-surface);
+            border: var(--border-width) solid var(--color-border-default);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            text-align: center;
+            font-size: var(--font-size-body-sm);
+        }
+
+        .preset-btn:hover {
+            border-color: var(--color-border-focus);
+            background: var(--color-bg-surface-hover);
+        }
+
+        /* === CHART CONTAINER === */
+        .chart-container {
+            height: 200px;
+            margin: var(--space-lg) 0;
+        }
+
+        /* === ANIMATIONS === */
+        .particle-track {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .collision-event {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary-500);
+            pointer-events: none;
+            animation: collisionFlash 0.5s ease-out;
+        }
+
+        @keyframes collisionFlash {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 768px) {
+            .app-main {
+                padding: var(--space-lg);
+            }
+            
+            .app-header {
+                padding: var(--space-lg);
+            }
+            
+            .tab {
+                padding: var(--space-sm);
+                font-size: var(--font-size-body-sm);
+            }
+            
+            .simulator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+            
+            .status-indicators {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .energy-display {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="header-content">
+            <div>
+                <h1 class="app-title">
+                    <span class="physics-icon">🌌</span>
+                    MÓDULO FÍSICO
+                </h1>
+                <p class="subtitle">Fusão Nuclear, Fissão Nuclear, Colisor de Partículas e Criação de Antimatéria</p>
+            </div>
+            <div class="header-actions">
+                <!-- Reserved for future actions -->
+            </div>
+        </div>
+    </div>
+
+    <div class="app-main">
+        <div class="app-grid">
+            <div class="tabs">
+                <div class="tab active" data-tab="fusion">☢️ Fusão Nuclear</div>
+                <div class="tab" data-tab="fission">💥 Fissão Nuclear</div>
+                <div class="tab" data-tab="collider">⚡ Colisor de Partículas</div>
+                <div class="tab" data-tab="antimatter">🌀 Antimatéria</div>
+            </div>
+
+            <!-- ABA: Fusão Nuclear -->
+            <div class="tab-content active" id="fusion">
+                <div class="simulator-grid">
+                    <div class="visualization-panel">
+                        <h3 class="section-title">🔥 Visualização da Fusão Nuclear</h3>
+                        <div id="fusion3D">
+                            <!-- Visualização 3D da fusão -->
+                        </div>
+                        <div class="energy-display">
+                            <div class="energy-card">
+                                <div>Temperatura</div>
+                                <div class="energy-value" id="fusionTemp">10 MK</div>
+                            </div>
+                            <div class="energy-card">
+                                <div>Energia Liberada</div>
+                                <div class="energy-value" id="fusionEnergy">0 MeV</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-panel">
+                        <h3 class="section-title">🎛️ Controles de Fusão</h3>
+                        
+                        <div class="control-group">
+                            <h4>⚛️ Reações de Fusão</h4>
+                            <div class="experiment-presets">
+                                <div class="preset-btn" onclick="loadFusionPreset('deuterium-tritium')">
+                                    D + T → He
+                                </div>
+                                <div class="preset-btn" onclick="loadFusionPreset('deuterium-deuterium')">
+                                    D + D → He
+                                </div>
+                                <div class="preset-btn" onclick="loadFusionPreset('proton-proton')">
+                                    p + p → D
+                                </div>
+                                <div class="preset-btn" onclick="loadFusionPreset('stellar')">
+                                    Fusão Estelar
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>🔥 Parâmetros do Plasma</h4>
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Temperatura do Plasma:</span>
+                                    <span id="plasmaTempValue">10 MK</span>
+                                </div>
+                                <input type="range" id="plasmaTemp" min="1" max="100" value="10" step="1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Densidade do Plasma:</span>
+                                    <span id="plasmaDensityValue">10²⁰ part/m³</span>
+                                </div>
+                                <input type="range" id="plasmaDensity" min="1" max="100" value="50" step="1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Confinamento Magnético:</span>
+                                    <span id="confinementValue">5 T</span>
+                                </div>
+                                <input type="range" id="confinement" min="0" max="10" value="5" step="0.1">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>📈 Métricas da Reação</h4>
+                            <div class="status-indicators">
+                                <div class="status-indicator">
+                                    <div>Taxa de Fusão</div>
+                                    <div class="status-value" id="fusionRate">0/s</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Ganho de Energia</div>
+                                    <div class="status-value" id="energyGain">0</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Pressão</div>
+                                    <div class="status-value" id="fusionPressure">0 atm</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Eficiência</div>
+                                    <div class="status-value" id="fusionEfficiency">0%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reaction-equation" id="fusionEquation">
+                            D + T → He⁴ + n + 17.6 MeV
+                        </div>
+
+                        <div class="control-group">
+                            <button class="btn btn-fusion" onclick="startFusion()">Ignitar Fusão</button>
+                            <button class="btn btn-primary" onclick="resetFusion()">Reiniciar</button>
+                            <button class="btn btn-primary" onclick="exportFusionData()">Exportar Dados</button>
+                        </div>
+
+                        <div class="data-log" id="fusionLog">
+                            <div class="log-entry">Sistema de fusão inicializado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: Fissão Nuclear -->
+            <div class="tab-content" id="fission">
+                <div class="simulator-grid">
+                    <div class="visualization-panel">
+                        <h3 class="section-title">💥 Visualização da Fissão Nuclear</h3>
+                        <div id="fission3D">
+                            <!-- Visualização 3D da fissão -->
+                        </div>
+                        <div class="energy-display">
+                            <div class="energy-card">
+                                <div>Nêutrons por Fissão</div>
+                                <div class="energy-value" id="neutronsPerFission">2.5</div>
+                            </div>
+                            <div class="energy-card">
+                                <div>Energia por Fissão</div>
+                                <div class="energy-value" id="fissionEnergy">200 MeV</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-panel">
+                        <h3 class="section-title">🎛️ Controles de Fissão</h3>
+                        
+                        <div class="control-group">
+                            <h4>⚛️ Elementos Fissionáveis</h4>
+                            <div class="particle-selector">
+                                <div class="particle-btn active" data-element="uranium235">U-235</div>
+                                <div class="particle-btn" data-element="plutonium239">Pu-239</div>
+                                <div class="particle-btn" data-element="uranium233">U-233</div>
+                                <div class="particle-btn" data-element="thorium232">Th-232</div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>📊 Parâmetros do Reator</h4>
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Massa Crítica:</span>
+                                    <span id="criticalMassValue">52 kg</span>
+                                </div>
+                                <input type="range" id="criticalMass" min="1" max="100" value="52" step="1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Barras de Controle:</span>
+                                    <span id="controlRodsValue">75%</span>
+                                </div>
+                                <input type="range" id="controlRods" min="0" max="100" value="75" step="1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Moderador:</span>
+                                    <span id="moderatorValue">Água</span>
+                                </div>
+                                <input type="range" id="moderator" min="0" max="2" value="1" step="1">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>📈 Reação em Cadeia</h4>
+                            <div class="status-indicators">
+                                <div class="status-indicator">
+                                    <div>Fator k</div>
+                                    <div class="status-value" id="kFactor">1.00</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Taxa de Fissão</div>
+                                    <div class="status-value" id="fissionRate">0/s</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Temperatura</div>
+                                    <div class="status-value" id="reactorTemp">300°C</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Potência</div>
+                                    <div class="status-value" id="reactorPower">0 MW</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reaction-equation" id="fissionEquation">
+                            U²³⁵ + n → Ba¹⁴¹ + Kr⁹² + 3n + 200 MeV
+                        </div>
+
+                        <div class="control-group">
+                            <button class="btn btn-fission" onclick="startFission()">Iniciar Fissão</button>
+                            <button class="btn btn-primary" onclick="scramReactor()">Parada de Emergência</button>
+                            <button class="btn btn-primary" onclick="exportFissionData()">Exportar Dados</button>
+                        </div>
+
+                        <div class="data-log" id="fissionLog">
+                            <div class="log-entry">Reator de fissão inicializado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: Colisor de Partículas -->
+            <div class="tab-content" id="collider">
+                <div class="simulator-grid">
+                    <div class="visualization-panel">
+                        <h3 class="section-title">⚡ Colisor de Partículas</h3>
+                        <div id="collider3D">
+                            <!-- Visualização 3D do colisor -->
+                        </div>
+                        <div class="energy-display">
+                            <div class="energy-card">
+                                <div>Energia do Feixe</div>
+                                <div class="energy-value" id="beamEnergy">7 TeV</div>
+                            </div>
+                            <div class="energy-card">
+                                <div>Taxa de Colisões</div>
+                                <div class="status-value" id="collisionRate">0 Hz</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-panel">
+                        <h3 class="section-title">🎛️ Controles do Colisor</h3>
+                        
+                        <div class="control-group">
+                            <h4>🔬 Partículas para Colisão</h4>
+                            <div class="particle-selector">
+                                <div class="particle-btn active" data-particle="proton">Próton</div>
+                                <div class="particle-btn" data-particle="electron">Elétron</div>
+                                <div class="particle-btn" data-particle="lead">Núcleo de Chumbo</div>
+                                <div class="particle-btn" data-particle="photon">Fóton</div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>⚡ Parâmetros do Acelerador</h4>
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Energia do Feixe:</span>
+                                    <span id="beamEnergyValue">7 TeV</span>
+                                </div>
+                                <input type="range" id="beamEnergySlider" min="1" max="14" value="7" step="0.1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Luminosidade:</span>
+                                    <span id="luminosityValue">10³⁴ cm⁻²s⁻¹</span>
+                                </div>
+                                <input type="range" id="luminosity" min="1" max="100" value="50" step="1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Campo Magnético:</span>
+                                    <span id="colliderFieldValue">8.3 T</span>
+                                </div>
+                                <input type="range" id="colliderField" min="1" max="10" value="8.3" step="0.1">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>🎯 Detectores</h4>
+                            <div class="experiment-presets">
+                                <div class="preset-btn" onclick="loadDetector('atlas')">ATLAS</div>
+                                <div class="preset-btn" onclick="loadDetector('cms')">CMS</div>
+                                <div class="preset-btn" onclick="loadDetector('alice')">ALICE</div>
+                                <div class="preset-btn" onclick="loadDetector('lhcb')">LHCb</div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>📊 Partículas Detectadas</h4>
+                            <div class="chart-container">
+                                <canvas id="particleChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <button class="btn btn-collider" onclick="startCollider()">Iniciar Colisor</button>
+                            <button class="btn btn-primary" onclick="stopCollider()">Parar Colisor</button>
+                            <button class="btn btn-primary" onclick="exportColliderData()">Exportar Dados</button>
+                        </div>
+
+                        <div class="data-log" id="colliderLog">
+                            <div class="log-entry">Colisor inicializado - Pronto para operação</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA: Antimatéria -->
+            <div class="tab-content" id="antimatter">
+                <div class="simulator-grid">
+                    <div class="visualization-panel">
+                        <h3 class="section-title">🌀 Criação de Antimatéria</h3>
+                        <div id="antimatter3D">
+                            <!-- Visualização 3D da criação de antimatéria -->
+                        </div>
+                        <div class="energy-display">
+                            <div class="energy-card">
+                                <div>Antipartículas Criadas</div>
+                                <div class="energy-value" id="antiparticlesCreated">0</div>
+                            </div>
+                            <div class="energy-card">
+                                <div>Energia Necessária</div>
+                                <div class="energy-value" id="antimatterEnergy">1.02 MeV</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-panel">
+                        <h3 class="section-title">🎛️ Controles de Antimatéria</h3>
+                        
+                        <div class="control-group">
+                            <h4>🌀 Pares Partícula-Antipartícula</h4>
+                            <div class="particle-selector">
+                                <div class="particle-btn active" data-pair="electron">e⁻/e⁺</div>
+                                <div class="particle-btn" data-pair="muon">μ⁻/μ⁺</div>
+                                <div class="particle-btn" data-pair="proton">p/p̄</div>
+                                <div class="particle-btn" data-pair="photon">γ/γ</div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>⚡ Métodos de Criação</h4>
+                            <div class="experiment-presets">
+                                <div class="preset-btn" onclick="loadCreationMethod('pairProduction')">Produção de Pares</div>
+                                <div class="preset-btn" onclick="loadCreationMethod('collider')">Colisões</div>
+                                <div class="preset-btn" onclick="loadCreationMethod('decay')">Decaimento</div>
+                                <div class="preset-btn" onclick="loadCreationMethod('laser')">Laser</div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>🔧 Parâmetros do Experimento</h4>
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Energia do Fóton:</span>
+                                    <span id="photonEnergyValue">2.04 MeV</span>
+                                </div>
+                                <input type="range" id="photonEnergy" min="1.02" max="10" value="2.04" step="0.01">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Confinamento Magnético:</span>
+                                    <span id="antimatterFieldValue">5 T</span>
+                                </div>
+                                <input type="range" id="antimatterField" min="0" max="10" value="5" step="0.1">
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="slider-label">
+                                    <span>Tempo de Vida:</span>
+                                    <span id="lifetimeValue">∞</span>
+                                </div>
+                                <input type="range" id="lifetime" min="1" max="100" value="100" step="1">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>📈 Estatísticas</h4>
+                            <div class="status-indicators">
+                                <div class="status-indicator">
+                                    <div>Eficiência</div>
+                                    <div class="status-value" id="creationEfficiency">0%</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Aniquilações</div>
+                                    <div class="status-value" id="annihilations">0</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Armazenamento</div>
+                                    <div class="status-value" id="storageTime">0 s</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div>Razão Matéria/Antimatéria</div>
+                                    <div class="status-value" id="matterRatio">1:0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reaction-equation" id="antimatterEquation">
+                            γ → e⁻ + e⁺
+                        </div>
+
+                        <div class="control-group">
+                            <button class="btn btn-antimatter" onclick="createAntimatter()">Criar Antimatéria</button>
+                            <button class="btn btn-primary" onclick="annihilate()">Aniquilar</button>
+                            <button class="btn btn-primary" onclick="exportAntimatterData()">Exportar Dados</button>
+                        </div>
+
+                        <div class="data-log" id="antimatterLog">
+                            <div class="log-entry">Sistema de antimatéria inicializado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // O JavaScript permanece exatamente o mesmo - apenas o CSS foi ajustado
+        // Banco de dados para simulações
+        const physicsDatabase = {
+            fusion: {
+                'deuterium-tritium': {
+                    equation: 'D + T → He⁴ + n + 17.6 MeV',
+                    crossSection: 5.0,
+                    energy: 17.6,
+                    particles: ['deuterium', 'tritium', 'helium4', 'neutron']
+                },
+                'deuterium-deuterium': {
+                    equation: 'D + D → He³ + n + 3.27 MeV',
+                    crossSection: 0.1,
+                    energy: 3.27,
+                    particles: ['deuterium', 'deuterium', 'helium3', 'neutron']
+                },
+                'proton-proton': {
+                    equation: 'p + p → D + e⁺ + νₑ + 0.42 MeV',
+                    crossSection: 0.0000001,
+                    energy: 0.42,
+                    particles: ['proton', 'proton', 'deuterium', 'positron', 'neutrino']
+                }
+            },
+            fission: {
+                'uranium235': {
+                    equation: 'U²³⁵ + n → Ba¹⁴¹ + Kr⁹² + 3n + 200 MeV',
+                    criticalMass: 52,
+                    neutrons: 2.5,
+                    energy: 200
+                },
+                'plutonium239': {
+                    equation: 'Pu²³⁹ + n → Xe¹⁴⁰ + Zr⁹⁹ + 2n + 210 MeV',
+                    criticalMass: 10,
+                    neutrons: 2.9,
+                    energy: 210
+                }
+            },
+            particles: {
+                'proton': { mass: 938.27, charge: 1, type: 'baryon' },
+                'electron': { mass: 0.511, charge: -1, type: 'lepton' },
+                'positron': { mass: 0.511, charge: 1, type: 'lepton' },
+                'neutron': { mass: 939.57, charge: 0, type: 'baryon' },
+                'photon': { mass: 0, charge: 0, type: 'boson' },
+                'deuterium': { mass: 1875.61, charge: 1, type: 'nucleus' }
+            }
+        };
+
+        // Estado das simulações
+        let currentSimulation = {
+            fusion: {
+                active: false,
+                temperature: 10, // MK
+                density: 50,
+                confinement: 5,
+                reaction: 'deuterium-tritium'
+            },
+            fission: {
+                active: false,
+                element: 'uranium235',
+                mass: 52,
+                controlRods: 75,
+                moderator: 1
+            },
+            collider: {
+                active: false,
+                particle: 'proton',
+                energy: 7, // TeV
+                luminosity: 50,
+                magneticField: 8.3,
+                detector: 'atlas'
+            },
+            antimatter: {
+                active: false,
+                pair: 'electron',
+                method: 'pairProduction',
+                photonEnergy: 2.04, // MeV
+                magneticField: 5,
+                lifetime: 100
+            }
+        };
+
+        // Variáveis de visualização
+        let fusionScene, fissionScene, colliderScene, antimatterScene;
+        let fusionRenderer, fissionRenderer, colliderRenderer, antimatterRenderer;
+        let particleChart = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTabs();
+            initializeVisualizations();
+            initializeParticleChart();
+            initializeEventListeners();
+        });
+
+        // Sistema de Abas
+        function initializeTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // Inicializar Visualizações 3D
+        function initializeVisualizations() {
+            initializeFusion3D();
+            initializeFission3D();
+            initializeCollider3D();
+            initializeAntimatter3D();
+        }
+
+        function initializeFusion3D() {
+            const container = document.getElementById('fusion3D');
+            
+            fusionScene = new THREE.Scene();
+            fusionScene.background = new THREE.Color(0x0A0A0A);
+            
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 15;
+            
+            fusionRenderer = new THREE.WebGLRenderer({ antialias: true });
+            fusionRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(fusionRenderer.domElement);
+            
+            const controls = new THREE.OrbitControls(camera, fusionRenderer.domElement);
+            controls.enableDamping = true;
+            
+            // Luz
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            fusionScene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            fusionScene.add(directionalLight);
+            
+            // Plasma base
+            const plasmaGeometry = new THREE.SphereGeometry(5, 32, 32);
+            const plasmaMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xDC2626,
+                transparent: true,
+                opacity: 0.3
+            });
+            const plasma = new THREE.Mesh(plasmaGeometry, plasmaMaterial);
+            fusionScene.add(plasma);
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                fusionRenderer.render(fusionScene, camera);
+                
+                // Animar partículas do plasma
+                plasma.rotation.y += 0.01;
+            }
+            animate();
+        }
+
+        function initializeFission3D() {
+            const container = document.getElementById('fission3D');
+            
+            fissionScene = new THREE.Scene();
+            fissionScene.background = new THREE.Color(0x0A0A0A);
+            
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 10;
+            
+            fissionRenderer = new THREE.WebGLRenderer({ antialias: true });
+            fissionRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(fissionRenderer.domElement);
+            
+            const controls = new THREE.OrbitControls(camera, fissionRenderer.domElement);
+            controls.enableDamping = true;
+            
+            // Luz
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            fissionScene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            fissionScene.add(directionalLight);
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                fissionRenderer.render(fissionScene, camera);
+            }
+            animate();
+        }
+
+        function initializeCollider3D() {
+            const container = document.getElementById('collider3D');
+            
+            colliderScene = new THREE.Scene();
+            colliderScene.background = new THREE.Color(0x0A0A0A);
+            
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 20;
+            
+            colliderRenderer = new THREE.WebGLRenderer({ antialias: true });
+            colliderRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(colliderRenderer.domElement);
+            
+            const controls = new THREE.OrbitControls(camera, colliderRenderer.domElement);
+            controls.enableDamping = true;
+            
+            // Luz
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            colliderScene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            colliderScene.add(directionalLight);
+            
+            // Criar anel do colisor
+            const ringGeometry = new THREE.TorusGeometry(8, 0.5, 16, 100);
+            const ringMaterial = new THREE.MeshBasicMaterial({ color: 0x16A34A });
+            const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+            colliderScene.add(ring);
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                colliderRenderer.render(colliderScene, camera);
+                
+                // Animar partículas no colisor
+                ring.rotation.x += 0.01;
+            }
+            animate();
+        }
+
+        function initializeAntimatter3D() {
+            const container = document.getElementById('antimatter3D');
+            
+            antimatterScene = new THREE.Scene();
+            antimatterScene.background = new THREE.Color(0x0A0A0A);
+            
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 10;
+            
+            antimatterRenderer = new THREE.WebGLRenderer({ antialias: true });
+            antimatterRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(antimatterRenderer.domElement);
+            
+            const controls = new THREE.OrbitControls(camera, antimatterRenderer.domElement);
+            controls.enableDamping = true;
+            
+            // Luz
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            antimatterScene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            antimatterScene.add(directionalLight);
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                antimatterRenderer.render(antimatterScene, camera);
+            }
+            animate();
+        }
+
+        // Gráfico de Partículas
+        function initializeParticleChart() {
+            const ctx = document.getElementById('particleChart').getContext('2d');
+            particleChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Prótons', 'Elétrons', 'Fótons', 'Neutrinos', 'Múons', 'Píons'],
+                    datasets: [{
+                        label: 'Partículas Detectadas',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            '#DC2626', '#0284C7', '#16A34A', '#FBBF24', '#8B5CF6', '#06B6D4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#E4E4E7' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#E4E4E7' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#E4E4E7' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event Listeners
+        function initializeEventListeners() {
+            // Fusão
+            document.getElementById('plasmaTemp').addEventListener('input', updateFusionParameters);
+            document.getElementById('plasmaDensity').addEventListener('input', updateFusionParameters);
+            document.getElementById('confinement').addEventListener('input', updateFusionParameters);
+            
+            // Fissão
+            document.querySelectorAll('.particle-btn[data-element]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.particle-btn[data-element]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSimulation.fission.element = this.dataset.element;
+                    updateFissionParameters();
+                });
+            });
+            
+            document.getElementById('criticalMass').addEventListener('input', updateFissionParameters);
+            document.getElementById('controlRods').addEventListener('input', updateFissionParameters);
+            document.getElementById('moderator').addEventListener('input', updateFissionParameters);
+            
+            // Colisor
+            document.querySelectorAll('.particle-btn[data-particle]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.particle-btn[data-particle]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSimulation.collider.particle = this.dataset.particle;
+                    updateColliderParameters();
+                });
+            });
+            
+            document.getElementById('beamEnergySlider').addEventListener('input', updateColliderParameters);
+            document.getElementById('luminosity').addEventListener('input', updateColliderParameters);
+            document.getElementById('colliderField').addEventListener('input', updateColliderParameters);
+            
+            // Antimatéria
+            document.querySelectorAll('.particle-btn[data-pair]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.particle-btn[data-pair]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSimulation.antimatter.pair = this.dataset.pair;
+                    updateAntimatterParameters();
+                });
+            });
+            
+            document.getElementById('photonEnergy').addEventListener('input', updateAntimatterParameters);
+            document.getElementById('antimatterField').addEventListener('input', updateAntimatterParameters);
+            document.getElementById('lifetime').addEventListener('input', updateAntimatterParameters);
+        }
+
+        // Funções de Fusão Nuclear
+        function loadFusionPreset(preset) {
+            currentSimulation.fission.reaction = preset;
+            const reaction = physicsDatabase.fusion[preset];
+            
+            document.getElementById('fusionEquation').textContent = reaction.equation;
+            document.getElementById('fusionEnergy').textContent = reaction.energy + ' MeV';
+            
+            addLogEntry('fusionLog', `Preset carregado: ${preset}`);
+        }
+
+        function updateFusionParameters() {
+            const temp = document.getElementById('plasmaTemp').value;
+            const density = document.getElementById('plasmaDensity').value;
+            const confinement = document.getElementById('confinement').value;
+            
+            currentSimulation.fusion.temperature = temp;
+            currentSimulation.fusion.density = density;
+            currentSimulation.fusion.confinement = confinement;
+            
+            document.getElementById('plasmaTempValue').textContent = temp + ' MK';
+            document.getElementById('plasmaDensityValue').textContent = `10²⁰ part/m³`;
+            document.getElementById('confinementValue').textContent = confinement + ' T';
+            
+            // Atualizar métricas
+            const fusionRate = calculateFusionRate();
+            const energyGain = calculateEnergyGain();
+            
+            document.getElementById('fusionRate').textContent = fusionRate.toExponential(2) + '/s';
+            document.getElementById('energyGain').textContent = energyGain.toFixed(2);
+            document.getElementById('fusionPressure').textContent = (temp * density / 100).toFixed(1) + ' atm';
+            document.getElementById('fusionEfficiency').textContent = (energyGain * 10).toFixed(1) + '%';
+        }
+
+        function calculateFusionRate() {
+            // Taxa de fusão baseada na temperatura e densidade
+            const T = currentSimulation.fusion.temperature; // MK
+            const n = currentSimulation.fusion.density;
+            const σ = physicsDatabase.fusion[currentSimulation.fusion.reaction].crossSection;
+            
+            return σ * n * n * Math.pow(T, 2) * 1e20;
+        }
+
+        function calculateEnergyGain() {
+            // Ganho de energia Q = E_out / E_in
+            const T = currentSimulation.fusion.temperature;
+            const E_fusion = physicsDatabase.fusion[currentSimulation.fusion.reaction].energy;
+            
+            return (E_fusion * calculateFusionRate()) / (T * 1e3);
+        }
+
+        function startFusion() {
+            currentSimulation.fusion.active = true;
+            addLogEntry('fusionLog', 'Fusão nuclear iniciada');
+            addLogEntry('fusionLog', `Temperatura do plasma: ${currentSimulation.fusion.temperature} MK`);
+            addLogEntry('fusionLog', `Reação: ${currentSimulation.fusion.reaction}`);
+            
+            // Simular fusão contínua
+            if (currentSimulation.fusion.active) {
+                setTimeout(() => {
+                    const energy = calculateFusionRate() * physicsDatabase.fusion[currentSimulation.fusion.reaction].energy;
+                    addLogEntry('fusionLog', `Energia liberada: ${energy.toExponential(2)} MeV`);
+                }, 2000);
+            }
+        }
+
+        function resetFusion() {
+            currentSimulation.fusion.active = false;
+            document.getElementById('fusionLog').innerHTML = '<div class="log-entry">Sistema de fusão reinicializado</div>';
+        }
+
+        // Funções de Fissão Nuclear
+        function updateFissionParameters() {
+            const mass = document.getElementById('criticalMass').value;
+            const rods = document.getElementById('controlRods').value;
+            const moderator = document.getElementById('moderator').value;
+            
+            currentSimulation.fission.mass = mass;
+            currentSimulation.fission.controlRods = rods;
+            currentSimulation.fission.moderator = moderator;
+            
+            document.getElementById('criticalMassValue').textContent = mass + ' kg';
+            document.getElementById('controlRodsValue').textContent = rods + '%';
+            
+            const moderators = ['Grafite', 'Água', 'Água Pesada'];
+            document.getElementById('moderatorValue').textContent = moderators[moderator];
+            
+            // Atualizar métricas
+            const kFactor = calculateKFactor();
+            const power = calculateReactorPower();
+            
+            document.getElementById('kFactor').textContent = kFactor.toFixed(3);
+            document.getElementById('reactorPower').textContent = power.toFixed(1) + ' MW';
+            document.getElementById('reactorTemp').textContent = (300 + power * 2).toFixed(0) + '°C';
+        }
+
+        function calculateKFactor() {
+            // Fator de multiplicação neutrônica
+            const massEffect = currentSimulation.fission.mass / physicsDatabase.fission[currentSimulation.fission.element].criticalMass;
+            const rodEffect = (100 - currentSimulation.fission.controlRods) / 100;
+            const moderatorEffect = 0.8 + currentSimulation.fission.moderator * 0.1;
+            
+            return massEffect * rodEffect * moderatorEffect;
+        }
+
+        function calculateReactorPower() {
+            const k = calculateKFactor();
+            if (k <= 1) return 0;
+            
+            const basePower = physicsDatabase.fission[currentSimulation.fission.element].energy;
+            return basePower * (k - 1) * 100;
+        }
+
+        function startFission() {
+            currentSimulation.fission.active = true;
+            addLogEntry('fissionLog', 'Reator de fissão iniciado');
+            addLogEntry('fissionLog', `Elemento: ${currentSimulation.fission.element}`);
+            addLogEntry('fissionLog', `Massa: ${currentSimulation.fission.mass} kg`);
+            
+            const k = calculateKFactor();
+            if (k > 1) {
+                addLogEntry('fissionLog', '⚠️ REAÇÃO EM CADEIA CRÍTICA DETECTADA');
+            }
+        }
+
+        function scramReactor() {
+            currentSimulation.fission.active = false;
+            addLogEntry('fissionLog', '🚨 PARADA DE EMERGÊNCIA ATIVADA');
+            addLogEntry('fissionLog', 'Barras de controle inseridas');
+            document.getElementById('controlRods').value = 100;
+            updateFissionParameters();
+        }
+
+        // Funções do Colisor
+        function loadDetector(detector) {
+            currentSimulation.collider.detector = detector;
+            addLogEntry('colliderLog', `Detector ${detector.toUpperCase()} ativado`);
+        }
+
+        function updateColliderParameters() {
+            const energy = document.getElementById('beamEnergySlider').value;
+            const luminosity = document.getElementById('luminosity').value;
+            const field = document.getElementById('colliderField').value;
+            
+            currentSimulation.collider.energy = energy;
+            currentSimulation.collider.luminosity = luminosity;
+            currentSimulation.collider.magneticField = field;
+            
+            document.getElementById('beamEnergyValue').textContent = energy + ' TeV';
+            document.getElementById('luminosityValue').textContent = `10³⁴ cm⁻²s⁻¹`;
+            document.getElementById('colliderFieldValue').textContent = field + ' T';
+            
+            // Atualizar taxa de colisões
+            const collisionRate = calculateCollisionRate();
+            document.getElementById('collisionRate').textContent = collisionRate.toExponential(2) + ' Hz';
+        }
+
+        function calculateCollisionRate() {
+            const L = currentSimulation.collider.luminosity;
+            const E = currentSimulation.collider.energy;
+            return L * E * 1e10;
+        }
+
+        function startCollider() {
+            currentSimulation.collider.active = true;
+            addLogEntry('colliderLog', 'Colisor iniciado');
+            addLogEntry('colliderLog', `Energia do feixe: ${currentSimulation.collider.energy} TeV`);
+            addLogEntry('colliderLog', `Partícula: ${currentSimulation.collider.particle}`);
+            
+            // Simular detecção de partículas
+            simulateParticleDetection();
+        }
+
+        function stopCollider() {
+            currentSimulation.collider.active = false;
+            addLogEntry('colliderLog', 'Colisor parado');
+        }
+
+        function simulateParticleDetection() {
+            if (!currentSimulation.collider.active) return;
+            
+            // Atualizar gráfico com dados simulados
+            const newData = particleChart.data.datasets[0].data.map(() => 
+                Math.floor(Math.random() * 1000)
+            );
+            particleChart.data.datasets[0].data = newData;
+            particleChart.update();
+            
+            setTimeout(simulateParticleDetection, 1000);
+        }
+
+        // Funções de Antimatéria
+        function loadCreationMethod(method) {
+            currentSimulation.antimatter.method = method;
+            addLogEntry('antimatterLog', `Método de criação: ${method}`);
+        }
+
+        function updateAntimatterParameters() {
+            const photonEnergy = document.getElementById('photonEnergy').value;
+            const field = document.getElementById('antimatterField').value;
+            const lifetime = document.getElementById('lifetime').value;
+            
+            currentSimulation.antimatter.photonEnergy = photonEnergy;
+            currentSimulation.antimatter.magneticField = field;
+            currentSimulation.antimatter.lifetime = lifetime;
+            
+            document.getElementById('photonEnergyValue').textContent = photonEnergy + ' MeV';
+            document.getElementById('antimatterFieldValue').textContent = field + ' T';
+            document.getElementById('lifetimeValue').textContent = lifetime === '100' ? '∞' : lifetime + ' ms';
+            
+            // Atualizar energia necessária
+            const pair = currentSimulation.antimatter.pair;
+            const minEnergy = pair === 'electron' ? 1.02 : pair === 'muon' ? 211 : 1876;
+            document.getElementById('antimatterEnergy').textContent = minEnergy + ' MeV';
+        }
+
+        function createAntimatter() {
+            const pair = currentSimulation.antimatter.pair;
+            const photonEnergy = currentSimulation.antimatter.photonEnergy;
+            const minEnergy = pair === 'electron' ? 1.02 : pair === 'muon' ? 211 : 1876;
+            
+            if (photonEnergy >= minEnergy) {
+                const count = Math.floor(photonEnergy / minEnergy);
+                document.getElementById('antiparticlesCreated').textContent = count;
+                
+                addLogEntry('antimatterLog', `Criados ${count} pares ${pair}`);
+                addLogEntry('antimatterLog', `Energia do fóton: ${photonEnergy} MeV`);
+                
+                // Atualizar estatísticas
+                document.getElementById('creationEfficiency').textContent = 
+                    Math.min(100, (count / (photonEnergy / minEnergy) * 100)).toFixed(1) + '%';
+                document.getElementById('matterRatio').textContent = `1:${count}`;
+            } else {
+                addLogEntry('antimatterLog', '❌ Energia insuficiente para criar pares');
+            }
+        }
+
+        function annihilate() {
+            const count = parseInt(document.getElementById('antiparticlesCreated').textContent);
+            if (count > 0) {
+                const energy = count * 1.02 * 2; // MeV
+                addLogEntry('antimatterLog', `Aniquilação liberou ${energy} MeV`);
+                document.getElementById('annihilations').textContent = 
+                    parseInt(document.getElementById('annihilations').textContent) + 1;
+                document.getElementById('antiparticlesCreated').textContent = '0';
+            }
+        }
+
+        // Funções Auxiliares
+        function addLogEntry(logId, message) {
+            const log = document.getElementById(logId);
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function exportFusionData() {
+            exportData(currentSimulation.fusion, 'fusion_data');
+        }
+
+        function exportFissionData() {
+            exportData(currentSimulation.fission, 'fission_data');
+        }
+
+        function exportColliderData() {
+            exportData(currentSimulation.collider, 'collider_data');
+        }
+
+        function exportAntimatterData() {
+            exportData(currentSimulation.antimatter, 'antimatter_data');
+        }
+
+        function exportData(data, filename) {
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `${filename}_${new Date().getTime()}.json`;
+            link.click();
+            
+            addLogEntry(filename.split('_')[0] + 'Log', 'Dados exportados com sucesso!');
+        }
+
+        // Configurar MathJax
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+</body>
+</html>

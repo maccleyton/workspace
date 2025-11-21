@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fórmulas Interativas - Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="style.css">
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <i class="fas fa-square-root-alt"></i>
+            <h1 class="header-title">Fórmulas Interativas</h1>
+        </div>
+        <div class="header-right">
+            <button class="back-button" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <button class="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="user-menu">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <aside class="left-panel">
+            <div class="panel-card">
+                <div class="section-header">
+                    <i class="fas fa-book"></i>
+                    <h2 class="section-title">Fórmulas</h2>
+                </div>
+                
+                <div class="formulas-list">
+                    <div class="category-group">
+                        <div class="category-header">Física</div>
+                        
+                        <div class="formula-item active" onclick="selectFormula('velocidade')">
+                            <div class="formula-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">Velocidade Média</div>
+                                <div class="formula-desc">v = Δs / Δt</div>
+                            </div>
+                        </div>
+
+                        <div class="formula-item" onclick="selectFormula('mruv')">
+                            <div class="formula-icon"><i class="fas fa-running"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">MRUV</div>
+                                <div class="formula-desc">S = S₀ + v₀t + ½at²</div>
+                            </div>
+                        </div>
+
+                        <div class="formula-item" onclick="selectFormula('forca')">
+                            <div class="formula-icon"><i class="fas fa-hand-rock"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">2ª Lei de Newton</div>
+                                <div class="formula-desc">F = m × a</div>
+                            </div>
+                        </div>
+
+                        <div class="formula-item" onclick="selectFormula('energia-cinetica')">
+                            <div class="formula-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">Energia Cinética</div>
+                                <div class="formula-desc">Ec = ½mv²</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="category-group">
+                        <div class="category-header">Matemática</div>
+                        
+                        <div class="formula-item" onclick="selectFormula('bhaskara')">
+                            <div class="formula-icon"><i class="fas fa-calculator"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">Bhaskara</div>
+                                <div class="formula-desc">x = (-b ± √Δ) / 2a</div>
+                            </div>
+                        </div>
+
+                        <div class="formula-item" onclick="selectFormula('pitagoras')">
+                            <div class="formula-icon"><i class="fas fa-ruler-combined"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">Pitágoras</div>
+                                <div class="formula-desc">a² + b² = c²</div>
+                            </div>
+                        </div>
+
+                        <div class="formula-item" onclick="selectFormula('area-circulo')">
+                            <div class="formula-icon"><i class="fas fa-circle"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">Área do Círculo</div>
+                                <div class="formula-desc">A = πr²</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="category-group">
+                        <div class="category-header">Geometria</div>
+                        
+                        <div class="formula-item" onclick="selectFormula('volume-esfera')">
+                            <div class="formula-icon"><i class="fas fa-globe"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">Volume da Esfera</div>
+                                <div class="formula-desc">V = 4/3 πr³</div>
+                            </div>
+                        </div>
+
+                        <div class="formula-item" onclick="selectFormula('volume-cilindro')">
+                            <div class="formula-icon"><i class="fas fa-database"></i></div>
+                            <div class="formula-info">
+                                <div class="formula-name">Volume do Cilindro</div>
+                                <div class="formula-desc">V = πr²h</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="center-panel">
+            <div class="form-card">
+			<!-- VELOCIDADE -->
+			<div id="formula-velocidade" class="formula-content active">
+				<div class="section-header">
+					<i class="fas fa-tachometer-alt"></i>
+					<h2 class="section-title">Velocidade Média</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">v = Δs / Δt</div>
+					<div class="formula-description">
+						Velocidade média é a razão entre o deslocamento e o intervalo de tempo.
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="form-group">
+						<label class="form-label">Deslocamento (Δs) [m]</label>
+						<input type="number" id="vel-ds" class="form-input" value="100" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Tempo (Δt) [s]</label>
+						<input type="number" id="vel-dt" class="form-input" value="10" step="0.1">
+					</div>
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular
+				</button>
+
+				<div id="steps-velocidade" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-velocidade"></div>
+				</div>
+			</div>
+
+			<!-- MRUV -->
+			<div id="formula-mruv" class="formula-content">
+				<div class="section-header">
+					<i class="fas fa-running"></i>
+					<h2 class="section-title">Movimento Uniformemente Variado</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">S = S₀ + v₀t + ½at²</div>
+					<div class="formula-description">
+						Equação horária da posição no MRUV.
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="form-group">
+						<label class="form-label">Posição Inicial (S₀) [m]</label>
+						<input type="number" id="mruv-s0" class="form-input" value="0" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Velocidade Inicial (v₀) [m/s]</label>
+						<input type="number" id="mruv-v0" class="form-input" value="0" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Aceleração (a) [m/s²]</label>
+						<input type="number" id="mruv-a" class="form-input" value="2" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Tempo (t) [s]</label>
+						<input type="number" id="mruv-t" class="form-input" value="5" step="0.1">
+					</div>
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular
+				</button>
+
+				<div id="steps-mruv" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-mruv"></div>
+				</div>
+			</div>
+
+			<!-- FORÇA -->
+			<div id="formula-forca" class="formula-content">
+				<div class="section-header">
+					<i class="fas fa-hand-rock"></i>
+					<h2 class="section-title">2ª Lei de Newton</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">F = m × a</div>
+					<div class="formula-description">
+						A força resultante é o produto da massa pela aceleração.
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="form-group">
+						<label class="form-label">Massa (m) [kg]</label>
+						<input type="number" id="forca-m" class="form-input" value="10" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Aceleração (a) [m/s²]</label>
+						<input type="number" id="forca-a" class="form-input" value="5" step="0.1">
+					</div>
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular
+				</button>
+
+				<div id="steps-forca" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-forca"></div>
+				</div>
+			</div>
+
+			<!-- ENERGIA CINÉTICA -->
+			<div id="formula-energia-cinetica" class="formula-content">
+				<div class="section-header">
+					<i class="fas fa-bolt"></i>
+					<h2 class="section-title">Energia Cinética</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">Ec = ½mv²</div>
+					<div class="formula-description">
+						Energia associada ao movimento de um corpo.
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="form-group">
+						<label class="form-label">Massa (m) [kg]</label>
+						<input type="number" id="ec-m" class="form-input" value="2" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Velocidade (v) [m/s]</label>
+						<input type="number" id="ec-v" class="form-input" value="10" step="0.1">
+					</div>
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular
+				</button>
+
+				<div id="steps-energia-cinetica" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-energia-cinetica"></div>
+				</div>
+			</div>
+
+			<!-- BHASKARA -->
+			<div id="formula-bhaskara" class="formula-content">
+				<div class="section-header">
+					<i class="fas fa-calculator"></i>
+					<h2 class="section-title">Fórmula de Bhaskara</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">x = (-b ± √Δ) / 2a</div>
+					<div class="formula-description">
+						Resolve equações do 2º grau: ax² + bx + c = 0
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="form-group">
+						<label class="form-label">Coeficiente a</label>
+						<input type="number" id="bhask-a" class="form-input" value="1" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Coeficiente b</label>
+						<input type="number" id="bhask-b" class="form-input" value="-3" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Coeficiente c</label>
+						<input type="number" id="bhask-c" class="form-input" value="2" step="0.1">
+					</div>
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular
+				</button>
+
+				<div id="steps-bhaskara" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-bhaskara"></div>
+				</div>
+			</div>
+
+			<!-- PITÁGORAS -->
+			<div id="formula-pitagoras" class="formula-content">
+				<div class="section-header">
+					<i class="fas fa-ruler-combined"></i>
+					<h2 class="section-title">Teorema de Pitágoras</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">a² + b² = c²</div>
+					<div class="formula-description">
+						Em um triângulo retângulo, o quadrado da hipotenusa é igual à soma dos quadrados dos catetos.
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="form-group">
+						<label class="form-label">Cateto a [m]</label>
+						<input type="number" id="pit-a" class="form-input" value="3" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Cateto b [m]</label>
+						<input type="number" id="pit-b" class="form-input" value="4" step="0.1">
+					</div>
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular Hipotenusa
+				</button>
+
+				<div id="steps-pitagoras" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-pitagoras"></div>
+				</div>
+			</div>
+
+			<!-- ÁREA DO CÍRCULO -->
+			<div id="formula-area-circulo" class="formula-content">
+				<div class="section-header">
+					<i class="fas fa-circle"></i>
+					<h2 class="section-title">Área do Círculo</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">A = πr²</div>
+					<div class="formula-description">
+						Área de um círculo em função do raio.
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">Raio (r) [m]</label>
+					<input type="number" id="circ-r" class="form-input" value="5" step="0.1">
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular
+				</button>
+
+				<div id="steps-area-circulo" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-area-circulo"></div>
+				</div>
+			</div>
+
+			<!-- VOLUME DA ESFERA -->
+			<div id="formula-volume-esfera" class="formula-content">
+				<div class="section-header">
+					<i class="fas fa-globe"></i>
+					<h2 class="section-title">Volume da Esfera</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">V = 4/3 πr³</div>
+					<div class="formula-description">
+						Volume de uma esfera em função do raio.
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="form-label">Raio (r) [m]</label>
+					<input type="number" id="esf-r" class="form-input" value="3" step="0.1">
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular
+				</button>
+
+				<div id="steps-volume-esfera" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-volume-esfera"></div>
+				</div>
+			</div>
+
+			<!-- VOLUME DO CILINDRO -->
+			<div id="formula-volume-cilindro" class="formula-content">
+				<div class="section-header">
+					<i class="fas fa-database"></i>
+					<h2 class="section-title">Volume do Cilindro</h2>
+				</div>
+
+				<div class="formula-display">
+					<div class="formula-equation">V = πr²h</div>
+					<div class="formula-description">
+						Volume de um cilindro circular reto.
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="form-group">
+						<label class="form-label">Raio (r) [m]</label>
+						<input type="number" id="cil-r" class="form-input" value="2" step="0.1">
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Altura (h) [m]</label>
+						<input type="number" id="cil-h" class="form-input" value="5" step="0.1">
+					</div>
+				</div>
+
+				<button class="btn" onclick="calcular()">
+					<i class="fas fa-calculator"></i> Calcular
+				</button>
+
+				<div id="steps-volume-cilindro" class="resolution-steps">
+					<div class="steps-header">
+						<i class="fas fa-list-ol"></i>
+						<h3 class="steps-title">Resolução Passo a Passo</h3>
+					</div>
+					<div id="steps-content-volume-cilindro"></div>
+				</div>
+            </div>
+        </section>
+
+        <aside class="right-panel">
+            <div class="viz-card">
+                <div class="section-header">
+                    <i class="fas fa-eye"></i>
+                    <h2 class="section-title">Visualização</h2>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="canvas" width="400" height="300"></canvas>
+                </div>
+
+                <div class="result-display">
+                    <div class="result-label">Resultado</div>
+                    <div class="result-value" id="resultado">
+                        -
+                        <span class="result-unit" id="unidade"></span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

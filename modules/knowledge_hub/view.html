@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Hub - Visualizador</title>
+    <link rel="stylesheet" href="./css/view.css">
+
+    <!-- ✅ MATHJAX 3 - CONFIGURAÇÃO IDÊNTICA AO EDITOR -->
+    <script type="text/javascript">
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          },
+          startup: {
+            ready: () => {
+              MathJax.startup.defaultReady();
+              MathJax.startup.promise.then(() => {
+                // Depois do typeset, garante os wrappers de LaTeX
+                setTimeout(() => {
+                  if (window.wrapLatexBlocks) {
+                    window.wrapLatexBlocks();
+                  }
+                }, 500);
+              });
+            }
+          }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Highlight.js para syntax highlighting -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+    <!-- Marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <aside class="toc-sidebar-left">
+            <div class="toc-header">
+                <h2>📑 Navegação</h2>
+                <div class="doc-info" id="docInfo"></div>
+            </div>
+            <div class="toc-content" id="tocContent">
+                <div style="color: #6b7280; text-align: center; padding: 20px; font-size: 12px;">
+                    Carregando...
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="toolbar">
+                <div class="doc-title" id="docTitle">Carregando...</div>
+                <div class="toolbar-actions">
+                    <a href="assistant.html" class="toolbar-btn">🤖 Assistente</a>
+                    <a id="editLink" href="#" class="toolbar-btn">Editar</a>
+                    <button class="toolbar-btn" onclick="exportPDF()">Exportar PDF</button>
+                    <button class="toolbar-btn" onclick="printDoc()">Imprimir</button>
+                    <a href="index.html" class="toolbar-btn">Voltar</a>
+                </div>
+            </div>
+
+            <div class="content-wrapper">
+                <article id="content">
+                    <div class="loading">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📄</div>
+                        <div>Carregando documento...</div>
+                    </div>
+                </article>
+            </div>
+        </main>
+    </div>
+
+    <!-- Só o view.js; ele importa o hub-api.js -->
+    <script type="module" src="./js/view.js"></script>
+</body>
+</html>
