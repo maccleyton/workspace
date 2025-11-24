@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Simulador Termodinâmico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <i class="fas fa-thermometer-half"></i>
+            <h1 class="header-title">Simulador Termodinâmico</h1>
+        </div>
+        <div class="header-center">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar módulo..." id="searchInput">
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="header-btn" id="toGoBackBtn"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="header-btn"><i class="fas fa-moon"></i></button>
+            <button class="header-btn"><i class="fas fa-user"></i></button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <aside class="left-panel">
+            <div class="left-scroll">
+                <div class="panel-card">
+                    <div class="section-header">
+                        <i class="fas fa-fire"></i>
+                        <h2 class="section-title">Módulos Termodinâmicos</h2>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-item active" data-module="leis">
+                            <span class="module-number">1</span>
+                            <span class="module-icon">📚</span>
+                            <span class="module-name">Leis da Termodinâmica</span>
+                        </div>
+                        <div class="module-item" data-module="maquinas">
+                            <span class="module-number">2</span>
+                            <span class="module-icon">⚙️</span>
+                            <span class="module-name">Máquinas Térmicas</span>
+                        </div>
+                        <div class="module-item" data-module="transferencia">
+                            <span class="module-number">3</span>
+                            <span class="module-icon">🔥</span>
+                            <span class="module-name">Transferência de Calor</span>
+                        </div>
+                        <div class="module-item" data-module="gases">
+                            <span class="module-number">4</span>
+                            <span class="module-icon">💨</span>
+                            <span class="module-name">Leis dos Gases</span>
+                        </div>
+                        <div class="module-item" data-module="fases">
+                            <span class="module-number">5</span>
+                            <span class="module-icon">🌀</span>
+                            <span class="module-name">Mudanças de Fase</span>
+                        </div>
+                        <div class="module-item" data-module="diagramas">
+                            <span class="module-number">6</span>
+                            <span class="module-icon">📊</span>
+                            <span class="module-name">Diagramas Termodinâmicos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="center-panel">
+            <div class="center-scroll">
+
+                <!-- MÓDULO 1: LEIS DA TERMODINÂMICA -->
+                <div class="module-content active" id="leis-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-thermometer-half"></i>
+                            <h3 class="section-title">Princípios Termodinâmicos</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Energia Interna (U)</span>
+                                <span class="info-slot-value" id="energiaInterna">0 J</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Entropia (S)</span>
+                                <span class="info-slot-value" id="entropia">0 J/K</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-book"></i>
+                            <h3 class="section-title">As Quatro Leis</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="showLaw(0)">
+                                <span class="module-icon">0️⃣</span>
+                                <span class="module-name">Lei Zero</span>
+                            </div>
+                            <div class="module-item" onclick="showLaw(1)">
+                                <span class="module-icon">1️⃣</span>
+                                <span class="module-name">Primeira Lei</span>
+                            </div>
+                            <div class="module-item" onclick="showLaw(2)">
+                                <span class="module-icon">2️⃣</span>
+                                <span class="module-name">Segunda Lei</span>
+                            </div>
+                            <div class="module-item" onclick="showLaw(3)">
+                                <span class="module-icon">3️⃣</span>
+                                <span class="module-name">Terceira Lei</span>
+                            </div>
+                        </div>
+                        <div class="formula-box" id="lawDescription">
+                            Lei Zero: Se dois sistemas estão em equilíbrio térmico com um terceiro, então estão em equilíbrio térmico entre si.
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-balance-scale"></i>
+                            <h3 class="section-title">Balanço Energético</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Calor Adicionado (Q)</span>
+                                <input type="range" min="-1000" max="1000" value="0" id="calorQ" step="10">
+                                <span class="info-slot-value" id="calorQValue">0 J</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Trabalho Realizado (W)</span>
+                                <input type="range" min="-1000" max="1000" value="0" id="trabalhoW" step="10">
+                                <span class="info-slot-value" id="trabalhoWValue">0 J</span>
+                            </div>
+                        </div>
+                        <div class="formula-box" id="deltaU">
+                            ΔU = Q - W = 0 J
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-project-diagram"></i>
+                            <h3 class="section-title">Processos Termodinâmicos</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="selectProcess('isotermico')">
+                                <span class="module-icon">🌡️</span>
+                                <span class="module-name">Isotérmico</span>
+                            </div>
+                            <div class="module-item" onclick="selectProcess('adiabatico')">
+                                <span class="module-icon">🔒</span>
+                                <span class="module-name">Adiabático</span>
+                            </div>
+                            <div class="module-item" onclick="selectProcess('isobarico')">
+                                <span class="module-icon">📊</span>
+                                <span class="module-name">Isobárico</span>
+                            </div>
+                            <div class="module-item" onclick="selectProcess('isocorico')">
+                                <span class="module-icon">📦</span>
+                                <span class="module-name">Isocórico</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-sliders-h"></i>
+                            <h3 class="section-title">Variáveis de Estado</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura</span>
+                                <input type="range" min="0" max="1000" value="300" id="tempLeis">
+                                <span class="info-slot-value" id="tempLeisValue">300 K</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Pressão</span>
+                                <input type="range" min="0.1" max="10" value="1" step="0.1" id="pressaoLeis">
+                                <span class="info-slot-value" id="pressaoLeisValue">1 atm</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Volume</span>
+                                <input type="range" min="0.1" max="10" value="1" step="0.1" id="volumeLeis">
+                                <span class="info-slot-value" id="volumeLeisValue">1 m³</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Entropia</span>
+                                <span class="info-slot-value" id="entropiaLeis">0 J/K</span>
+                            </div>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="simulateProcess()"><i class="fas fa-play"></i> Simular Processo</button>
+                            <button class="btn" onclick="resetLeis()"><i class="fas fa-redo"></i> Reiniciar</button>
+                            <button class="btn" onclick="exportData('leis')"><i class="fas fa-download"></i> Exportar Dados</button>
+                        </div>
+                        <div class="log-output" id="leisLog">
+                            <div class="log-line">Sistema termodinâmico inicializado a 300 K</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO 2: MÁQUINAS TÉRMICAS -->
+                <div class="module-content" id="maquinas-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-cogs"></i>
+                            <h3 class="section-title">Visualização da Máquina Térmica</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Eficiência</span>
+                                <span class="info-slot-value" id="eficiencia">0%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Potência</span>
+                                <span class="info-slot-value" id="potencia">0 W</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-wrench"></i>
+                            <h3 class="section-title">Tipos de Máquinas</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item active" onclick="selectMachine('carnot')">
+                                <span class="module-icon">♻️</span>
+                                <span class="module-name">Carnot</span>
+                            </div>
+                            <div class="module-item" onclick="selectMachine('stirling')">
+                                <span class="module-icon">🔄</span>
+                                <span class="module-name">Stirling</span>
+                            </div>
+                            <div class="module-item" onclick="selectMachine('otto')">
+                                <span class="module-icon">🚗</span>
+                                <span class="module-name">Otto</span>
+                            </div>
+                            <div class="module-item" onclick="selectMachine('diesel')">
+                                <span class="module-icon">🚚</span>
+                                <span class="module-name">Diesel</span>
+                            </div>
+                            <div class="module-item" onclick="selectMachine('rankine')">
+                                <span class="module-icon">⚡</span>
+                                <span class="module-name">Rankine</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-thermometer-half"></i>
+                            <h3 class="section-title">Reservatórios Térmicos</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura Fonte Quente (T₁)</span>
+                                <input type="range" min="300" max="1000" value="600" id="tempQuente">
+                                <span class="info-slot-value" id="tempQuenteValue">600 K</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura Fonte Fria (T₂)</span>
+                                <input type="range" min="200" max="500" value="300" id="tempFria">
+                                <span class="info-slot-value" id="tempFriaValue">300 K</span>
+                            </div>
+                        </div>
+                        <div class="formula-box" id="eficienciaFormula">
+                            η = 1 - T₂/T₁ = 50%
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 class="section-title">Ciclo Termodinâmico</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Trabalho Líquido</span>
+                                <span class="info-slot-value" id="trabalhoLiquido">0 J</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Calor Absorvido</span>
+                                <span class="info-slot-value" id="calorAbsorvido">0 J</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Calor Rejeitado</span>
+                                <span class="info-slot-value" id="calorRejeitado">0 J</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Razão de Compressão</span>
+                                <input type="range" min="2" max="20" value="8" id="razaoComp">
+                                <span class="info-slot-value" id="razaoCompValue">8:1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-bolt"></i>
+                            <h3 class="section-title">Performance</h3>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="startMachine()"><i class="fas fa-play"></i> Iniciar Máquina</button>
+                            <button class="btn" onclick="stopMachine()"><i class="fas fa-stop"></i> Parar Máquina</button>
+                            <button class="btn" onclick="exportData('maquinas')"><i class="fas fa-download"></i> Exportar Dados</button>
+                        </div>
+                        <div class="log-output" id="maquinasLog">
+                            <div class="log-line">Máquina térmica inicializada</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO 3: TRANSFERÊNCIA DE CALOR -->
+                <div class="module-content" id="transferencia-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-fire"></i>
+                            <h3 class="section-title">Visualização da Transferência</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Fluxo de Calor</span>
+                                <span class="info-slot-value" id="fluxoCalor">0 W/m²</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Condutividade</span>
+                                <span class="info-slot-value" id="condutividade">0 W/m·K</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-bar"></i>
+                            <h3 class="section-title">Mecanismos de Transferência</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item active" onclick="selectMechanism('conducao')">
+                                <span class="module-icon">🔗</span>
+                                <span class="module-name">Condução</span>
+                            </div>
+                            <div class="module-item" onclick="selectMechanism('conveccao')">
+                                <span class="module-icon">💨</span>
+                                <span class="module-name">Convecção</span>
+                            </div>
+                            <div class="module-item" onclick="selectMechanism('radiacao')">
+                                <span class="module-icon">☀️</span>
+                                <span class="module-name">Radiação</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-thermometer-half"></i>
+                            <h3 class="section-title">Gradiente Térmico</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura Quente</span>
+                                <input type="range" min="0" max="200" value="100" id="tempQuenteTransf">
+                                <span class="info-slot-value" id="tempQuenteTransfValue">100°C</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura Fria</span>
+                                <input type="range" min="-50" max="100" value="0" id="tempFriaTransf">
+                                <span class="info-slot-value" id="tempFriaTransfValue">0°C</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Comprimento</span>
+                                <input type="range" min="0.01" max="1" value="0.1" step="0.01" id="comprimento">
+                                <span class="info-slot-value" id="comprimentoValue">0.1 m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-cubes"></i>
+                            <h3 class="section-title">Materiais</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item active" onclick="selectMaterial('cobre')">
+                                <span class="module-icon">🟤</span>
+                                <span class="module-name">Cobre</span>
+                            </div>
+                            <div class="module-item" onclick="selectMaterial('aluminio')">
+                                <span class="module-icon">⚪</span>
+                                <span class="module-name">Alumínio</span>
+                            </div>
+                            <div class="module-item" onclick="selectMaterial('aco')">
+                                <span class="module-icon">⚫</span>
+                                <span class="module-name">Aço</span>
+                            </div>
+                            <div class="module-item" onclick="selectMaterial('vidro')">
+                                <span class="module-icon">💎</span>
+                                <span class="module-name">Vidro</span>
+                            </div>
+                            <div class="module-item" onclick="selectMaterial('madeira')">
+                                <span class="module-icon">🪵</span>
+                                <span class="module-name">Madeira</span>
+                            </div>
+                        </div>
+                        <div class="formula-box">
+                            q = -k·ΔT/Δx
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-area"></i>
+                            <h3 class="section-title">Taxas de Transferência</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Condução</span>
+                                <span class="info-slot-value" id="taxaConducao">0 W</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Convecção</span>
+                                <span class="info-slot-value" id="taxaConveccao">0 W</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Radiação</span>
+                                <span class="info-slot-value" id="taxaRadiacao">0 W</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Resistência Térmica</span>
+                                <span class="info-slot-value" id="resistenciaTermica">0 K/W</span>
+                            </div>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="startTransfer()"><i class="fas fa-play"></i> Iniciar Transferência</button>
+                            <button class="btn" onclick="resetTransfer()"><i class="fas fa-redo"></i> Reiniciar</button>
+                            <button class="btn" onclick="exportData('transferencia')"><i class="fas fa-download"></i> Exportar Dados</button>
+                        </div>
+                        <div class="log-output" id="transfLog">
+                            <div class="log-line">Sistema de transferência de calor inicializado</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO 4: LEIS DOS GASES -->
+                <div class="module-content" id="gases-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-wind"></i>
+                            <h3 class="section-title">Comportamento dos Gases</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Energia Cinética Média</span>
+                                <span class="info-slot-value" id="energiaCinetica">0 J</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Velocidade RMS</span>
+                                <span class="info-slot-value" id="velocidadeRMS">0 m/s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-book"></i>
+                            <h3 class="section-title">Leis dos Gases</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="selectGasLaw('boyle')">
+                                <span class="module-icon">Ⓑ</span>
+                                <span class="module-name">Boyle</span>
+                            </div>
+                            <div class="module-item" onclick="selectGasLaw('charles')">
+                                <span class="module-icon">Ⓒ</span>
+                                <span class="module-name">Charles</span>
+                            </div>
+                            <div class="module-item" onclick="selectGasLaw('gay')">
+                                <span class="module-icon">Ⓖ</span>
+                                <span class="module-name">Gay-Lussac</span>
+                            </div>
+                            <div class="module-item" onclick="selectGasLaw('combinada')">
+                                <span class="module-icon">🔗</span>
+                                <span class="module-name">Combinada</span>
+                            </div>
+                            <div class="module-item active" onclick="selectGasLaw('ideal')">
+                                <span class="module-icon">⭐</span>
+                                <span class="module-name">Ideal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-balance-scale"></i>
+                            <h3 class="section-title">Variáveis de Estado</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Pressão (P)</span>
+                                <input type="range" min="10" max="500" value="101.3" step="0.1" id="pressaoGas">
+                                <span class="info-slot-value" id="pressaoGasValue">101.3 kPa</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Volume (V)</span>
+                                <input type="range" min="0.001" max="1" value="0.0224" step="0.001" id="volumeGas">
+                                <span class="info-slot-value" id="volumeGasValue">0.0224 m³</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura (T)</span>
+                                <input type="range" min="0" max="1000" value="273" id="tempGas">
+                                <span class="info-slot-value" id="tempGasValue">273 K</span>
+                            </div>
+                        </div>
+                        <div class="formula-box">
+                            PV = nRT
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-flask"></i>
+                            <h3 class="section-title">Propriedades do Gás</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Número de Mols (n)</span>
+                                <span class="info-slot-value">1.0 mol</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Constante R</span>
+                                <span class="info-slot-value">8.314 J/mol·K</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Número de Partículas</span>
+                                <span class="info-slot-value">6.02×10²³</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Massa Molar</span>
+                                <span class="info-slot-value">0.029 kg/mol</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 class="section-title">Estatísticas Moleculares</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Pressão</span>
+                                <span class="info-slot-value" id="pressaoCalc">101.3 kPa</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Velocidade Média</span>
+                                <span class="info-slot-value" id="velocidadeMedia">461 m/s</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Collisions/s</span>
+                                <span class="info-slot-value">7.2×10⁹</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Free Path</span>
+                                <span class="info-slot-value">68 nm</span>
+                            </div>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="simulateGas()"><i class="fas fa-play"></i> Simular Gás</button>
+                            <button class="btn" onclick="resetGas()"><i class="fas fa-redo"></i> Reiniciar</button>
+                            <button class="btn" onclick="exportData('gases')"><i class="fas fa-download"></i> Exportar Dados</button>
+                        </div>
+                        <div class="log-output" id="gasLog">
+                            <div class="log-line">Sistema de gás ideal inicializado a 273 K</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO 5: MUDANÇAS DE FASE -->
+                <div class="module-content" id="fases-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-snowflake"></i>
+                            <h3 class="section-title">Diagrama de Fases</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Calor Latente</span>
+                                <span class="info-slot-value" id="calorLatente">0 kJ/kg</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Ponto Crítico</span>
+                                <span class="info-slot-value">647 K</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-droplet"></i>
+                            <h3 class="section-title">Substâncias</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item active" onclick="selectSubstance('agua')">
+                                <span class="module-icon">💧</span>
+                                <span class="module-name">Água</span>
+                            </div>
+                            <div class="module-item" onclick="selectSubstance('co2')">
+                                <span class="module-icon">🌫️</span>
+                                <span class="module-name">CO₂</span>
+                            </div>
+                            <div class="module-item" onclick="selectSubstance('nitrogenio')">
+                                <span class="module-icon">🔵</span>
+                                <span class="module-name">Nitrogênio</span>
+                            </div>
+                            <div class="module-item" onclick="selectSubstance('oxigenio')">
+                                <span class="module-icon">🟢</span>
+                                <span class="module-name">Oxigênio</span>
+                            </div>
+                            <div class="module-item" onclick="selectSubstance('argonio')">
+                                <span class="module-icon">🟣</span>
+                                <span class="module-name">Argônio</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-thermometer-half"></i>
+                            <h3 class="section-title">Condições Atuais</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura</span>
+                                <input type="range" min="-50" max="200" value="20" id="tempFase">
+                                <span class="info-slot-value" id="tempFaseValue">20°C</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Pressão</span>
+                                <input type="range" min="0.1" max="10" value="1" step="0.1" id="pressaoFase">
+                                <span class="info-slot-value" id="pressaoFaseValue">1 atm</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Calor Adicionado</span>
+                                <input type="range" min="0" max="1000" value="0" id="calorAdd">
+                                <span class="info-slot-value" id="calorAddValue">0 kJ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-layer-group"></i>
+                            <h3 class="section-title">Estados da Matéria</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Fase Atual</span>
+                                <span class="info-slot-value" id="faseAtual">Líquido</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Ponto de Fusão</span>
+                                <span class="info-slot-value">0°C</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Ponto de Ebulição</span>
+                                <span class="info-slot-value">100°C</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Calor Específico</span>
+                                <span class="info-slot-value">4.18 kJ/kg·K</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-exchange-alt"></i>
+                            <h3 class="section-title">Transições de Fase</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="triggerTransition('fusao')">
+                                <span class="module-icon">🧊➡️💧</span>
+                                <span class="module-name">Fusão</span>
+                            </div>
+                            <div class="module-item" onclick="triggerTransition('vaporizacao')">
+                                <span class="module-icon">💧➡️💨</span>
+                                <span class="module-name">Vaporização</span>
+                            </div>
+                            <div class="module-item" onclick="triggerTransition('sublimacao')">
+                                <span class="module-icon">🧊➡️💨</span>
+                                <span class="module-name">Sublimação</span>
+                            </div>
+                            <div class="module-item" onclick="triggerTransition('deposicao')">
+                                <span class="module-icon">💨➡️🧊</span>
+                                <span class="module-name">Deposição</span>
+                            </div>
+                        </div>
+                        <div class="formula-box">
+                            Q = m·L
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="simulatePhaseChange()"><i class="fas fa-play"></i> Simular Mudança</button>
+                            <button class="btn" onclick="resetPhase()"><i class="fas fa-redo"></i> Reiniciar</button>
+                            <button class="btn" onclick="exportData('fases')"><i class="fas fa-download"></i> Exportar Dados</button>
+                        </div>
+                        <div class="log-output" id="faseLog">
+                            <div class="log-line">Sistema de mudança de fase inicializado</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO 6: DIAGRAMAS TERMODINÂMICOS -->
+                <div class="module-content" id="diagramas-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-area"></i>
+                            <h3 class="section-title">Diagrama P-V</h3>
+                        </div>
+                        <div style="padding: 6px; text-align: center; color: var(--text-secondary); font-size: 10px;">
+                            Gráfico Pressão × Volume
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-project-diagram"></i>
+                            <h3 class="section-title">Tipos de Diagramas</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item active" onclick="selectDiagram('pv')">
+                                <span class="module-icon">📊</span>
+                                <span class="module-name">P-V (Pressão-Volume)</span>
+                            </div>
+                            <div class="module-item" onclick="selectDiagram('ts')">
+                                <span class="module-icon">📈</span>
+                                <span class="module-name">T-S (Temperatura-Entropia)</span>
+                            </div>
+                            <div class="module-item" onclick="selectDiagram('hs')">
+                                <span class="module-icon">📉</span>
+                                <span class="module-name">H-S (Entalpia-Entropia)</span>
+                            </div>
+                            <div class="module-item" onclick="selectDiagram('pt')">
+                                <span class="module-icon">📋</span>
+                                <span class="module-name">P-T (Pressão-Temperatura)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-cog"></i>
+                            <h3 class="section-title">Ciclos Termodinâmicos</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="plotCycle('carnot')">
+                                <span class="module-icon">♻️</span>
+                                <span class="module-name">Ciclo de Carnot</span>
+                            </div>
+                            <div class="module-item" onclick="plotCycle('otto')">
+                                <span class="module-icon">🚗</span>
+                                <span class="module-name">Ciclo Otto</span>
+                            </div>
+                            <div class="module-item" onclick="plotCycle('diesel')">
+                                <span class="module-icon">🚚</span>
+                                <span class="module-name">Ciclo Diesel</span>
+                            </div>
+                            <div class="module-item" onclick="plotCycle('rankine')">
+                                <span class="module-icon">⚡</span>
+                                <span class="module-name">Ciclo Rankine</span>
+                            </div>
+                            <div class="module-item" onclick="plotCycle('brayton')">
+                                <span class="module-icon">✈️</span>
+                                <span class="module-name">Ciclo Brayton</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-sliders-h"></i>
+                            <h3 class="section-title">Parâmetros do Diagrama</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Escala X</span>
+                                <input type="range" min="1" max="10" value="5" id="escalaX">
+                                <span class="info-slot-value" id="escalaXValue">5</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Escala Y</span>
+                                <input type="range" min="1" max="10" value="5" id="escalaY">
+                                <span class="info-slot-value" id="escalaYValue">5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 class="section-title">Análise do Ciclo</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Trabalho Líquido</span>
+                                <span class="info-slot-value" id="trabalhoDiagrama">0 J</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Eficiência</span>
+                                <span class="info-slot-value" id="eficienciaDiagrama">0%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Área do Ciclo</span>
+                                <span class="info-slot-value" id="areaCiclo">0 J</span>
+                            </div>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="plotDiagram()"><i class="fas fa-chart-line"></i> Plotar Diagrama</button>
+                            <button class="btn" onclick="clearDiagram()"><i class="fas fa-eraser"></i> Limpar</button>
+                            <button class="btn" onclick="exportData('diagramas')"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                        <div class="log-output" id="diagramaLog">
+                            <div class="log-line">Sistema de diagramas inicializado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+                <aside class="right-panel">
+            <div class="right-card">
+                <div class="section-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h3 class="section-title">Visualização em Tempo Real</h3>
+                </div>
+
+                <div class="tabs-row">
+                    <button class="tab-button active" onclick="switchTab('3d')">
+                        <i class="fas fa-cube"></i> 3D
+                    </button>
+                    <button class="tab-button" onclick="switchTab('grafico')">
+                        <i class="fas fa-chart-line"></i> Gráfico
+                    </button>
+                </div>
+
+                <div class="tab-content active" id="tab-3d">
+                    <div class="canvas-container">
+                        <canvas id="canvas3D"></canvas>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-grafico">
+                    <div class="canvas-container">
+                        <canvas id="canvas2D"></canvas>
+                    </div>
+                </div>
+
+                <div class="canvas-controls">
+                    <button class="btn primary" id="playBtn" onclick="toggleSimulation()">
+                        <i class="fas fa-play"></i> Iniciar
+                    </button>
+                    <button class="btn" onclick="resetSimulation()">
+                        <i class="fas fa-redo"></i> Reiniciar
+                    </button>
+                    <button class="btn" onclick="exportCanvas()">
+                        <i class="fas fa-camera"></i> Capturar
+                    </button>
+                </div>
+
+                <div class="feedback-panel">
+                    <div class="feedback-title">📋 Log de Reações</div>
+                    <div class="feedback-log" id="feedbackLog">
+                        <div class="feedback-line info">[Inicialização] Sistema pronto</div>
+                    </div>
+                </div>
+
+                <div class="status-bar">
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-label">Status</div>
+                            <div class="status-value" id="canvasStatus">Ativo</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">FPS</div>
+                            <div class="status-value" id="canvasFPS">60</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">Modo</div>
+                            <div class="status-value" id="modoAtual">3D</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+	<script src="script.js"></script>
+</body>
+</html>

@@ -3,24 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Químico - Tabela Periódica Interativa</title>
+    <title>Workspace - Simulador Químico</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
     
-    <link href="style.css" rel="stylesheet">
-</head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+		</head>
 <body>
-    <!-- Header -->
     <header class="app-header">
         <div class="header-left">
             <i class="fa-solid fa-flask"></i>
@@ -53,9 +48,7 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="app-main">
-        <!-- COLUNA ESQUERDA - TABELA PERIÓDICA -->
         <section class="left-panel">
             <div class="panel-card">
                 <div class="section-header">
@@ -69,17 +62,21 @@
             </div>
         </section>
 
-        <!-- COLUNA CENTRAL - INFORMAÇÕES DO ELEMENTO -->
         <section class="center-panel">
             <div class="panel-card">
-                <div class="section-header">
-                    <i class="fa-solid fa-info-circle"></i>
-                    <div class="section-title">Informações do Elemento</div>
+                <div class="center-toggle">
+                    <button class="toggle-btn active" onclick="switchCenterView('element', this)">
+                        <i class="fa-solid fa-atom"></i>
+                        Elemento
+                    </button>
+                    <button class="toggle-btn" onclick="switchCenterView('reaction', this)">
+                        <i class="fa-solid fa-flask-conical"></i>
+                        Sim. Reações
+                    </button>
                 </div>
             </div>
 
-            <div class="center-scroll">
-                <!-- Informações Básicas -->
+            <div class="center-scroll" id="elementView">
                 <div class="info-card">
                     <div class="section-header" style="margin-bottom: var(--space-md);">
                         <i class="fa-solid fa-atom"></i>
@@ -105,7 +102,6 @@
                     </div>
                 </div>
 
-                <!-- Propriedades Físicas -->
                 <div class="info-card">
                     <div class="section-header" style="margin-bottom: var(--space-md);">
                         <i class="fa-solid fa-temperature-half"></i>
@@ -131,7 +127,6 @@
                     </div>
                 </div>
 
-                <!-- Propriedades Químicas -->
                 <div class="info-card">
                     <div class="section-header" style="margin-bottom: var(--space-md);">
                         <i class="fa-solid fa-flask-vial"></i>
@@ -157,7 +152,6 @@
                     </div>
                 </div>
 
-                <!-- Propriedades Estruturais -->
                 <div class="info-card">
                     <div class="section-header" style="margin-bottom: var(--space-md);">
                         <i class="fa-solid fa-cube"></i>
@@ -179,146 +173,214 @@
                     </div>
                 </div>
             </div>
+
+            <div class="center-scroll" id="reactionView" style="display: none;">
+                <div class="info-card">
+                    <div class="section-header" style="margin-bottom: var(--space-md);">
+                        <i class="fa-solid fa-flask-vial"></i>
+                        <div class="section-title">Controles da Reação</div>
+                    </div>
+                    
+                    <div class="reagent-selector">
+                        <div class="reagent-dropdown">
+                            <div class="reagent-input" id="reactant1Display" onclick="toggleDropdown('reactant1')">
+                                Selecione o Reagente 1
+                            </div>
+                            <div class="dropdown-content" id="reactant1Dropdown">
+                                </div>
+                        </div>
+                        
+                        <div class="reagent-dropdown">
+                            <div class="reagent-input" id="reactant2Display" onclick="toggleDropdown('reactant2')">
+                                Selecione o Reagente 2
+                            </div>
+                            <div class="dropdown-content" id="reactant2Dropdown">
+                                </div>
+                        </div>
+                    </div>
+                    
+                    <div class="reaction-equation" id="reactionEquation">
+                        ? + ? → ?
+                    </div>
+
+                    <div class="reaction-controls">
+                        <button class="control-btn" onclick="balanceEquation()" style="background: var(--color-acid);">
+                            <i class="fa-solid fa-balance-scale"></i>
+                            Balancear
+                        </button>
+                        <button class="control-btn" onclick="simulateReaction()" style="background: var(--color-primary-500);">
+                            <i class="fa-solid fa-play"></i>
+                            Simular
+                        </button>
+                    </div>
+
+                    <div class="reaction-equation" id="reactionResult" style="display: none;">
+                        </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="section-header" style="margin-bottom: var(--space-md);">
+                        <i class="fa-solid fa-shapes"></i>
+                        <div class="section-title">Tipos de Reações</div>
+                    </div>
+                    
+                    <div class="reaction-controls" style="flex-wrap: wrap;">
+                        <button class="control-btn" onclick="loadReactionExample('acid-base')" style="background: var(--color-acid);">
+                            <i class="fa-solid fa-flask"></i>
+                            Ácido-Base
+                        </button>
+                        <button class="control-btn" onclick="loadReactionExample('salt-formation')" style="background: var(--color-salt);">
+                            <i class="fa-solid fa-cube"></i>
+                            Sais
+                        </button>
+                        <button class="control-btn" onclick="loadReactionExample('precipitation')" style="background: var(--color-base);">
+                            <i class="fa-solid fa-cloud-rain"></i>
+                            Precipitação
+                        </button>
+                        <button class="control-btn" onclick="loadReactionExample('organic')" style="background: var(--color-organic);">
+                            <i class="fa-solid fa-dna"></i>
+                            Orgânicas
+                        </button>
+                    </div>
+
+                    <div id="reactionExamples" style="margin-top: var(--space-lg);">
+                        <h4 style="color: var(--accent); margin-bottom: var(--space-md); font-size: var(--font-lg);">
+                            <i class="fa-solid fa-lightbulb"></i> Exemplos de Reações:
+                        </h4>
+                        <div class="reagent-option" onclick="loadExample('neutralization')" style="margin-bottom: var(--space-sm);">
+                            <strong>Neutralização:</strong> HCl + NaOH → NaCl + H₂O
+                        </div>
+                        <div class="reagent-option" onclick="loadExample('carbonate')" style="margin-bottom: var(--space-sm);">
+                            <strong>Ácido + Carbonato:</strong> 2HCl + CaCO₃ → CaCl₂ + H₂O + CO₂
+                        </div>
+                        <div class="reagent-option" onclick="loadExample('metal')" style="margin-bottom: var(--space-sm);">
+                            <strong>Metal + Ácido:</strong> Zn + 2HCl → ZnCl₂ + H₂
+                        </div>
+                        <div class="reagent-option" onclick="loadExample('combustion')" style="margin-bottom: var(--space-sm);">
+                            <strong>Combustão:</strong> CH₄ + 2O₂ → CO₂ + 2H₂O
+                        </div>
+                    </div>
+
+                    <div id="reactionInfo" style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--surface-alt); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--accent); margin-bottom: var(--space-md);">
+                            <i class="fa-solid fa-info-circle"></i> Informações da Reação:
+                        </h4>
+                        <div id="reactionDetails">
+                            Selecione uma reação para ver os detalhes...
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
                     
-        <!-- COLUNA DIREITA - VISUALIZAÇÃO 3D E SIMULADOR -->
-        <section class="right-panel card">
+        <section class="right-panel">
             <div class="right-card">
-                <div class="tabs-row">
-                    <div class="tab-buttons">
-                        <button class="tab-btn active" onclick="switchTab('visualization', this)">
-                            <i class="fa-solid fa-eye"></i>
-                            Visualização
-                        </button>
-                        <button class="tab-btn" onclick="switchTab('structure', this)">
-                            <i class="fa-solid fa-cube"></i>
-                            Estrutura
-                        </button>
-                        <button class="tab-btn" onclick="switchTab('reactions', this)">
-                            <i class="fa-solid fa-flask"></i>
-                            Reações
-                        </button>
+                <div id="elementRightView" class="tab-content active">
+                    <div class="tab-buttons-row">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" onclick="switchElementTab('visualization', this)">
+                                <i class="fa-solid fa-eye"></i>
+                                Visualização
+                            </button>
+                            <button class="tab-btn" onclick="switchElementTab('structure', this)">
+                                <i class="fa-solid fa-cube"></i>
+                                Estrutura
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tab-visualization" class="tab-content active">
+                        <div class="canvas-3d-container">
+                            <canvas id="atom3DCanvas"></canvas>
+                        </div>
+                        
+                        <div class="canvas-controls">
+                            <button class="control-btn active" onclick="setViewMode('orbital', this)">
+                                <i class="fa-solid fa-circle-notch"></i>
+                                Órbitas
+                            </button>
+                            <button class="control-btn" onclick="setViewMode('cloud', this)">
+                                <i class="fa-solid fa-cloud"></i>
+                                Nuvem
+                            </button>
+                            <button class="control-btn" onclick="setViewMode('nucleus', this)">
+                                <i class="fa-solid fa-bullseye"></i>
+                                Núcleo
+                            </button>
+                            <button class="control-btn" onclick="toggleAnimation(this)">
+                                <i class="fa-solid fa-play"></i>
+                                Animar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tab-structure" class="tab-content">
+                        <div class="atom-info-panel">
+                            <div class="section-header" style="margin-bottom: var(--space-md);">
+                                <i class="fa-solid fa-atom"></i>
+                                <div class="section-title">Estrutura Atômica</div>
+                            </div>
+                            <div style="font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6;">
+                                <p id="structureDescription">Selecione um elemento para visualizar sua estrutura atômica detalhada.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ABA: VISUALIZAÇÃO 3D -->
-                <div id="tab-visualization" class="tab-content active">
-                    <div class="canvas-3d-container">
-                        <canvas id="atom3DCanvas"></canvas>
+                <div id="reactionRightView" class="tab-content" style="display: none;">
+                    <div class="tab-buttons-row">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" onclick="switchReactionTab('visualization', this)">
+                                <i class="fa-solid fa-flask"></i>
+                                Visualização da Reação
+                            </button>
+                            <button class="tab-btn" onclick="switchReactionTab('data', this)">
+                                <i class="fa-solid fa-chart-line"></i>
+                                Dados
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tab-reaction-view" class="tab-content active">
+                        <!-- CONTROLES MOVIDOS PARA CIMA DO CANVAS -->
+                        <div class="canvas-controls" style="margin-bottom: var(--space-sm);">
+                            <button class="control-btn active" onclick="startReactionAnimation()" id="startBtn">
+                                <i class="fa-solid fa-play"></i>
+                                Iniciar
+                            </button>
+                            <button class="control-btn" onclick="pauseReactionAnimation()" id="pauseBtn">
+                                <i class="fa-solid fa-pause"></i>
+                                Pausar
+                            </button>
+                            <button class="control-btn" onclick="resetReactionAnimation()">
+                                <i class="fa-solid fa-undo"></i>
+                                Resetar
+                            </button>
+                            <button class="control-btn" onclick="changeReactionSpeed()" id="speedBtn">
+                                <i class="fa-solid fa-tachometer-alt"></i>
+                                Velocidade
+                            </button>
+                        </div>
+                        
+                        <div class="canvas-3d-container">
+                            <canvas id="reactionCanvas"></canvas>
+                        </div>
                     </div>
                     
-                    <div class="canvas-controls">
-                        <button class="control-btn active" onclick="setViewMode('orbital', this)">
-                            <i class="fa-solid fa-circle-notch"></i>
-                            Órbitas
-                        </button>
-                        <button class="control-btn" onclick="setViewMode('cloud', this)">
-                            <i class="fa-solid fa-cloud"></i>
-                            Nuvem
-                        </button>
-                        <button class="control-btn" onclick="setViewMode('nucleus', this)">
-                            <i class="fa-solid fa-bullseye"></i>
-                            Núcleo
-                        </button>
-                        <button class="control-btn" onclick="toggleAnimation(this)">
-                            <i class="fa-solid fa-play"></i>
-                            Animar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ABA: ESTRUTURA -->
-                <div id="tab-structure" class="tab-content">
-                    <div class="atom-info-panel">
-                        <div class="section-header" style="margin-bottom: var(--space-md);">
-                            <i class="fa-solid fa-atom"></i>
-                            <div class="section-title">Estrutura Atômica</div>
-                        </div>
-                        <div style="font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6;">
-                            <p id="structureDescription">Selecione um elemento para visualizar sua estrutura atômica detalhada.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA: SIMULADOR DE REAÇÕES -->
-                <div id="tab-reactions" class="tab-content">
-                    <div class="reaction-simulator-container">
-                        <!-- Layout lado a lado -->
-                        <div class="reaction-layout">
-                            <!-- Canvas na esquerda -->
-                            <div class="reaction-canvas-section">
-                                <div class="reaction-canvas-container">
-                                    <canvas id="reactionCanvas"></canvas>
-                                </div>
+                    <div id="tab-reaction-info" class="tab-content">
+                        <div class="atom-info-panel">
+                            <div class="section-header" style="margin-bottom: var(--space-md);">
+                                <i class="fa-solid fa-chart-line"></i>
+                                <div class="section-title">Dados da Reação</div>
                             </div>
-                            
-                            <!-- Controles na direita -->
-                            <div class="reaction-controls-section">
-                                <!-- Exemplos Rápidos -->
-                                <div class="quick-examples">
-                                    <div class="section-header" style="margin: var(--space-md) 0;">
-                                        <i class="fa-solid fa-vial"></i>
-                                        <div class="section-title">Exemplos Rápidos</div>
-                                    </div>
-                                    <div class="example-buttons">
-                                        <button class="example-btn" onclick="ReactionSimulator.loadExample('neutralization')">
-                                            Neutralização
-                                        </button>
-                                        <button class="example-btn" onclick="ReactionSimulator.loadExample('carbonate')">
-                                            Ácido + Carbonato
-                                        </button>
-                                        <button class="example-btn" onclick="ReactionSimulator.loadExample('metal')">
-                                            Metal + Ácido
-                                        </button>
-                                        <button class="example-btn" onclick="ReactionSimulator.loadExample('precipitation')">
-                                            Precipitação
-                                        </button>
-                                    </div>
+                            <div style="font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6;">
+                                <div id="reactionData" style="text-align: left;">
+                                    <p><strong>Estado:</strong> Aguardando reagentes...</p>
+                                    <p><strong>Temperatura:</strong> 25°C</p>
+                                    <p><strong>Pressão:</strong> 1 atm</p>
+                                    <p><strong>pH:</strong> 7.0</p>
+                                    <p><strong>Produtos formados:</strong> 0</p>
                                 </div>
-
-                                <!-- Controles da Reação -->
-                                <div class="reaction-controls">
-                                    <button class="btn btn-primary" onclick="ReactionSimulator.balanceEquation()">
-                                        <i class="fa-solid fa-scale-balanced"></i>
-                                        Balancear
-                                    </button>
-                                    <button class="btn btn-success" onclick="ReactionSimulator.simulateReaction()">
-                                        <i class="fa-solid fa-play"></i>
-                                        Simular
-                                    </button>
-                                </div>
-								
-                                <!-- Seletor de Reagentes -->
-                                <div class="reagent-selector">
-                                    <div class="reagent-dropdown">
-                                        <div class="reagent-input" id="reactant1Display" onclick="ReactionSimulator.toggleDropdown('reactant1')">
-                                            Selecione o Reagente 1
-                                        </div>
-                                        <div class="dropdown-content" id="reactant1Dropdown">
-                                            <!-- Opções serão preenchidas via JavaScript -->
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="reagent-dropdown">
-                                        <div class="reagent-input" id="reactant2Display" onclick="ReactionSimulator.toggleDropdown('reactant2')">
-                                            Selecione o Reagente 2
-                                        </div>
-                                        <div class="dropdown-content" id="reactant2Dropdown">
-                                            <!-- Opções serão preenchidas via JavaScript -->
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Equação da Reação -->
-                                <div class="reaction-equation" id="reactionEquation">
-                                    ? + ? → ?
-                                </div>
-
-                                <!-- Resultado da Reação -->
-                                <div class="reaction-result" id="reactionResult" style="display: none;">
-                                    <!-- Resultado da reação aparecerá aqui -->
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -327,6 +389,6 @@
         </section>
     </main>
 
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

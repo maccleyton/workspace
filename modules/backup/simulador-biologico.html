@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Biológico Completo - Workspace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --workspace-bg: #0a0a0a;
+            --surface-bg: #141414;
+            --color-bg-page: #0a0a0a;
+            --surface-alt: #1a1a1a;
+            --border-color: #1a1a1a;
+            --border-hover: #10b981;
+            --text-primary: #e0e0e0;
+            --text-secondary: #9ca3af;
+            --text-tertiary: #6b7280;
+            --accent: #10b981;
+            --accent-soft: rgba(16, 185, 129, 0.15);
+            --accent-hover: #34d399;
+            --danger: #ef4444;
+            --radius-md: 6px;
+            --radius-sm: 4px;
+            --shadow-hover: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--workspace-bg);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .app-header {
+            background: var(--surface-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 6px 12px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 6px; }
+        .header-left i { color: var(--accent); font-size: 14px; }
+        .header-title { font-size: 16px; font-weight: 600; color: var(--accent); margin: 0; }
+
+        .header-center { flex: 1; max-width: 280px; margin: 0 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 10px; }
+        .search-input {
+            width: 100%;
+            background: var(--color-bg-page);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 12px 6px 28px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+        .search-input:focus { outline: none; border-color: var(--accent); }
+
+        .header-right { display: flex; gap: 6px; }
+        .header-btn {
+            background: var(--color-bg-page);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .app-main {
+            height: calc(100vh - 48px);
+            padding: 8px;
+            display: grid;
+            grid-template-columns: 260px 280px minmax(0, 1fr);
+            gap: 8px;
+            background: var(--workspace-bg);
+        }
+
+        /* Painel Esquerdo */
+        .left-panel { display: flex; flex-direction: column; overflow: hidden; }
+        .left-scroll { flex: 1; overflow-y: auto; padding-right: 3px; }
+        .panel-card {
+            padding: 8px 10px;
+            background: var(--surface-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        .section-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .section-header i { color: var(--accent); font-size: 12px; }
+        .section-title { font-size: 12px; font-weight: 600; color: var(--accent); margin: 0; }
+
+        .module-list { display: flex; flex-direction: column; gap: 3px; }
+        .module-item {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .module-item:hover, .module-item.active { 
+            border-color: var(--accent); 
+            background: var(--accent-soft);
+        }
+        .module-number { font-size: 9px; color: var(--text-tertiary); min-width: 16px; }
+        .module-icon { font-size: 11px; min-width: 24px; }
+        .module-name { font-size: 10px; color: var(--text-secondary); flex: 1; font-weight: 500; }
+
+        /* Painel Central */
+        .center-panel { display: flex; flex-direction: column; overflow: hidden; }
+        .center-scroll { flex: 1; overflow-y: auto; padding-right: 3px; }
+
+        .module-content { display: none; }
+        .module-content.active { display: block; }
+
+        .info-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+        }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+        .info-slot { display: flex; flex-direction: column; gap: 2px; }
+        .info-slot-label { font-size: 9px; color: var(--text-secondary); font-weight: 500; }
+        .info-slot-value { font-size: 10px; color: var(--accent); font-weight: 600; }
+
+        .control-row { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+        .btn {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            background: var(--surface-bg);
+            color: var(--text-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 9px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn:hover { border-color: var(--accent); color: var(--accent); }
+        .btn.primary { background: var(--accent); border-color: var(--accent); color: #000; }
+        .btn.primary:hover { background: var(--accent-hover); }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 4px 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .log-output {
+            background: var(--color-bg-page);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-size: 9px;
+            color: var(--text-secondary);
+            max-height: 80px;
+            overflow-y: auto;
+            margin-top: 6px;
+            font-family: 'Courier New', monospace;
+        }
+        .log-line { margin-bottom: 2px; color: var(--accent); }
+
+        /* Painel Direito */
+        .right-panel { display: flex; flex-direction: column; overflow: hidden; }
+        .right-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--color-bg-page);
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        #mainCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .canvas-controls {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status-bar {
+            padding: 6px 8px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+        .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .status-item { text-align: center; }
+        .status-label { font-size: 9px; color: var(--text-secondary); margin-bottom: 2px; }
+        .status-value { font-size: 11px; color: var(--accent); font-weight: 600; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <i class="fas fa-dna"></i>
+            <h1 class="header-title">Simulador Biológico</h1>
+        </div>
+        <div class="header-center">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar módulo..." id="searchInput">
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="header-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+            <button class="header-btn"><i class="fas fa-moon"></i></button>
+            <button class="header-btn"><i class="fas fa-user"></i></button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <!-- Painel Esquerdo: Lista de Módulos -->
+        <aside class="left-panel">
+            <div class="left-scroll">
+                <div class="panel-card">
+                    <div class="section-header">
+                        <i class="fas fa-microscope"></i>
+                        <h2 class="section-title">Módulos Biológicos</h2>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-item active" data-module="celulas">
+                            <span class="module-number">1</span>
+                            <span class="module-icon">🔬</span>
+                            <span class="module-name">Células e Organismos</span>
+                        </div>
+                        <div class="module-item" data-module="dna">
+                            <span class="module-number">2</span>
+                            <span class="module-icon">🧬</span>
+                            <span class="module-name">Genética e DNA</span>
+                        </div>
+                        <div class="module-item" data-module="ecossistemas">
+                            <span class="module-number">3</span>
+                            <span class="module-icon">🌿</span>
+                            <span class="module-name">Ecossistemas</span>
+                        </div>
+                        <div class="module-item" data-module="microbiologia">
+                            <span class="module-number">4</span>
+                            <span class="module-icon">🦠</span>
+                            <span class="module-name">Interações Microbianas</span>
+                        </div>
+                        <div class="module-item" data-module="fisiologia">
+                            <span class="module-number">5</span>
+                            <span class="module-icon">👤</span>
+                            <span class="module-name">Fisiologia Humana</span>
+                        </div>
+                        <div class="module-item" data-module="evolucao">
+                            <span class="module-number">6</span>
+                            <span class="module-icon">🔄</span>
+                            <span class="module-name">Evolução</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Painel Central: Controles -->
+        <section class="center-panel">
+            <div class="center-scroll">
+
+                <!-- MÓDULO CÉLULAS -->
+                <div class="module-content active" id="celulas-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-microscope"></i>
+                            <h3 class="section-title">Célula Eucariótica 3D</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Metabolismo</span>
+                                <span class="info-slot-value" id="metabolismo">85%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">ATP Produzido</span>
+                                <span class="info-slot-value" id="atp">1.2M/s</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Divisão Celular</span>
+                                <span class="info-slot-value">24h</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Homeostase</span>
+                                <span class="info-slot-value">92%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-cogs"></i>
+                            <h3 class="section-title">Organelas Celulares</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="focusOrganelle('nucleo')">
+                                <span class="module-icon">⚛️</span>
+                                <span class="module-name">Núcleo</span>
+                            </div>
+                            <div class="module-item" onclick="focusOrganelle('mitocondria')">
+                                <span class="module-icon">⚡</span>
+                                <span class="module-name">Mitocôndria</span>
+                            </div>
+                            <div class="module-item" onclick="focusOrganelle('ribossomo')">
+                                <span class="module-icon">🔵</span>
+                                <span class="module-name">Ribossomo</span>
+                            </div>
+                            <div class="module-item" onclick="focusOrganelle('golgi')">
+                                <span class="module-icon">📦</span>
+                                <span class="module-name">Complexo Golgi</span>
+                            </div>
+                            <div class="module-item" onclick="focusOrganelle('reticulo')">
+                                <span class="module-icon">🧬</span>
+                                <span class="module-name">Retículo</span>
+                            </div>
+                            <div class="module-item" onclick="focusOrganelle('lisossomo')">
+                                <span class="module-icon">🟣</span>
+                                <span class="module-name">Lisossomo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-bolt"></i>
+                            <h3 class="section-title">Processos Celulares</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Taxa Metabólica</span>
+                                <input type="range" min="0" max="100" value="85" id="taxaMetabolica">
+                                <span class="info-slot-value">85%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Produção ATP</span>
+                                <span class="info-slot-value" id="atpProd">1.2M/s</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura</span>
+                                <span class="info-slot-value">37°C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 class="section-title">Estado da Célula</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">pH Interno</span>
+                                <span class="info-slot-value">7.2</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Pressão Osmótica</span>
+                                <span class="info-slot-value">280 mOsm</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Membrana</span>
+                                <span class="info-slot-value">98%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Sinalização</span>
+                                <span class="info-slot-value">45/s</span>
+                            </div>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="startCellProcesses()"><i class="fas fa-play"></i> Iniciar Processos</button>
+                            <button class="btn" onclick="divideCell()"><i class="fas fa-cut"></i> Dividir Célula</button>
+                            <button class="btn" onclick="exportData('celulas')"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                        <div class="log-output" id="cellLog">
+                            <div class="log-line">Célula eucariótica inicializada</div>
+                            <div class="log-line">Organelas ativas: Núcleo, Mitocôndrias, Ribossomos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO DNA -->
+                <div class="module-content" id="dna-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-dna"></i>
+                            <h3 class="section-title">Estrutura do DNA 3D</h3>
+                        </div>
+                        <div style="background: var(--color-bg-page); padding: 6px; border-radius: 4px; font-family: monospace; font-size: 9px; color: var(--accent); text-align: center;">
+                            ATG-CGT-ACC-GTA-TGC-ATG-CGT-ACC-GTA
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-cogs"></i>
+                            <h3 class="section-title">Processos Genéticos</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="startGeneticProcess('replicacao')">
+                                <span class="module-icon">🔄</span>
+                                <span class="module-name">Replicação</span>
+                            </div>
+                            <div class="module-item" onclick="startGeneticProcess('transcricao')">
+                                <span class="module-icon">📝</span>
+                                <span class="module-name">Transcrição</span>
+                            </div>
+                            <div class="module-item" onclick="startGeneticProcess('traducao')">
+                                <span class="module-icon">🔤</span>
+                                <span class="module-name">Tradução</span>
+                            </div>
+                            <div class="module-item" onclick="startGeneticProcess('mutacao')">
+                                <span class="module-icon">⚠️</span>
+                                <span class="module-name">Mutação</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-wrench"></i>
+                            <h3 class="section-title">Ferramentas de Edição</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Taxa de Mutação</span>
+                                <input type="range" min="0" max="100" value="1" id="taxaMutacao">
+                                <span class="info-slot-value">0.001%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Expressão Gênica</span>
+                                <input type="range" min="0" max="100" value="75" id="expressao">
+                                <span class="info-slot-value">75%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Recombinação</span>
+                                <input type="range" min="0" max="100" value="50" id="recombinacao">
+                                <span class="info-slot-value">50%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-bar"></i>
+                            <h3 class="section-title">Estatísticas Genéticas</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Pares de Base</span>
+                                <span class="info-slot-value">3.2B</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Genes Ativos</span>
+                                <span class="info-slot-value">21,000</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Proteínas</span>
+                                <span class="info-slot-value">100K</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Telômeros</span>
+                                <span class="info-slot-value">8.5kb</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-cut"></i>
+                            <h3 class="section-title">CRISPR Simulator</h3>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="executeCRISPR()"><i class="fas fa-cut"></i> Executar Edição</button>
+                            <button class="btn" onclick="startDNAProcess()"><i class="fas fa-play"></i> Iniciar Processo</button>
+                            <button class="btn" onclick="resetDNA()"><i class="fas fa-redo"></i> Reiniciar</button>
+                            <button class="btn" onclick="exportData('dna')"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                        <div class="log-output" id="dnaLog">
+                            <div class="log-line">Sistema genético inicializado</div>
+                            <div class="log-line">DNA helicoidal carregado</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO ECOSSISTEMAS -->
+                <div class="module-content" id="ecossistemas-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-tree"></i>
+                            <h3 class="section-title">Biomas</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item active" onclick="selectBiome('floresta')">
+                                <span class="module-icon">🌲</span>
+                                <span class="module-name">Floresta</span>
+                            </div>
+                            <div class="module-item" onclick="selectBiome('oceano')">
+                                <span class="module-icon">🌊</span>
+                                <span class="module-name">Oceano</span>
+                            </div>
+                            <div class="module-item" onclick="selectBiome('deserto')">
+                                <span class="module-icon">🏜️</span>
+                                <span class="module-name">Deserto</span>
+                            </div>
+                            <div class="module-item" onclick="selectBiome('pradaria')">
+                                <span class="module-icon">🌾</span>
+                                <span class="module-name">Pradaria</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-thermometer-half"></i>
+                            <h3 class="section-title">Fatores Ambientais</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura</span>
+                                <input type="range" min="-20" max="50" value="25" id="ecoTemp">
+                                <span class="info-slot-value" id="ecoTempValue">25°C</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Umidade</span>
+                                <input type="range" min="0" max="100" value="65" id="ecoUmidade">
+                                <span class="info-slot-value" id="ecoUmidadeValue">65%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Luz Solar</span>
+                                <input type="range" min="0" max="100" value="80" id="ecoLuz">
+                                <span class="info-slot-value" id="ecoLuzValue">80%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-users"></i>
+                            <h3 class="section-title">Populações</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Produtores</span>
+                                <span class="info-slot-value">1.2M</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Consumidores</span>
+                                <span class="info-slot-value">450K</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Decompositores</span>
+                                <span class="info-slot-value">800K</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Biodiversidade</span>
+                                <span class="info-slot-value">85%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-project-diagram"></i>
+                            <h3 class="section-title">Cadeia Alimentar</h3>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="startEcosystem()"><i class="fas fa-play"></i> Iniciar Simulação</button>
+                            <button class="btn" onclick="addSpecies()"><i class="fas fa-plus"></i> Adicionar Espécie</button>
+                            <button class="btn" onclick="exportData('ecossistema')"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                        <div class="log-output" id="ecoLog">
+                            <div class="log-line">Ecossistema florestal inicializado</div>
+                            <div class="log-line">Cadeia alimentar estabelecida</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO MICROBIOLOGIA -->
+                <div class="module-content" id="microbiologia-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-bacterium"></i>
+                            <h3 class="section-title">Placa de Petri Interativa</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Bactérias</span>
+                                <span class="info-slot-value" id="bacterias">1.5M</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Fungos</span>
+                                <span class="info-slot-value" id="fungos">800K</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Vírus</span>
+                                <span class="info-slot-value" id="virus">5M</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Interações</span>
+                                <span class="info-slot-value" id="interacoes">120/s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-vial"></i>
+                            <h3 class="section-title">Tipos de Microrganismos</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="addMicrobe('ecoli')">
+                                <span class="module-icon">🔴</span>
+                                <span class="module-name">E. coli</span>
+                            </div>
+                            <div class="module-item" onclick="addMicrobe('lacto')">
+                                <span class="module-icon">🟢</span>
+                                <span class="module-name">Lactobacillus</span>
+                            </div>
+                            <div class="module-item" onclick="addMicrobe('staph')">
+                                <span class="module-icon">🟡</span>
+                                <span class="module-name">S. aureus</span>
+                            </div>
+                            <div class="module-item" onclick="addMicrobe('influenza')">
+                                <span class="module-icon">🔵</span>
+                                <span class="module-name">Influenza</span>
+                            </div>
+                            <div class="module-item" onclick="addMicrobe('rhizopus')">
+                                <span class="module-icon">🟤</span>
+                                <span class="module-name">Rhizopus</span>
+                            </div>
+                            <div class="module-item" onclick="addMicrobe('penicillium')">
+                                <span class="module-icon">🟦</span>
+                                <span class="module-name">Penicillium</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-flask"></i>
+                            <h3 class="section-title">Condições do Meio</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">pH</span>
+                                <input type="range" min="0" max="14" value="7" step="0.1" id="microPh">
+                                <span class="info-slot-value" id="microPhValue">7.0</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura</span>
+                                <input type="range" min="0" max="60" value="37" id="microTemp">
+                                <span class="info-slot-value" id="microTempValue">37°C</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Nutrientes</span>
+                                <input type="range" min="0" max="100" value="85" id="microNutri">
+                                <span class="info-slot-value" id="microNutriValue">85%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-exchange-alt"></i>
+                            <h3 class="section-title">Tipos de Interação</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="setInteraction('simbiose')">
+                                <span class="module-icon">🤝</span>
+                                <span class="module-name">Simbiose</span>
+                            </div>
+                            <div class="module-item" onclick="setInteraction('competicao')">
+                                <span class="module-icon">⚔️</span>
+                                <span class="module-name">Competição</span>
+                            </div>
+                            <div class="module-item" onclick="setInteraction('predacao')">
+                                <span class="module-icon">🦁</span>
+                                <span class="module-name">Predação</span>
+                            </div>
+                            <div class="module-item" onclick="setInteraction('parasitismo')">
+                                <span class="module-icon">🐛</span>
+                                <span class="module-name">Parasitismo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 class="section-title">Dinâmica Populacional</h3>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn" onclick="addMicrobe('bacteria')"><i class="fas fa-plus"></i> + Bactéria</button>
+                            <button class="btn" onclick="addMicrobe('fungus')"><i class="fas fa-plus"></i> + Fungo</button>
+                            <button class="btn" onclick="addMicrobe('virus')"><i class="fas fa-plus"></i> + Vírus</button>
+                            <button class="btn primary" onclick="startInfection()"><i class="fas fa-biohazard"></i> Iniciar Infecção</button>
+                        </div>
+                        <div class="log-output" id="microLog">
+                            <div class="log-line">Placa de Petri inicializada</div>
+                            <div class="log-line">Meio de cultura preparado</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO FISIOLOGIA -->
+                <div class="module-content" id="fisiologia-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-heartbeat"></i>
+                            <h3 class="section-title">Sistema Corporal 3D</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Frequência Cardíaca</span>
+                                <span class="info-slot-value">72 bpm</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Pressão Arterial</span>
+                                <span class="info-slot-value">120/80</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Taxa Metabólica</span>
+                                <span class="info-slot-value">1600 kcal</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Oxigenação</span>
+                                <span class="info-slot-value">98%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-user-md"></i>
+                            <h3 class="section-title">Sistemas do Corpo</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="focusSystem('cardiovascular')">
+                                <span class="module-icon">❤️</span>
+                                <span class="module-name">Cardiovascular</span>
+                            </div>
+                            <div class="module-item" onclick="focusSystem('respiratorio')">
+                                <span class="module-icon">🫁</span>
+                                <span class="module-name">Respiratório</span>
+                            </div>
+                            <div class="module-item" onclick="focusSystem('nervoso')">
+                                <span class="module-icon">🧠</span>
+                                <span class="module-name">Nervoso</span>
+                            </div>
+                            <div class="module-item" onclick="focusSystem('digestorio')">
+                                <span class="module-icon">🍽️</span>
+                                <span class="module-name">Digestório</span>
+                            </div>
+                            <div class="module-item" onclick="focusSystem('imune')">
+                                <span class="module-icon">🛡️</span>
+                                <span class="module-name">Imune</span>
+                            </div>
+                            <div class="module-item" onclick="focusSystem('endocrino')">
+                                <span class="module-icon">⚖️</span>
+                                <span class="module-name">Endócrino</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 class="section-title">Sinais Vitais</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Frequência Cardíaca</span>
+                                <span class="info-slot-value">72 bpm</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Taxa Respiratória</span>
+                                <span class="info-slot-value">16 rpm</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Temperatura Corporal</span>
+                                <span class="info-slot-value">37.0°C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-stethoscope"></i>
+                            <h3 class="section-title">Diagnóstico</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Glicemia</span>
+                                <span class="info-slot-value">95 mg/dL</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Colesterol</span>
+                                <span class="info-slot-value">180 mg/dL</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Hemoglobina</span>
+                                <span class="info-slot-value">14 g/dL</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Leucócitos</span>
+                                <span class="info-slot-value">7.5K/μL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-shield-virus"></i>
+                            <h3 class="section-title">Resposta Imune</h3>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn" onclick="introducePathogen()"><i class="fas fa-virus"></i> Introduzir Patógeno</button>
+                            <button class="btn primary" onclick="activateImmunity()"><i class="fas fa-shield-alt"></i> Ativar Imunidade</button>
+                            <button class="btn" onclick="applyVaccine()"><i class="fas fa-syringe"></i> Aplicar Vacina</button>
+                        </div>
+                        <div style="margin-top: 6px; padding: 6px 8px; background: var(--color-bg-page); border-radius: 4px; font-size: 9px; color: var(--text-secondary);">
+                            Sistema imune em estado basal
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="control-row">
+                            <button class="btn primary" onclick="startPhysiology()"><i class="fas fa-play"></i> Iniciar Fisiologia</button>
+                            <button class="btn" onclick="resetPhysiology()"><i class="fas fa-redo"></i> Reiniciar</button>
+                            <button class="btn" onclick="exportData('fisiologia')"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                        <div class="log-output" id="fisioLog">
+                            <div class="log-line">Sistema fisiológico inicializado</div>
+                            <div class="log-line">Sinais vitais dentro dos parâmetros normais</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO EVOLUÇÃO -->
+                <div class="module-content" id="evolucao-content">
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-project-diagram"></i>
+                            <h3 class="section-title">Árvore Filogenética</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Gerações</span>
+                                <span class="info-slot-value" id="geracoes">1,250</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Diversidade</span>
+                                <span class="info-slot-value" id="diversidade">78%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Fitness</span>
+                                <span class="info-slot-value">0.85</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Espécies</span>
+                                <span class="info-slot-value">42</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-dna"></i>
+                            <h3 class="section-title">Mecanismos Evolutivos</h3>
+                        </div>
+                        <div class="module-list">
+                            <div class="module-item" onclick="applyMechanism('mutacao')">
+                                <span class="module-icon">⚡</span>
+                                <span class="module-name">Mutação</span>
+                            </div>
+                            <div class="module-item" onclick="applyMechanism('selecao')">
+                                <span class="module-icon">🎯</span>
+                                <span class="module-name">Seleção</span>
+                            </div>
+                            <div class="module-item" onclick="applyMechanism('deriva')">
+                                <span class="module-icon">🌊</span>
+                                <span class="module-name">Deriva</span>
+                            </div>
+                            <div class="module-item" onclick="applyMechanism('migracao')">
+                                <span class="module-icon">🚶</span>
+                                <span class="module-name">Migração</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-sliders-h"></i>
+                            <h3 class="section-title">Parâmetros Evolutivos</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Taxa de Mutação</span>
+                                <input type="range" min="0" max="100" value="10" id="evoMutacao">
+                                <span class="info-slot-value" id="evoMutacaoValue">0.01%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Pressão Seletiva</span>
+                                <input type="range" min="0" max="100" value="65" id="evoPressao">
+                                <span class="info-slot-value" id="evoPressaoValue">65%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Tamanho Populacional</span>
+                                <input type="range" min="100" max="50000" value="10000" step="100" id="evoPopulacao">
+                                <span class="info-slot-value" id="evoPopulacaoValue">10,000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-chart-bar"></i>
+                            <h3 class="section-title">Estatísticas Evolutivas</h3>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-slot">
+                                <span class="info-slot-label">Gerações</span>
+                                <span class="info-slot-value">1,250</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Diversidade</span>
+                                <span class="info-slot-value">78%</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Fitness</span>
+                                <span class="info-slot-value">0.85</span>
+                            </div>
+                            <div class="info-slot">
+                                <span class="info-slot-label">Espécies</span>
+                                <span class="info-slot-value">42</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="section-header">
+                            <i class="fas fa-microscope"></i>
+                            <h3 class="section-title">Simulador de Evolução</h3>
+                        </div>
+                        <div class="control-row">
+                            <button class="btn primary" onclick="startEvolution()"><i class="fas fa-play"></i> Iniciar Evolução</button>
+                            <button class="btn" onclick="applySelection()"><i class="fas fa-filter"></i> Pressão Seletiva</button>
+                            <button class="btn" onclick="triggerSpeciation()"><i class="fas fa-code-branch"></i> Especiação</button>
+                        </div>
+                        <div style="margin-top: 6px; padding: 6px 8px; background: var(--color-bg-page); border-radius: 4px; font-size: 9px; color: var(--text-secondary);">
+                            Pronto para simulação evolutiva
+                        </div>
+                        <div class="control-row" style="margin-top: 6px;">
+                            <button class="btn primary" onclick="executeGeneration()"><i class="fas fa-forward"></i> Executar Geração</button>
+                            <button class="btn" onclick="resetEvolution()"><i class="fas fa-redo"></i> Reiniciar</button>
+                            <button class="btn" onclick="exportData('evolucao')"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                        <div class="log-output" id="evoLog">
+                            <div class="log-line">Sistema evolutivo inicializado</div>
+                            <div class="log-line">População fundadora estabelecida</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Painel Direito: Canvas -->
+        <aside class="right-panel">
+            <div class="right-card">
+                <div class="section-header">
+                    <i class="fas fa-cube"></i>
+                    <h3 class="section-title">Visualização em Tempo Real</h3>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="mainCanvas"></canvas>
+                </div>
+
+                <div class="canvas-controls">
+                    <button class="btn primary" id="playBtn" onclick="toggleSimulation()">
+                        <i class="fas fa-play"></i> Iniciar
+                    </button>
+                    <button class="btn" onclick="resetSimulation()">
+                        <i class="fas fa-redo"></i> Reiniciar
+                    </button>
+                    <button class="btn" onclick="exportCanvas()">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                </div>
+
+                <div class="status-bar">
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-label">Status</div>
+                            <div class="status-value" id="canvasStatus">Ativo</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">FPS</div>
+                            <div class="status-value" id="canvasFPS">60</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">Elementos</div>
+                            <div class="status-value" id="canvasElements">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        // ==================== GLOBAL VARIABLES ====================
+        let canvas, ctx;
+        let isSimulating = false;
+        let currentModule = 'celulas';
+        let animationId = null;
+        let particles = [];
+        let fps = 0;
+        let lastTime = Date.now();
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            initCanvas();
+            setupModuleNavigation();
+            setupSearch();
+            setupSliders();
+            loadModule('celulas');
+            animate();
+        });
+
+        // ==================== CANVAS SETUP ====================
+        function initCanvas() {
+            canvas = document.getElementById('mainCanvas');
+            ctx = canvas.getContext('2d');
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            redrawCurrentModule();
+        }
+
+        // ==================== ANIMATION LOOP ====================
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+
+            // Calculate FPS
+            const now = Date.now();
+            fps = Math.round(1000 / (now - lastTime));
+            lastTime = now;
+            document.getElementById('canvasFPS').textContent = fps;
+
+            // Clear canvas
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw based on current module
+            switch(currentModule) {
+                case 'celulas':
+                    drawCell();
+                    break;
+                case 'dna':
+                    drawDNA();
+                    break;
+                case 'ecossistemas':
+                    drawEcosystem();
+                    break;
+                case 'microbiologia':
+                    drawMicrobes();
+                    break;
+                case 'fisiologia':
+                    drawBody();
+                    break;
+                case 'evolucao':
+                    drawEvolution();
+                    break;
+            }
+
+            // Update particles if simulating
+            if (isSimulating) {
+                updateParticles();
+            }
+        }
+
+        // ==================== DRAWING FUNCTIONS ====================
+        function drawCell() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const cellRadius = Math.min(canvas.width, canvas.height) * 0.35;
+
+            // Cell membrane
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, cellRadius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Nucleus
+            ctx.globalAlpha = 0.6;
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, cellRadius * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mitochondria
+            ctx.globalAlpha = 0.8;
+            ctx.fillStyle = '#ef4444';
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2 + Date.now() * 0.0001;
+                const x = centerX + Math.cos(angle) * cellRadius * 0.6;
+                const y = centerY + Math.sin(angle) * cellRadius * 0.6;
+                ctx.beginPath();
+                ctx.ellipse(x, y, 15, 8, angle, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Ribosomes
+            ctx.fillStyle = '#10b981';
+            for (let i = 0; i < 20; i++) {
+                const angle = (i / 20) * Math.PI * 2;
+                const radius = cellRadius * (0.4 + Math.random() * 0.3);
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.globalAlpha = 1;
+            document.getElementById('canvasElements').textContent = 26;
+        }
+
+        function drawDNA() {
+            const centerX = canvas.width / 2;
+            const startY = 20;
+            const amplitude = 40;
+            const frequency = 0.05;
+            const segments = 100;
+
+            ctx.lineWidth = 2;
+
+            for (let i = 0; i < segments; i++) {
+                const y = startY + (i / segments) * (canvas.height - 40);
+                const offset = Date.now() * 0.001;
+                const x1 = centerX + Math.sin((i * frequency) + offset) * amplitude;
+                const x2 = centerX - Math.sin((i * frequency) + offset) * amplitude;
+
+                // Strand 1
+                ctx.strokeStyle = '#3b82f6';
+                ctx.beginPath();
+                ctx.arc(x1, y, 4, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Strand 2
+                ctx.strokeStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(x2, y, 4, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Base pairs
+                if (i % 5 === 0) {
+                    ctx.strokeStyle = '#10b981';
+                    ctx.globalAlpha = 0.3;
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y);
+                    ctx.lineTo(x2, y);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+            }
+
+            document.getElementById('canvasElements').textContent = segments * 2;
+        }
+
+        function drawEcosystem() {
+            // Ground
+            ctx.fillStyle = '#047857';
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+
+            // Trees
+            ctx.fillStyle = '#78350f';
+            for (let i = 0; i < 8; i++) {
+                const x = (i / 7) * canvas.width;
+                const y = canvas.height - 80;
+                ctx.fillRect(x - 5, y, 10, 30);
+
+                // Foliage
+                ctx.fillStyle = '#10b981';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#78350f';
+            }
+
+            // Sun
+            ctx.fillStyle = '#f59e0b';
+            ctx.globalAlpha = 0.8;
+            ctx.beginPath();
+            ctx.arc(canvas.width - 50, 50, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+
+            // Animals (moving)
+            ctx.fillStyle = '#dc2626';
+            const animalX = (Date.now() * 0.05) % canvas.width;
+            ctx.beginPath();
+            ctx.arc(animalX, canvas.height - 70, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            document.getElementById('canvasElements').textContent = 17;
+        }
+
+        function drawMicrobes() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const petriRadius = Math.min(canvas.width, canvas.height) * 0.4;
+
+            // Petri dish
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, petriRadius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Microbes
+            const colors = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b'];
+            for (let i = 0; i < 30; i++) {
+                const angle = (i / 30) * Math.PI * 2 + Date.now() * 0.0002;
+                const radius = Math.random() * petriRadius * 0.8;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.globalAlpha = 0.7;
+                ctx.beginPath();
+                ctx.arc(x, y, 5 + Math.random() * 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.globalAlpha = 1;
+            document.getElementById('canvasElements').textContent = 30;
+        }
+
+        function drawBody() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Head
+            ctx.fillStyle = '#10b981';
+            ctx.globalAlpha = 0.6;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY - 80, 40, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Torso
+            ctx.fillRect(centerX - 30, centerY - 40, 60, 80);
+
+            // Heart (pulsing)
+            const heartScale = 1 + Math.sin(Date.now() * 0.005) * 0.1;
+            ctx.fillStyle = '#ef4444';
+            ctx.globalAlpha = 0.9;
+            ctx.beginPath();
+            ctx.arc(centerX - 10, centerY - 10, 15 * heartScale, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Lungs
+            ctx.fillStyle = '#3b82f6';
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.arc(centerX - 25, centerY, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(centerX + 15, centerY, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.globalAlpha = 1;
+            document.getElementById('canvasElements').textContent = 5;
+        }
+
+        function drawEvolution() {
+            const centerX = canvas.width / 2;
+            const baseY = canvas.height - 50;
+
+            // Tree trunk
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(centerX - 10, baseY - 150, 20, 150);
+
+            // Branches (evolutionary paths)
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 3;
+
+            for (let i = 0; i < 6; i++) {
+                const angle = ((i / 6) * Math.PI) - Math.PI / 2;
+                const length = 80;
+                const startY = baseY - 150 + (i * 25);
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, startY);
+                ctx.lineTo(
+                    centerX + Math.cos(angle) * length,
+                    startY + Math.sin(angle) * length
+                );
+                ctx.stroke();
+
+                // Species nodes
+                ctx.fillStyle = '#3b82f6';
+                ctx.beginPath();
+                ctx.arc(
+                    centerX + Math.cos(angle) * length,
+                    startY + Math.sin(angle) * length,
+                    8, 0, Math.PI * 2
+                );
+                ctx.fill();
+            }
+
+            document.getElementById('canvasElements').textContent = 12;
+        }
+
+        function updateParticles() {
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+
+                if (p.life <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+
+        // ==================== MODULE NAVIGATION ====================
+        function setupModuleNavigation() {
+            const moduleItems = document.querySelectorAll('.module-item[data-module]');
+            moduleItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    moduleItems.forEach(m => m.classList.remove('active'));
+                    this.classList.add('active');
+                    loadModule(this.dataset.module);
+                });
+            });
+        }
+
+        function loadModule(module) {
+            currentModule = module;
+
+            // Hide all modules
+            document.querySelectorAll('.module-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Show selected module
+            const moduleContent = document.getElementById(module + '-content');
+            if (moduleContent) {
+                moduleContent.classList.add('active');
+            }
+
+            particles = [];
+            redrawCurrentModule();
+        }
+
+        function redrawCurrentModule() {
+            // Force redraw on next frame
+        }
+
+        // ==================== SIMULATION CONTROLS ====================
+        function toggleSimulation() {
+            isSimulating = !isSimulating;
+            const btn = document.getElementById('playBtn');
+            const status = document.getElementById('canvasStatus');
+
+            if (isSimulating) {
+                btn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+                btn.classList.add('primary');
+                status.textContent = 'Simulando';
+            } else {
+                btn.innerHTML = '<i class="fas fa-play"></i> Iniciar';
+                status.textContent = 'Pausado';
+            }
+        }
+
+        function resetSimulation() {
+            isSimulating = false;
+            particles = [];
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i> Iniciar';
+            document.getElementById('canvasStatus').textContent = 'Resetado';
+            loadModule(currentModule);
+        }
+
+        function exportCanvas() {
+            const dataURL = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = `biologico_${currentModule}_${Date.now()}.png`;
+            a.click();
+        }
+
+        function exportData(module) {
+            const data = {
+                module: module,
+                timestamp: new Date().toISOString(),
+                isSimulating: isSimulating
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `biologico_${module}_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ==================== SEARCH ====================
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const items = document.querySelectorAll('.module-item[data-module]');
+                items.forEach(item => {
+                    const name = item.querySelector('.module-name').textContent.toLowerCase();
+                    item.style.display = name.includes(query) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        // ==================== SLIDERS ====================
+        function setupSliders() {
+            // Ecossistema
+            ['ecoTemp', 'ecoUmidade', 'ecoLuz'].forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    slider.addEventListener('input', function() {
+                        const value = this.value;
+                        const suffix = id === 'ecoTemp' ? '°C' : '%';
+                        document.getElementById(id + 'Value').textContent = value + suffix;
+                    });
+                }
+            });
+
+            // Microbiologia
+            ['microPh', 'microTemp', 'microNutri'].forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    slider.addEventListener('input', function() {
+                        const value = parseFloat(this.value).toFixed(id === 'microPh' ? 1 : 0);
+                        const suffix = id === 'microTemp' ? '°C' : (id === 'microNutri' ? '%' : '');
+                        document.getElementById(id + 'Value').textContent = value + suffix;
+                    });
+                }
+            });
+
+            // Evolução
+            ['evoMutacao', 'evoPressao', 'evoPopulacao'].forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    slider.addEventListener('input', function() {
+                        let value = this.value;
+                        if (id === 'evoPopulacao') {
+                            value = parseInt(value).toLocaleString();
+                        } else {
+                            value = value + '%';
+                        }
+                        document.getElementById(id + 'Value').textContent = value;
+                    });
+                }
+            });
+        }
+
+        // ==================== MODULE SPECIFIC FUNCTIONS ====================
+        function focusOrganelle(type) {
+            addLog('cellLog', `Focando organela: ${type}`);
+        }
+
+        function startCellProcesses() {
+            addLog('cellLog', 'Processos celulares iniciados');
+            isSimulating = true;
+            toggleSimulation();
+        }
+
+        function divideCell() {
+            addLog('cellLog', 'Divisão celular em progresso (mitose)');
+        }
+
+        function startGeneticProcess(type) {
+            addLog('dnaLog', `Processo genético iniciado: ${type}`);
+        }
+
+        function executeCRISPR() {
+            addLog('dnaLog', 'Edição CRISPR executada com sucesso');
+        }
+
+        function startDNAProcess() {
+            addLog('dnaLog', 'Replicação de DNA iniciada');
+        }
+
+        function resetDNA() {
+            addLog('dnaLog', 'Sistema genético reiniciado');
+        }
+
+        function selectBiome(type) {
+            addLog('ecoLog', `Bioma selecionado: ${type}`);
+        }
+
+        function startEcosystem() {
+            addLog('ecoLog', 'Simulação de ecossistema iniciada');
+            isSimulating = true;
+        }
+
+        function addSpecies() {
+            addLog('ecoLog', 'Nova espécie adicionada ao ecossistema');
+        }
+
+        function addMicrobe(type) {
+            addLog('microLog', `Microrganismo adicionado: ${type}`);
+        }
+
+        function setInteraction(type) {
+            addLog('microLog', `Tipo de interação: ${type}`);
+        }
+
+        function startInfection() {
+            addLog('microLog', 'Processo de infecção iniciado');
+            isSimulating = true;
+        }
+
+        function focusSystem(type) {
+            addLog('fisioLog', `Sistema focado: ${type}`);
+        }
+
+        function introducePathogen() {
+            addLog('fisioLog', 'Patógeno introduzido no sistema');
+        }
+
+        function activateImmunity() {
+            addLog('fisioLog', 'Sistema imune ativado');
+        }
+
+        function applyVaccine() {
+            addLog('fisioLog', 'Vacina aplicada com sucesso');
+        }
+
+        function startPhysiology() {
+            addLog('fisioLog', 'Simulação fisiológica iniciada');
+            isSimulating = true;
+        }
+
+        function resetPhysiology() {
+            addLog('fisioLog', 'Sistema fisiológico reiniciado');
+        }
+
+        function applyMechanism(type) {
+            addLog('evoLog', `Mecanismo evolutivo aplicado: ${type}`);
+        }
+
+        function startEvolution() {
+            addLog('evoLog', 'Evolução iniciada');
+            isSimulating = true;
+        }
+
+        function applySelection() {
+            addLog('evoLog', 'Pressão seletiva aplicada');
+        }
+
+        function triggerSpeciation() {
+            addLog('evoLog', 'Evento de especiação disparado');
+        }
+
+        function executeGeneration() {
+            addLog('evoLog', 'Nova geração executada');
+        }
+
+        function resetEvolution() {
+            addLog('evoLog', 'Sistema evolutivo reiniciado');
+        }
+
+        function addLog(logId, message) {
+            const logEl = document.getElementById(logId);
+            if (logEl) {
+                const line = document.createElement('div');
+                line.className = 'log-line';
+                line.textContent = message;
+                logEl.appendChild(line);
+                logEl.scrollTop = logEl.scrollHeight;
+
+                // Keep only last 10 lines
+                while (logEl.children.length > 10) {
+                    logEl.removeChild(logEl.firstChild);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

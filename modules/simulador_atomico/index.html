@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Simulador Atômico</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <i class="fa-solid fa-flask"></i>
+            <h1 class="header-title">Simulador Atômico</h1>
+        </div>
+        
+        <div class="header-center">
+            <div class="search-container">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar elementos..." autocomplete="off">
+            </div>
+        </div>
+        
+        <div class="header-right">
+			<button class="back-button" id="toGoBackBtn"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="back-button" onclick="resetSim()" title="Resetar"><i class="fa-solid fa-rotate-right"></i></button>
+            <button class="theme-toggle"><i class="fa-solid fa-sun"></i></button>
+            <button class="user-menu"><i class="fa-solid fa-user"></i></button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        
+        <section class="left-panel">
+            <div class="panel-card">
+                <div class="section-header">
+                    <i class="fa-solid fa-table-cells"></i>
+                    <div class="section-title">Elementos</div>
+                </div>
+            </div>
+            <div class="left-scroll">
+                <div id="elementsList" class="elements-list">
+                    </div>
+            </div>
+        </section>
+
+        <section class="center-panel">
+            
+            <div class="center-scroll">
+                <div class="info-card">
+                    <div class="section-header" style="margin-bottom: var(--space-md);">
+                        <i class="fa-solid fa-atom"></i>
+                        <div class="section-title">Constituintes</div>
+                    </div>
+                    
+                    <div class="particle-grid">
+                        <button class="control-btn btn-p" onclick="updPart('p', 1)">+ Próton</button>
+                        <button class="control-btn btn-p" onclick="updPart('p', -1)">- Próton</button>
+                        <button class="control-btn btn-n" onclick="updPart('n', 1)">+ Nêutron</button>
+                        <button class="control-btn btn-n" onclick="updPart('n', -1)">- Nêutron</button>
+                        <button class="control-btn btn-e" onclick="updPart('e', 1)">+ Elétron</button>
+                        <button class="control-btn btn-e" onclick="updPart('e', -1)">- Elétron</button>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-slot">
+                            <div class="info-slot-label">Prótons</div>
+                            <div class="info-slot-value" id="valP">1</div>
+                        </div>
+                        <div class="info-slot">
+                            <div class="info-slot-label">Nêutrons</div>
+                            <div class="info-slot-value" id="valN">0</div>
+                        </div>
+                        <div class="info-slot">
+                            <div class="info-slot-label">Elétrons</div>
+                            <div class="info-slot-value" id="valE">1</div>
+                        </div>
+                        <div class="info-slot">
+                            <div class="info-slot-label">Carga</div>
+                            <div class="info-slot-value" id="valC">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="section-header" style="margin-bottom: var(--space-md);">
+                        <i class="fa-solid fa-temperature-half"></i>
+                        <div class="section-title">Ambiente</div>
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Temperatura</span>
+                            <span id="lblTemp" style="color: var(--accent);">300 K</span>
+                        </div>
+                        <input type="range" id="rngTemp" min="0" max="5000" value="300" oninput="updEnv()">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Campo Magnético</span>
+                            <span id="lblMag">0 T</span>
+                        </div>
+                        <input type="range" id="rngMag" min="-10" max="10" step="0.1" value="0" oninput="updEnv()">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Radioatividade</span>
+                            <span id="lblRad">0 Bq</span>
+                        </div>
+                        <input type="range" id="rngRad" min="0" max="100" value="0" oninput="updEnv()">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>pH Ambiente</span>
+                            <span id="lblPH">7.0</span>
+                        </div>
+                        <input type="range" id="rngPH" min="0" max="14" step="0.1" value="7" oninput="updEnv()">
+                    </div>
+
+                    <div class="slider-container" style="margin-bottom: 0;">
+                        <div class="slider-header">
+                            <span>Estabilidade Nuclear</span>
+                            <span id="lblStab" style="color: var(--accent);">Estável</span>
+                        </div>
+                        <div class="stability-track">
+                            <div class="stability-marker" id="markStab" style="left: 90%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="section-header" style="margin-bottom: var(--space-md);">
+                        <i class="fa-solid fa-microscope"></i>
+                        <div class="section-title">Identificação</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-slot">
+                            <div class="info-slot-label">Elemento</div>
+                            <div class="info-slot-value" id="lblEl">Hidrogênio</div>
+                        </div>
+                        <div class="info-slot">
+                            <div class="info-slot-label">Massa Atômica</div>
+                            <div class="info-slot-value" id="lblMass">1.008 u</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="right-panel">
+            <div class="right-card">
+                <div class="tabs-row">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchView('3d', this)">
+                            <i class="fa-solid fa-cube"></i> 3D
+                        </button>
+                        <button class="tab-btn" onclick="switchView('2d', this)">
+                            <i class="fa-solid fa-circle-notch"></i> 2D (Bohr)
+                        </button>
+                        <button class="tab-btn" onclick="switchView('sp', this)">
+                            <i class="fa-solid fa-barcode"></i> Espectro
+                        </button>
+                    </div>
+                    <button class="control-btn" onclick="toggleAnim()" style="width: auto; padding: 4px 8px;">
+                        <i class="fa-solid fa-pause" id="iconAnim"></i>
+                    </button>
+                </div>
+
+                <div class="canvas-3d-container">
+                    <div id="view3D" class="view-layer active"></div>
+                    
+                    <div id="view2D" class="view-layer">
+                        <canvas id="canvas2D"></canvas>
+                    </div>
+                    
+                    <div id="viewSp" class="view-layer" style="padding: var(--space-lg);">
+                        <canvas id="chartSpec"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
