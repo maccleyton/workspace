@@ -1,0 +1,2 @@
+Simulador Gravitacional
+Plataforma de simulação de interações gravitacionais entre corpos celestes, órbitas e trajetórias planetárias em tempo real.

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Simulador Cósmico</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-title"><i class="fas fa-globe"></i> Simulador Cósmico</div>
+        <div class="header-right">
+			<button class="back-button" id="toGoBackBtn"><i class="fa-solid fa-arrow-left"></i></button>
+		</div>
+    </header>
+
+    <main class="app-main">
+        
+        <!-- 1. NAVEGAÇÃO -->
+        <aside class="panel-col">
+            <div class="panel-card">
+                <div class="section-head">Catálogo</div>
+                <div class="scroll-content" id="catalog-list"></div>
+            </div>
+        </aside>
+
+        <!-- 2. CONTROLES -->
+        <aside class="panel-col">
+            <div class="panel-card">
+                <div class="section-head" id="ctrl-header">Detalhes</div>
+                <div class="scroll-content">
+                    
+                    <!-- DETALHES GERAIS -->
+                    <div id="ctrl-general" class="module-ctrl active">
+                        <div style="font-size:14px; color:var(--accent); font-weight:bold; margin-bottom:4px;" id="det-name">Sol</div>
+                        <div style="font-size:10px; color:var(--text-tertiary); margin-bottom:10px;" id="det-type">Estrela G2V</div>
+                        <div class="info-grid">
+                            <div class="info-box"><span class="lbl">Massa</span><span class="val" id="det-mass">-</span></div>
+                            <div class="info-box"><span class="lbl">Raio</span><span class="val" id="det-radius">-</span></div>
+                            <div class="info-box"><span class="lbl">Temp/Dist</span><span class="val" id="det-extra">-</span></div>
+                        </div>
+                        <p id="det-desc" style="font-size:11px; color:#aaa; margin-top:10px; line-height:1.4;">-</p>
+                        <div id="action-container" style="margin-top:15px;"></div>
+                    </div>
+
+                    <!-- CONTROLES SISTEMA SOLAR -->
+                    <div id="ctrl-solar" class="module-ctrl">
+                        <div class="ctrl-group">
+                            <div class="ctrl-label">Velocidade</div>
+                            <input type="range" style="width:100%" min="0" max="5" step="0.1" value="1"
+                                   oninput="solarSpeed = parseFloat(this.value)">
+                        </div>
+                    </div>
+
+                    <!-- CONTROLES FUSÃO -->
+                    <div id="ctrl-fusion" class="module-ctrl">
+                        <div class="ctrl-group">
+                            <div class="ctrl-label">Temperatura (MK)</div>
+                            <input type="range" style="width:100%" min="10" max="100" value="15"
+                                   oninput="updateFusion(this.value)">
+                        </div>
+                        <div class="info-box">
+                            <span class="lbl">Nucleossíntese</span>
+                            <span class="val" id="fusion-elem" style="color:var(--accent);">Hidrogênio</span>
+                        </div>
+                    </div>
+
+                    <!-- CONTROLES CONSTRUTOR -->
+                    <div id="ctrl-builder" class="module-ctrl">
+                        <div class="ctrl-group">
+                            <div class="ctrl-label">Criar</div>
+                            <select class="ctrl-select" id="build-type">
+                                <option value="star">Estrela</option>
+                                <option value="planet">Planeta</option>
+                                <option value="blackhole">Buraco Negro</option>
+                            </select>
+                            <button class="btn-action" onclick="builderMode='add'">Selecionar</button>
+                        </div>
+                        <button class="btn-action btn-danger" onclick="resetBuilder()">Limpar</button>
+                    </div>
+
+                </div>
+            </div>
+        </aside>
+
+        <!-- 3. VISUALIZAÇÃO -->
+        <section class="panel-col">
+            <div class="panel-card">
+                <div class="tabs-row">
+                    <button class="tab-btn active" onclick="setTab('viewer')" id="btn-viewer">Visualizador</button>
+                    <button class="tab-btn" onclick="setTab('solar')" id="btn-solar">Sistema Solar</button>
+                    <button class="tab-btn" onclick="setTab('builder')" id="btn-builder">Construtor</button>
+                </div>
+                
+                <div class="canvas-wrapper">
+                    <div id="cnv-viewer" class="sim-canvas active"></div>
+                    <div id="cnv-solar" class="sim-canvas"></div>
+                    <div id="cnv-builder" class="sim-canvas"></div>
+                    <div class="overlay" id="sim-overlay">
+                        <div style="color:var(--accent); font-weight:bold; font-size:12px;">Visualizador</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

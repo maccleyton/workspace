@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Simulador Físico</title>
+    
+    <!-- Dependências Three.js (Versões estáveis) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-title"><i class="fas fa-atom"></i> Simulador Físico</div>
+		<div class="header-right">
+			<button class="back-button" id="toGoBackBtn"><i class="fa-solid fa-arrow-left"></i></button>
+		</div>	
+    </header>
+
+    <main class="app-main">
+        
+        <!-- 1. NAVEGAÇÃO (MÓDULOS) -->
+        <aside class="panel-col">
+            <div class="panel-card">
+                <div class="section-head"><i class="fas fa-layer-group"></i> Módulos</div>
+                <div class="nav-item active" onclick="setModule('fusion')">
+                    <i class="fas fa-sun"></i>
+                    <div>
+                        <div style="font-weight:600;">Fusão Nuclear</div>
+                        <div style="font-size:9px; color:var(--text-tertiary);">Plasma & Energia</div>
+                    </div>
+                </div>
+                <div class="nav-item" onclick="setModule('fission')">
+                    <i class="fas fa-radiation"></i>
+                    <div>
+                        <div style="font-weight:600;">Fissão Nuclear</div>
+                        <div style="font-size:9px; color:var(--text-tertiary);">Reatores & Controle</div>
+                    </div>
+                </div>
+                <div class="nav-item" onclick="setModule('collider')">
+                    <i class="fas fa-circle-notch"></i>
+                    <div>
+                        <div style="font-weight:600;">Colisor de Partículas</div>
+                        <div style="font-size:9px; color:var(--text-tertiary);">Alta Energia (LHC)</div>
+                    </div>
+                </div>
+                <div class="nav-item" onclick="setModule('antimatter')">
+                    <i class="fas fa-infinity"></i>
+                    <div>
+                        <div style="font-weight:600;">Antimatéria</div>
+                        <div style="font-size:9px; color:var(--text-tertiary);">Criação & Aniquilação</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. CONTROLES (DINÂMICOS) -->
+        <aside class="panel-col">
+            <div class="panel-card">
+                <div class="section-head"><i class="fas fa-sliders-h"></i> Parâmetros</div>
+                <div class="scroll-content">
+                    
+                    <!-- MÓDULO FUSÃO -->
+                    <div id="ctrl-fusion" class="module-ctrl active">
+                        <div class="ctrl-group">
+                            <div class="ctrl-label"><span>Temperatura Plasma</span><span id="val-fus-temp">15 MK</span></div>
+                            <input type="range" class="ctrl-range" min="1" max="100" value="15" oninput="updateFusionParam('temp', this.value)">
+                        </div>
+                        <div class="ctrl-group">
+                            <div style="margin-bottom:5px; font-size:10px;">Núcleos Leves (Reagentes)</div>
+                            <select class="ctrl-select" id="sel-fusion-react" onchange="updateFusionReact()">
+                                <!-- Preenchido via JS com 20+ isótopos leves -->
+                            </select>
+                        </div>
+                        <button class="btn-action" onclick="toggleSim('fusion')">Ignitar / Parar</button>
+                        
+                        <div style="margin-top:20px;">
+                            <div class="section-head" style="font-size:10px;">Métricas</div>
+                            <div class="metric-row"><span>Energia:</span><span class="metric-val" id="met-fus-eng">0 MeV</span></div>
+                            <div class="metric-row"><span>Estabilidade:</span><span class="metric-val" id="met-fus-stab">100%</span></div>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO FISSÃO -->
+                    <div id="ctrl-fission" class="module-ctrl">
+                        <div class="ctrl-group">
+                            <div class="ctrl-label"><span>Barras de Controle</span><span id="val-fis-rod">50%</span></div>
+                            <input type="range" class="ctrl-range" min="0" max="100" value="50" oninput="updateFissionParam('rod', this.value)">
+                        </div>
+                        <div class="ctrl-group">
+                            <div style="margin-bottom:5px; font-size:10px;">Combustível (Isótopos Pesados)</div>
+                            <select class="ctrl-select" id="sel-fission-fuel">
+                                <!-- Preenchido via JS com 50+ isótopos pesados -->
+                            </select>
+                        </div>
+                        <button class="btn-action" onclick="triggerFissionVisual()">Disparar Nêutron (Visual)</button>
+                        <button class="btn-action btn-danger" onclick="scramReactor()">SCRAM (Emergência)</button>
+
+                        <div style="margin-top:20px;">
+                            <div class="section-head" style="font-size:10px;">Métricas</div>
+                            <div class="metric-row"><span>Temperatura:</span><span class="metric-val" id="met-fis-temp">300°C</span></div>
+                            <div class="metric-row"><span>Nêutrons:</span><span class="metric-val" id="met-fis-neu">0/s</span></div>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO COLISOR -->
+                    <div id="ctrl-collider" class="module-ctrl">
+                        <div class="ctrl-group">
+                            <div class="ctrl-label"><span>Energia do Feixe</span><span id="val-col-eng">7 TeV</span></div>
+                            <input type="range" class="ctrl-range" min="1" max="14" step="0.1" value="7" oninput="updateColliderParam('eng', this.value)">
+                        </div>
+                        <button class="btn-action" onclick="toggleSim('collider')">Acelerar Feixes</button>
+
+                        <div style="margin-top:20px;">
+                            <div class="section-head" style="font-size:10px;">Métricas</div>
+                            <div class="metric-row"><span>Colisões:</span><span class="metric-val" id="met-col-rate">0 Hz</span></div>
+                            <div class="metric-row"><span>Eventos:</span><span class="metric-val" id="met-col-evt">0</span></div>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO ANTIMATÉRIA -->
+                    <div id="ctrl-antimatter" class="module-ctrl">
+                        <div class="ctrl-group">
+                            <div class="ctrl-label"><span>Confinamento</span><span id="val-ant-mag">10 T</span></div>
+                            <input type="range" class="ctrl-range" min="1" max="20" value="10" oninput="updateAntParam('mag', this.value)">
+                        </div>
+                        <button class="btn-action" onclick="createAntimatter()">Criar Par</button>
+                        <button class="btn-action btn-danger" onclick="annihilate()">Aniquilar Tudo</button>
+
+                        <div style="margin-top:20px;">
+                            <div class="section-head" style="font-size:10px;">Métricas</div>
+                            <div class="metric-row"><span>Partículas:</span><span class="metric-val" id="met-ant-count">0</span></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </aside>
+
+        <!-- 3. VISUALIZAÇÃO (CANVAS MÚLTIPLOS) -->
+        <section class="panel-col">
+            <div class="panel-card">
+                <div class="canvas-wrapper">
+                    <!-- Overlay Comum -->
+                    <div class="overlay-info">
+                        <div id="sim-equation" class="equation-display">D + T → He⁴ + n</div>
+                        <div style="font-size:10px; color:#aaa;" id="sim-status">Sistema em espera...</div>
+                    </div>
+                    
+                    <!-- Canvases -->
+                    <div id="canvas-fusion" class="sim-canvas active"></div>
+                    <div id="canvas-fission" class="sim-canvas"></div>
+                    <div id="canvas-collider" class="sim-canvas"></div>
+                    <div id="canvas-antimatter" class="sim-canvas"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

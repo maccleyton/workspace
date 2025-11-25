@@ -1,0 +1,2 @@
+Simulador Cósmico Avançado
+Ferramenta para modelagem e visualização de fenômenos astronômicos, evolução de galáxias e estruturas em larga escala do universo.

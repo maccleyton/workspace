@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Simulador Gravitacional 3D</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+	<header class="app-header">
+		<div class="header-title"><i class="fas fa-atom"></i> Simulador Gravitacional 3D</div>
+		<div class="header-right">
+			<button class="back-button" id="toGoBackBtn"><i class="fa-solid fa-arrow-left"></i></button>
+		</div>
+	</header>
+
+	<main class="app-main">
+		<!-- COLUNA 1: CENÁRIOS -->
+		<aside class="panel-col">
+			<div class="panel-card">
+				<div class="section-head">Cenários de Simulação</div>
+				<div class="scroll-content" id="scenario-list"></div>
+			</div>
+		</aside>
+
+		<!-- COLUNA 2: DETALHES E CONTROLES -->
+		<aside class="panel-col">
+			<div class="panel-card">
+				<div class="section-head">Controles Globais</div>
+				<div class="scroll-content">
+					<div id="scenario-details">
+						<div style="font-size:13px; font-weight:600; color:var(--accent);" id="sc-name">–</div>
+						<div style="font-size:10px; color:var(--text-tertiary); margin-top:2px;" id="sc-type">–</div>
+						<p id="sc-desc" style="font-size:11px; color:var(--text-secondary); margin-top:8px; line-height:1.4;"></p>
+						<div class="info-grid">
+							<div class="info-box"><span class="lbl">Corpos</span><span class="val" id="info-count">0</span></div>
+							<div class="info-box"><span class="lbl">Simulação</span><span class="val" id="info-state">Pausada</span></div>
+						</div>
+					</div>
+					<div class="ctrl-group">
+						<div class="ctrl-label"><span>Intensidade G</span><span id="lbl-g">1.0x</span></div>
+						<input class="ctrl-range" type="range" min="0.1" max="2" step="0.1" value="1" oninput="setGravityScale(this.value)">
+					</div>
+					<div class="ctrl-group">
+						<div class="ctrl-label"><span>Escala de Tempo</span><span id="lbl-time">1.0x</span></div>
+						<input class="ctrl-range" type="range" min="0.2" max="3" step="0.1" value="1" oninput="setTimeScale(this.value)">
+					</div>
+					<button class="btn-action" onclick="toggleSimulation()" id="btn-play">Iniciar</button>
+					<button class="btn-action alt" onclick="resetCurrentScenario()">Reiniciar Cenário</button>
+					<button class="btn-action" style="background:var(--info); color:#fff;" onclick="addRandomPlanet()">Adicionar Planeta Aleatório</button>
+					<button class="btn-action danger" onclick="clearAllBodies()">Limpar Tudo</button>
+				</div>
+			</div>
+		</aside>
+
+		<!-- COLUNA 3: CANVAS 3D -->
+		<section class="panel-col">
+			<div class="panel-card">
+				<div class="tabs-row">
+					<button class="tab-btn active" id="tab-sim" onclick="setView('sim')">Simulação 3D</button>
+					<button class="tab-btn" id="tab-chart" onclick="setView('chart')">Energia do Sistema</button>
+				</div>
+				<div class="canvas-wrapper">
+					<div id="cnv-sim" class="sim-canvas active"></div>
+					<div id="cnv-chart" class="sim-canvas"><canvas id="energy-chart"></canvas></div>
+					<div class="overlay" id="ov-label">Simulação 3D</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script src="script.js"></script>
+</body>
+</html>
