@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Knowledge Assistant</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header com botões de funcionalidades -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="logo">
+                    <h1>🤖 Knowledge Assistant</h1>
+                    <div class="status">
+                        <span class="status-dot"></span>
+                        <span>Online</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="function-buttons">
+                    <button class="func-btn active" data-function="chat">
+                        <span class="func-icon">💬</span>
+                        <span class="func-text">Chat Geral</span>
+                    </button>
+                    <button class="func-btn" data-function="weather">
+                        <span class="func-icon">🌤️</span>
+                        <span class="func-text">Clima</span>
+                    </button>
+                    <button class="func-btn" data-function="calculator">
+                        <span class="func-icon">🧮</span>
+                        <span class="func-text">Calculadora</span>
+                    </button>
+                    <button class="func-btn" data-function="timers">
+                        <span class="func-icon">⏰</span>
+                        <span class="func-text">Timers</span>
+                    </button>
+                    <button class="func-btn" data-function="search">
+                        <span class="func-icon">🔍</span>
+                        <span class="func-text">Pesquisar</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <button class="header-btn" id="clearBtn" title="Limpar conversa">
+                    <span class="btn-icon">🗑️</span>
+                    <span class="btn-text">Limpar</span>
+                </button>
+                <button class="header-btn" id="helpBtn" title="Ajuda">
+                    <span class="btn-icon">❓</span>
+                    <span class="btn-text">Ajuda</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Área principal expandida -->
+        <main class="main-content-expanded">
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome-message">
+                    <h2>👋 Olá! Eu sou o Knowledge Assistant</h2>
+                    <p>Pronto para ajudar com estudos, códigos, cálculos, clima e muito mais!</p>
+                    <div class="welcome-features">
+                        <div class="feature">
+                            <span class="feature-icon">💬</span>
+                            <span>Chat inteligente</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">🧮</span>
+                            <span>Calculadora</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">🌤️</span>
+                            <span>Previsão do tempo</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">⏰</span>
+                            <span>Timers e alarmes</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">🔍</span>
+                            <span>Pesquisa web</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="userInput" placeholder="Digite sua mensagem ou comando..." rows="3"></textarea>
+                    <div class="button-group">
+                        <button id="voiceBtn" class="voice-btn" title="Ativar voz">
+                            <span class="btn-icon">🎤</span>
+                        </button>
+                        <button id="sendBtn" class="send-btn" title="Enviar mensagem">
+                            <span class="btn-icon">📤</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar de anotações (opcional - pode ser recolhida) -->
+        <aside class="annotations-sidebar collapsible">
+            <div class="annotations-header">
+                <h3>📝 Anotações</h3>
+                <button class="collapse-btn" id="collapseNotes">◀</button>
+            </div>
+            <div class="annotations-content">
+                <div class="empty-notes">
+                    <p>Nenhuma anotação ainda</p>
+                    <small>Clique em "+ Nova Anotação" para começar</small>
+                </div>
+            </div>
+            <div class="annotations-footer">
+                <button class="new-annotation-btn">
+                    <span class="btn-icon">+</span>
+                    <span class="btn-text">Nova Anotação</span>
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/storage.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/hub-api-assistant.js"></script>
+    <script type="module" src="js/speech.js"></script>
+    <script type="module" src="js/annotations.js"></script>
+    <script type="module" src="js/calculator.js"></script>
+    <script type="module" src="js/weather.js"></script>
+    <script type="module" src="js/timers.js"></script>
+    <script type="module" src="js/search.js"></script>
+    <script type="module" src="js/assistant.js"></script>    
+</body>
+</html>

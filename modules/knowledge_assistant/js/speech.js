@@ -69,7 +69,7 @@ function initSpeechRecognition() {
 }
 
 // Iniciar/parar reconhecimento
-function toggleVoiceRecognition() {
+export function toggleVoiceRecognition() {
     if (!recognition) {
         if (!initSpeechRecognition()) {
             alert('❌ Reconhecimento de voz não suportado.\n\nFunciona apenas no Chrome e Edge.');

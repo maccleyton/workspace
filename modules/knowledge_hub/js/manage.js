@@ -1,20 +1,12 @@
-// ======================================================
-// =============== IMPORTAÇÃO DA API =====================
-// ======================================================
-import { getDoc, listDocs, linkDoc, unlinkDoc, createDoc } from "./hub-api.js";
+import { getDoc, getDocs, linkDoc, unlinkDoc, createDoc, getLinks } from "./hub-api.js";
 
-// ======================================================
-// ==================== ESTADO ==========================
-// ======================================================
 let parentId = null;
 let parentDoc = null;
 let allDocs = [];
-let selectedChildId = null; // documento escolhido para vínculo
-let uploadedFile = null;    // upload de arquivo
+let selectedChildId = null;
+let uploadedFile = null;
+let childLinks = []; // armazenar objetos de links do backend { id, child_id, parent_id }
 
-// ======================================================
-// ===================== INICIALIZAÇÃO ===================
-// ======================================================
 window.addEventListener("DOMContentLoaded", initManage);
 
 async function initManage() {
@@ -27,34 +19,27 @@ async function initManage() {
     bindUIEvents();
 
     await loadParentDocument();
-    await loadAllDocs();
+    await loadAllDocs();      // Carrega todos os docs para o modal
+    await loadChildLinks();    // Carrega APENAS os links deste pai
     renderParentData();
     renderChildren();
     renderExistingDocs();
 }
 
-// ======================================================
-// ===================== BUSCAR ID =======================
-// ======================================================
 function getDocumentIdFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get("id");
 }
 
-// ======================================================
-// ===================== UI EVENTS =======================
-// ======================================================
 function bindUIEvents() {
     document.getElementById("btnOpenModal").addEventListener("click", openAddModal);
     document.getElementById("btnCloseModal").addEventListener("click", closeAddModal);
     document.getElementById("btnCancel").addEventListener("click", closeAddModal);
     document.getElementById("btnConfirm").addEventListener("click", confirmAddChild);
 
-    // Tabs
     document.getElementById("tabExistingBtn").addEventListener("click", () => switchTab("existing"));
     document.getElementById("tabUploadBtn").addEventListener("click", () => switchTab("upload"));
 
-    // Upload
     document.getElementById("uploadArea").addEventListener("click", () => {
         document.getElementById("fileInput").click();
     });
@@ -62,9 +47,6 @@ function bindUIEvents() {
     document.getElementById("fileInput").addEventListener("change", handleFileUpload);
 }
 
-// ======================================================
-// =============== CARREGAR DOCUMENTO PAI ================
-// ======================================================
 async function loadParentDocument() {
     try {
         parentDoc = await getDoc(parentId);
@@ -74,70 +56,83 @@ async function loadParentDocument() {
     }
 }
 
-// ======================================================
-// =============== CARREGAR TODOS DOCUMENTOS =============
-// ======================================================
 async function loadAllDocs() {
     try {
-        allDocs = await listDocs();
+        allDocs = await getDocs();
     } catch (err) {
         console.error(err);
         alert("Erro ao carregar documentos.");
     }
 }
 
-// ======================================================
-// =============== RENDERIZAR DADOS DO PAI ===============
-// ======================================================
+async function loadChildLinks() {
+    try {
+        childLinks = await getLinks(parentId);
+    } catch (err) {
+        console.error("Erro ao carregar os vínculos:", err);
+        alert("Erro ao carregar os vínculos.");
+        childLinks = []; // Garante que não quebre a renderização
+    }
+}
+
+// =================================================================
+// CORREÇÃO 1: Extrair H1 e renderizar com Marked para o título principal
+// =================================================================
 function renderParentData() {
-    document.getElementById("docTitle").textContent = parentDoc.title;
+    // Extrai o primeiro H1 do conteúdo, igual ao index.js
+    const lines = parentDoc.content ? parentDoc.content.split("\n") : [];
+    const h1Line = lines.find(l => l.trim().startsWith("#")) || "";
+    const h1Title = h1Line.replace(/^#+\s*/, "").trim();
+    const displayTitle = h1Title || parentDoc.title;
+
+    // Usa innerHTML com marked.parse para renderizar a formatação (ex: **negrito**)
+    document.getElementById("docTitle").innerHTML = marked.parse(displayTitle);
     document.getElementById("docMeta").textContent =
         "Atualizado: " + new Date(parentDoc.updated_at).toLocaleString("pt-BR");
 }
 
-// ======================================================
-// ============ RENDERIZAR FILHOS DO DOCUMENTO ===========
-// ======================================================
+// =================================================================
+// CORREÇÃO 2: Ajustar HTML para o botão "Remover" funcionar com o CSS
+// =================================================================
 function renderChildren() {
     const list = document.getElementById("childrenList");
     list.innerHTML = "";
 
-    const children = allDocs.filter(d => d.parent_id === parentId);
-
-    if (children.length === 0) {
-        list.innerHTML = `
-            <p class="empty-text">Nenhum documento filho vinculado.</p>
-        `;
+    if (childLinks.length === 0) {
+        list.innerHTML = `<p class="empty-text">Nenhum documento filho vinculado.</p>`;
         return;
     }
 
-    children.forEach(child => {
+    childLinks.forEach(link => {
+        const child = allDocs.find(d => d.id === link.child_id);
+        if (!child) return;
+
         const item = document.createElement("div");
         item.className = "child-item";
 
+        // HTML corrigido para corresponder ao CSS
         item.innerHTML = `
-            <div>
-                <strong>${child.title}</strong><br>
-                <small>${new Date(child.updated_at).toLocaleString("pt-BR")}</small>
+            <div class="child-info">
+                <div class="child-title">${child.title}</div>
+                <div class="child-date">${new Date(child.updated_at).toLocaleString("pt-BR")}</div>
             </div>
-            <button class="remove-child-btn">Remover</button>
+            <div class="child-actions">
+                <button class="action-btn action-btn-danger">Remover</button>
+            </div>
         `;
 
-        item.querySelector(".remove-child-btn").addEventListener("click", () => handleUnlink(child.id));
+        item.querySelector(".action-btn-danger").addEventListener("click", () => handleUnlink(link.id));
 
         list.appendChild(item);
     });
 }
 
-// ======================================================
-// ============== REMOVER VÍNCULO PAI → FILHO ============
-// ======================================================
-async function handleUnlink(id) {
+async function handleUnlink(linkId) {
     if (!confirm("Remover este vínculo?")) return;
 
     try {
-        await unlinkDoc(id);
-        await loadAllDocs();
+        await unlinkDoc(linkId);
+        await loadChildLinks();
         renderChildren();
         renderExistingDocs();
     } catch (err) {
@@ -146,9 +141,6 @@ async function handleUnlink(id) {
     }
 }
 
-// ======================================================
-// ============== RENDERIZAR LISTA DE DOCUMENTOS =========
-// ======================================================
 function renderExistingDocs() {
     const grid = document.getElementById("existingDocsGrid");
     grid.innerHTML = "";
@@ -156,13 +148,18 @@ function renderExistingDocs() {
     const docs = allDocs.filter(d => d.id !== parentId);
 
     docs.forEach(doc => {
+        const lines = doc.content ? doc.content.split("\n") : [];
+        const h1Line = lines.find(l => l.trim().startsWith("#")) || "";
+        const h1Title = h1Line.replace(/^#+\s*/, "").trim();
+        const displayTitle = h1Title || doc.title;
+
         const card = document.createElement("div");
-        card.className = "existing-doc-card";
+        card.className = "existing-doc-card"; // Mantive a classe original, mas o CSS usa .doc-card. Se quiser o estilo, troque aqui.
         card.dataset.id = doc.id;
 
         card.innerHTML = `
-            <div class="doc-title">${doc.title}</div>
-            <div class="doc-meta">${new Date(doc.updated_at).toLocaleString("pt-BR")}</div>
+            <div class="doc-card-title">${displayTitle}</div>
+            <div class="doc-card-date">${new Date(doc.updated_at).toLocaleString("pt-BR")}</div>
         `;
 
         card.addEventListener("click", () => selectExistingDoc(doc.id));
@@ -171,9 +168,6 @@ function renderExistingDocs() {
     });
 }
 
-// ======================================================
-// ============= SELECIONAR DOC EXISTENTE ===============
-// ======================================================
 function selectExistingDoc(id) {
     selectedChildId = id;
 
@@ -183,13 +177,9 @@ function selectExistingDoc(id) {
     const card = document.querySelector(`.existing-doc-card[data-id="${id}"]`);
     if (card) card.classList.add("selected");
 
-    // ativa botão de confirmar
     document.getElementById("btnConfirm").style.display = "inline-flex";
 }
 
-// ======================================================
-// ======================= MODAL =========================
-// ======================================================
 function openAddModal() {
     selectedChildId = null;
     uploadedFile = null;
@@ -198,7 +188,6 @@ function openAddModal() {
     document.getElementById("btnConfirm").style.display = "none";
 
     switchTab("existing");
-
     document.getElementById("addChildModal").style.display = "flex";
 }
 
@@ -206,9 +195,6 @@ function closeAddModal() {
     document.getElementById("addChildModal").style.display = "none";
 }
 
-// ======================================================
-// ============== TROCAR ENTRE TABS =====================
-// ======================================================
 function switchTab(tab) {
     if (tab === "existing") {
         document.getElementById("tabExisting").classList.add("active");
@@ -225,26 +211,16 @@ function switchTab(tab) {
     }
 }
 
-// ======================================================
-// ================ UPLOAD DE NOVO DOC ===================
-// ======================================================
 function handleFileUpload(event) {
     uploadedFile = event.target.files[0] || null;
-
-    if (uploadedFile) {
-        document.getElementById("btnConfirm").style.display = "inline-flex";
-    }
+    if (uploadedFile) document.getElementById("btnConfirm").style.display = "inline-flex";
 }
 
-// ======================================================
-// ================= CONFIRMAR AÇÃO ======================
-// ======================================================
 async function confirmAddChild() {
-    // Caso 1 → documento existente
     if (selectedChildId) {
         try {
-            await linkDoc(selectedChildId, parentId);
-            await loadAllDocs();
+            await linkDoc(parentId, selectedChildId);
+            await loadChildLinks();
             renderChildren();
             renderExistingDocs();
             closeAddModal();
@@ -255,16 +231,17 @@ async function confirmAddChild() {
         }
     }
 
-    // Caso 2 → upload
     if (uploadedFile) {
         try {
             const content = await uploadedFile.text();
             const title = extractH1(content) || uploadedFile.name;
 
             const newDoc = await createDoc({ title, content });
-            await linkDoc(newDoc.id, parentId);
-
-            await loadAllDocs();
+            allDocs.push(newDoc);
+            
+            await linkDoc(parentId, newDoc.id);
+            
+            await loadChildLinks();
             renderChildren();
             renderExistingDocs();
             closeAddModal();
@@ -278,9 +255,6 @@ async function confirmAddChild() {
     alert("Selecione um documento ou envie um arquivo.");
 }
 
-// ======================================================
-// ======== UTIL: extrair título do markdown ============
-// ======================================================
 function extractH1(md) {
     const match = md.match(/^#\s+(.+)/m);
     return match ? match[1].trim() : null;

@@ -387,7 +387,7 @@ function goBackToHub() {
 }
 
 function goToAssistant() {
-    window.location.href = "assistant.html";
+    window.location.href = "../Knowledge_assistant/index.html";
 }
 
 function openSettings() {

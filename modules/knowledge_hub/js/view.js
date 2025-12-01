@@ -1,3 +1,5 @@
+//view.js
+
 // ======================================================
 // =============== IMPORTAÇÃO DA API =====================
 // ======================================================
@@ -313,5 +315,10 @@ function exportPDF() {
     window.print();
 }
 
+function goToAssistant() {
+    window.location.href = "../Knowledge_assistant/index.html";
+}
+
 window.printDoc = printDoc;
 window.exportPDF = exportPDF;
+window.goToAssistant = goToAssistant;

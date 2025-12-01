@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workspace - Knowledge Assistant</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./css/style.css">
+	<script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 </head>
 <body>
 
@@ -74,11 +75,15 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/storage.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/speech.js"></script>
-    <script src="js/assistant.js"></script>
-    <script src="js/annotations.js"></script>
-
+	<script type="module" src="js/storage.js"></script>
+	<script type="module" src="js/api.js"></script>
+	<script type="module" src="js/hub-api-assistant.js"></script> <!-- Necessário para a busca -->
+	<script type="module" src="js/speech.js"></script>
+	<script type="module" src="js/annotations.js"></script>
+	<script type="module" src="js/calculator.js"></script>
+	<script type="module" src="js/weather.js"></script>
+	<script type="module" src="js/timers.js"></script>
+	<script type="module" src="js/search.js"></script>
+	<script type="module" src="js/assistant.js"></script>	
 </body>
 </html>

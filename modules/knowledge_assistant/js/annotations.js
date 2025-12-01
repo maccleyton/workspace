@@ -1,4 +1,4 @@
-class AnnotationsManager {
+export class AnnotationsManager {
     constructor() {
         this.annotations = this.loadAnnotations();
         this.currentAnnotationId = null;

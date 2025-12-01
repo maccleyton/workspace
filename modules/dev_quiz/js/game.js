@@ -1,3 +1,8 @@
+// game.js
+
+// Importação da API
+import { generateQuestions, submitScore, getRanking, generateFeedback, validateCode } from './quiz-api.js';
+
 // Estado do jogo
 const gameState = {
     score: 100,
@@ -10,8 +15,7 @@ const gameState = {
     mode: '',
     selectedAnswer: null,
     playerName: '',
-    timer: null,
-    lastEntryId: null
+    timer: null
 };
 
 // Elementos DOM
@@ -54,10 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Filtros de ranking
     document.querySelectorAll('.filter-tab').forEach(tab => {
-        tab.addEventListener('click', (e) => {
+        tab.addEventListener('click', async (e) => {
             document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
             e.target.classList.add('active');
-            displayRanking(e.target.dataset.language);
+            displayRanking(await getRanking(e.target.dataset.language));
         });
     });
 });
@@ -92,7 +96,7 @@ async function startGame() {
         
     } catch (error) {
         console.error(error);
-        alert('❌ Erro ao gerar questões. Verifique sua API key do Gemini.');
+        alert('❌ Erro ao gerar questões. Verifique a conexão com o servidor.');
         showScreen('start');
     }
 }
@@ -107,17 +111,21 @@ function loadQuestion() {
     elements.submitAnswer.disabled = false;
     gameState.selectedAnswer = null;
     
-    // Parar timer anterior se existir
     if (gameState.timer) {
         gameState.timer.stop();
     }
     
     let html = '';
     
+    // AJUSTE: Define o tempo com base no modo
+    let timerDuration = 60;
+    if (gameState.mode === 'erro') timerDuration = 120;
+    if (gameState.mode === 'codigo' || gameState.mode === 'corrigir') timerDuration = 180;
+
     if (gameState.mode === 'multipla' || gameState.mode === 'erro') {
         html = `
             <div class="timer-container">
-                <div class="timer-display" id="timerDisplay">60</div>
+                <div class="timer-display" id="timerDisplay">${timerDuration}</div>
             </div>
             <h2 class="question-title">${question.question}</h2>
             ${question.code ? `<div class="code-block">${escapeHtml(question.code)}</div>` : ''}
@@ -134,25 +142,25 @@ function loadQuestion() {
             document.querySelectorAll('.option').forEach(opt => {
                 opt.addEventListener('click', selectOption);
             });
-            startQuestionTimer();
+            startQuestionTimer(timerDuration);
         }, 100);
         
     } else if (gameState.mode === 'codigo') {
         html = `
             <div class="timer-container">
-                <div class="timer-display" id="timerDisplay">60</div>
+                <div class="timer-display" id="timerDisplay">${timerDuration}</div>
             </div>
             <h2 class="question-title">${question.question}</h2>
             <p style="margin: 15px 0; color: #666;">${question.task}</p>
             <textarea class="code-input" id="codeAnswer" placeholder="Digite seu código aqui..."></textarea>
         `;
         
-        setTimeout(startQuestionTimer, 100);
+        setTimeout(() => startQuestionTimer(timerDuration), 100);
         
     } else if (gameState.mode === 'corrigir') {
         html = `
             <div class="timer-container">
-                <div class="timer-display" id="timerDisplay">60</div>
+                <div class="timer-display" id="timerDisplay">${timerDuration}</div>
             </div>
             <h2 class="question-title">${question.question}</h2>
             <p style="margin: 15px 0; color: #666;">O código deveria: ${question.expectedBehavior}</p>
@@ -161,18 +169,18 @@ function loadQuestion() {
             <textarea class="code-input" id="codeAnswer" placeholder="Cole e corrija o código aqui...">${question.buggyCode}</textarea>
         `;
         
-        setTimeout(startQuestionTimer, 100);
+        setTimeout(() => startQuestionTimer(timerDuration), 100);
     }
     
     elements.questionContainer.innerHTML = html;
 }
 
 // Iniciar timer da questão
-function startQuestionTimer() {
+function startQuestionTimer(duration) {
     const timerDisplay = document.getElementById('timerDisplay');
     
     gameState.timer = new QuestionTimer(
-        60,
+        duration,
         (remaining) => {
             timerDisplay.textContent = remaining;
             if (remaining <= 10) {
@@ -262,9 +270,12 @@ async function submitAnswer() {
             const result = await validateCode(userCode, question.task, gameState.language);
             isCorrect = result.correct;
             feedback = result.feedback;
-        } else {
-            isCorrect = Validator.compareCode(userCode, question.correctCode);
-            feedback = isCorrect ? question.explanation : `Código incorreto. ${question.explanation}`;
+        } else { // modo 'corrigir'
+            // Validação simples no frontend como fallback
+            const isCorrectSimple = Validator.compareCode(userCode, question.correctCode);
+            const result = await validateCode(userCode, question.task, gameState.language);
+            isCorrect = result.correct || isCorrectSimple; // Aceita se a IA ou a validação simples concordar
+            feedback = result.feedback || (isCorrectSimple ? question.explanation : `Código incorreto. ${question.explanation}`);
         }
     }
     
@@ -313,7 +324,7 @@ function nextQuestionHandler() {
 }
 
 // Mostrar game over
-function showGameOver() {
+async function showGameOver() {
     if (gameState.timer) {
         gameState.timer.stop();
     }
@@ -328,20 +339,24 @@ function showGameOver() {
     document.getElementById('finalScore').textContent = gameState.score;
     
     // Salvar no ranking mesmo com game over
-    gameState.lastEntryId = rankingSystem.saveScore(
-        gameState.playerName,
-        gameState.score,
-        gameState.language,
-        gameState.mode,
-        gameState.correctAnswers,
-        gameState.wrongAnswers
-    );
+    try {
+        await submitScore(
+            gameState.playerName,
+            gameState.score,
+            gameState.language,
+            gameState.mode,
+            gameState.correctAnswers,
+            gameState.wrongAnswers
+        );
+    } catch (error) {
+        console.error("Erro ao salvar pontuação:", error);
+    }
     
     showScreen('gameOver');
 }
 
 // Mostrar resultados finais
-function showResults() {
+async function showResults() {
     if (gameState.timer) {
         gameState.timer.stop();
     }
@@ -358,21 +373,23 @@ function showResults() {
     const classification = classifications.find(c => gameState.score >= c.min);
     
     // Salvar no ranking
-    const position = rankingSystem.saveScore(
-        gameState.playerName,
-        gameState.score,
-        gameState.language,
-        gameState.mode,
-        gameState.correctAnswers,
-        gameState.wrongAnswers
-    );
+    try {
+        await submitScore(
+            gameState.playerName,
+            gameState.score,
+            gameState.language,
+            gameState.mode,
+            gameState.correctAnswers,
+            gameState.wrongAnswers
+        );
+    } catch (error) {
+        console.error("Erro ao salvar pontuação:", error);
+        alert("Não foi possível salvar sua pontuação no ranking.");
+    }
     
     document.getElementById('resultScore').textContent = gameState.score;
     document.getElementById('resultTitle').textContent = classification.title;
-    document.getElementById('resultMessage').innerHTML = `
-        ${classification.message}<br><br>
-        <strong>Sua posição no ranking: #${position}</strong>
-    `;
+    document.getElementById('resultMessage').innerHTML = classification.message;
     document.getElementById('correctAnswers').textContent = gameState.correctAnswers;
     document.getElementById('wrongAnswers').textContent = gameState.wrongAnswers;
     
@@ -380,14 +397,19 @@ function showResults() {
 }
 
 // Mostrar tela de ranking
-function showRankingScreen() {
-    displayRanking('all');
+async function showRankingScreen() {
+    try {
+        const ranking = await getRanking('all');
+        displayRanking(ranking);
+    } catch (error) {
+        console.error("Erro ao carregar ranking:", error);
+        elements.rankingList.innerHTML = '<p>Erro ao carregar ranking.</p>';
+    }
     showScreen('ranking');
 }
 
 // Exibir ranking
-function displayRanking(language = 'all') {
-    const ranking = rankingSystem.getRankingByLanguage(language);
+function displayRanking(ranking) {
     const container = elements.rankingList;
     
     if (ranking.length === 0) {
@@ -419,10 +441,10 @@ function displayRanking(language = 'all') {
                 ${medal}
                 <div class="ranking-position ${positionClass}">#${position}</div>
                 <div class="ranking-details">
-                    <div class="ranking-name">${escapeHtml(entry.playerName)}</div>
+                    <div class="ranking-name">${escapeHtml(entry.player_name)}</div>
                     <div class="ranking-info">
                         ${entry.language.toUpperCase()} • ${modeNames[entry.mode]} • 
-                        ${entry.correctAnswers} acertos • ${entry.dateFormatted}
+                        ${entry.correct_answers} acertos • ${new Date(entry.created_at + 'Z').toLocaleDateString('pt-BR')}
                     </div>
                 </div>
                 <div class="ranking-score">${entry.score}</div>
@@ -444,7 +466,7 @@ function resetGame() {
     }
     
     elements.score.textContent = 100;
-    elements.playerName.value = gameState.playerName; // Manter o nome
+    elements.playerName.value = gameState.playerName;
     
     showScreen('start');
 }
@@ -467,4 +489,57 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Classe de Timer (movida para cá)
+class QuestionTimer {
+    constructor(duration, onTick, onComplete) {
+        this.duration = duration;
+        this.remaining = duration;
+        this.onTick = onTick;
+        this.onComplete = onComplete;
+        this.interval = null;
+        this.isRunning = false;
+    }
+    
+    start() {
+        if (this.isRunning) return;
+        
+        this.isRunning = true;
+        this.remaining = this.duration;
+        this.onTick(this.remaining);
+        
+        this.interval = setInterval(() => {
+            this.remaining--;
+            this.onTick(this.remaining);
+            
+            if (this.remaining <= 0) {
+                this.stop();
+                this.onComplete();
+            }
+        }, 1000);
+    }
+    
+    stop() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+        this.isRunning = false;
+    }
+}
+
+// Classe de Validador (fallback)
+class Validator {
+    static compareCode(userCode, correctCode) {
+        const normalize = (code) => {
+            return code
+                .replace(/\s+/g, ' ')
+                .replace(/;\s*/g, ';')
+                .trim()
+                .toLowerCase();
+        };
+        
+        return normalize(userCode) === normalize(correctCode);
+    }
 }
