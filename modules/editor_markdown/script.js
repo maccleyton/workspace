@@ -593,7 +593,7 @@ document.getElementById('toGoBackBtn').addEventListener('click', toGoBack);
 
 function toGoBack() {
 	const base = window.location.origin;
-	window.location.href = "../index.html";
+	window.location.href = "../../index.html";
 }
 
 // Close settings on overlay click
