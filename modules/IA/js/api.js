@@ -1,5 +1,5 @@
 // Integração com APIs de IA
-const GEMINI_API_KEY = 'AIzaSyA5qaWZShe5PR3k6wbOv7nZtIPUJh76jJ8';
+const GEMINI_API_KEY = '';
 const GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 
 // Enviar mensagem para Gemini AI
@@ -63,7 +63,7 @@ async function sendToAI(userMessage, conversationHistory) {
 
 // Buscar clima usando API gratuita
 async function buscarClima(cidade) {
-    const API_KEY = '851bc390fc1ab37cbb74fb828a901007'; // Gratuita em: https://openweathermap.org/api
+    const API_KEY = ''; // Gratuita em: https://openweathermap.org/api
     
     if (!API_KEY || API_KEY === 'SUA_CHAVE_OPENWEATHERMAP') {
         return '⚠️ API de clima não configurada. Pegue uma chave gratuita em:\nhttps://openweathermap.org/api';
